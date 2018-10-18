@@ -57,6 +57,10 @@
 			<div class="textInfo">
 				<textarea rows="" cols="" id="content" placeholder="请输入请假详细理由...（200字以内）"></textarea>
 			</div>
+			<div style="padding:10px 2%;border-bottom:1px solid #e9e9e9;">
+				<img id="imageClose" class="showImageBox" alt="插入图片" src="{OSSURL}public/mobile/img/imageClose.png" width="30" height="30" onclick="showBox('image')">
+				<img id="imageOpen" class="showImageBox" alt="插入图片" src="{OSSURL}public/mobile/img/imageOpen.png" width="30" height="30" onclick="showBox('image')">
+			</div>
 			<div class="msgSubmit">
 				{if !empty($techers[$tid]['tname'])}<button class="mainColor" onclick="sendSubmitBtn();">发送</button>{/if}
 			</div>
