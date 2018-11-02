@@ -17,22 +17,37 @@
 		$it = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where weid = :weid AND id=:id ORDER BY id DESC", array(':weid' => $weid, ':id' => $userid['id']));
 		$tid_global = $it['tid'];
 		if($it){
+			
+			$bj_t = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
+			$nj_t = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
+			$bj_str_temp = '0,';
+			foreach($bj_t as $key_b=>$value_b){
+				$bj_str_temp .=$value_b['sid'].",";
+			}
+			$bj_str = trim($bj_str_temp,",");
+			$nj_str_temp = '0,';
+			foreach($nj_t as $key_n=>$value_n){
+				$nj_str_temp .=$value_n['sid'].",";
+			}
+			$nj_str = trim($nj_str_temp,",");
+			
 			$teacher = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " WHERE schoolid = :schoolid And id = :id", array(':schoolid' => $schoolid,':id' => $it['tid']));
 			
-				//若为校长 {if $teacher['status'] == 2 ||  is_njzr($teacher['id']) }
-				if($teacher['status'] ==2 && !(is_njzr($teacher['id']))){
-					$listAll = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}' And xq_id ='{$nj_id}'  ORDER BY end DESC, xq_id DESC");
-					$AllNJ = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}' AND type='semester'  ORDER BY  CONVERT(sname USING gbk) ASC");
-					//var_dump($AllNJ);
-				}elseif($teacher['status'] != 2 && is_njzr($teacher['id'])){
-					$AllNJ = getallnj($teacher['id']);
-					$listAll = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}' And xq_id ='{$nj_id}'  ORDER BY end DESC, xq_id DESC");
-				}
+			//若为校长 {if $teacher['status'] == 2 ||  is_njzr($teacher['id']) }
+			if($teacher['status'] ==2 && !(is_njzr($teacher['id']))){
+				$listAll = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}' And xq_id ='{$nj_id}' and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}')  ORDER BY end DESC, xq_id DESC");
+				$AllNJ = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}' AND type='semester' and is_over != 2  ORDER BY  CONVERT(sname USING gbk) ASC");
+				//var_dump($AllNJ);
+			}elseif($teacher['status'] != 2 && is_njzr($teacher['id'])){
+				$AllNJ = getallnj($teacher['id']);
+				$listAll = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}' And xq_id ='{$nj_id}' and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}')  ORDER BY end DESC, xq_id DESC");
+			}
+			
 			if($notOwner =='notOwner'){
 				$list = $listAll;
 			}else{
 				if($nj_id != 0){
-					$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}'  And xq_id ='{$nj_id}' AND (tid like '{$it['tid']},%' OR tid like '%,{$it['tid']}' OR tid like '%,{$it['tid']},%' OR tid='{$it['tid']}')  ORDER BY end DESC");
+					$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}'  And xq_id ='{$nj_id}' AND (tid like '{$it['tid']},%' OR tid like '%,{$it['tid']}' OR tid like '%,{$it['tid']},%' OR tid='{$it['tid']}')  and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}')  ORDER BY end DESC");
 					$kcstr  = '';
 					foreach($list as $keyl=>$valuel){
 						$kcstr  .= ','.$valuel['id'];
@@ -43,7 +58,7 @@
 					$freesign = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_kcsign) . " WHERE schoolid = '{$schoolid}' And tid = {$it['tid']} And status= 2 And type =1 and FIND_IN_SET(kcid,'{$kcstr}')" );
 					
 				}else{
-					$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}'  AND (tid like '{$it['tid']},%' OR tid like '%,{$it['tid']}' OR tid like '%,{$it['tid']},%' OR tid='{$it['tid']}')  ORDER BY end DESC");
+					$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid = {$_W['uniacid']} AND schoolid = '{$schoolid}'  AND (tid like '{$it['tid']},%' OR tid like '%,{$it['tid']}' OR tid like '%,{$it['tid']},%' OR tid='{$it['tid']}') and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}')  ORDER BY end DESC");
 					$allsign =  pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_kcsign) . " WHERE schoolid = '{$schoolid}' And tid = {$it['tid']} And status= 2 ");
 					$gudingsign = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_kcsign) . " WHERE schoolid = '{$schoolid}' And tid = {$it['tid']} And status= 2 And type=0 ");
 					$freesign = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_kcsign) . " WHERE schoolid = '{$schoolid}' And tid = {$it['tid']} And status= 2 And type =1");

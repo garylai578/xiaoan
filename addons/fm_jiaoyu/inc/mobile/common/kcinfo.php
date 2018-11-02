@@ -31,8 +31,22 @@ $bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) .
         $allnum = count($list);
         
 		$item = pdo_fetch("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE id = :id ", array(':id' => $id));
-		$others = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE id != :id And weid=:weid And schoolid=:schoolid  And end > :timeEnd ORDER BY  RAND() LIMIT 0,5 ", array(':id' => $id,':weid'=>$weid,':schoolid'=>$schoolid,':timeEnd'=>time()));
-		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$id."' And status = 2 ");
+		
+		
+		$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
+		$nj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
+		$bj_str_temp = '0,';
+		foreach($bj as $key_b=>$value_b){
+			$bj_str_temp .=$value_b['sid'].",";
+		}
+		$bj_str = trim($bj_str_temp,",");
+		$nj_str_temp = '0,';
+		foreach($nj as $key_n=>$value_n){
+			$nj_str_temp .=$value_n['sid'].",";
+		}
+		$nj_str = trim($nj_str_temp,",");
+		$others = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE id != :id And weid=:weid And schoolid=:schoolid  And end > :timeEnd  and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str) ORDER BY  RAND() LIMIT 0,5 ", array(':id' => $id,':weid'=>$weid,':schoolid'=>$schoolid,':timeEnd'=>time(),':bj_str'=>$bj_str,':nj_str'=>$nj_str));
+		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
 		$addr = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = :sid ", array(':sid' => $item['adrr']));
 		$item['yb'] = $yb + $item['yibao'];
 		$item['address'] = $addr['sname'];
@@ -48,7 +62,7 @@ $bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) .
         $teacher = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " where weid = :weid AND schoolid=:schoolid AND id=:id", array(':weid' => $weid, ':schoolid' => $schoolid, ':id' => $item['tid']));
 		$title = $item['title'];
         $category = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid =  :weid AND schoolid =:schoolid ORDER BY sid ASC, ssort DESC", array(':weid' => $weid, ':schoolid' => $schoolid), 'sid');
-		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$id."' And status = 2 ");
+		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
 		$rest = $item['minge'] - $yb;
 		
 		$isfull =false;

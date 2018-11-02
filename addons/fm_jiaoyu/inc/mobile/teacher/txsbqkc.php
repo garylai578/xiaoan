@@ -65,7 +65,7 @@
 					
 				
 					$NotSign[$i_NS]['sname']      = $student['s_name'];
-					$NotSign[$i_NS]['createtime'] = $checksign['createtime'];
+				
 					$NotSign[$i_NS]['sid']         = $row['sid'];
 					$i_NS++;
 				}
@@ -85,24 +85,28 @@
 							$HasSign[$i_HS]['createtime'] = $value_sign['createtime'];
 							$HasSign[$i_HS]['id']         = $value_sign['id'];
 							$i_HS++;
-						}elseif($checksign['status'] ==3){
+						}elseif($value_sign['status'] ==3){
 							$HasQJ[$i_QJ]['sname']      = $student['s_name'];
 							$HasQJ[$i_QJ]['createtime'] = $checksign['createtime'];
 							$HasQJ[$i_QJ]['id']         = $checksign['id'];
 							$i_QJ++;
 						}
 					}
-				}
+				}else{
+					
 					$NotSign[$i_NS]['sname'] = $student['s_name'];
 					$NotSign[$i_NS]['sid']   = $row['sid'];
 					$i_NS++;
+				}
+					
 				
 			}
-		
+
 		}		
 		$HScount = count($HasSign);
 		$Allcount = count($bmlist);
 		$qdl=round($HScount/$Allcount*100, 2);
+		
 		include $this->template(''.$school['style3'].'/txsbqkc');
     }else{
 		session_destroy();

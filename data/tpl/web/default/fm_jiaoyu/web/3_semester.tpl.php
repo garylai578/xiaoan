@@ -179,6 +179,7 @@ $(document).on('click', '.btn-default', function(){
 						<th><?php echo NJNAME;?>主任(或管理员)</th>
 						<th>本<?php echo NJNAME;?>人数</th>
 						<th>本<?php echo NJNAME;?>下属班级数</th>
+						<th class="qx_00214">是否毕业</th>
                         <th class="qx_e_d" style="text-align:right;">编辑/删除</th>
                     </tr>
                     </thead>
@@ -190,6 +191,7 @@ $(document).on('click', '.btn-default', function(){
 						<td><div class="type-parent"><?php  echo $row['tname'];?>&nbsp;&nbsp;</div></td>
 						<td><span class="label label-info"><?php  echo $row['renshu'];?>人</span></td>
 						<td><span class="label label-info"><?php  echo $row['bjsm'];?>个</span></td>
+						<td class="qx_00214"><input type="checkbox" value="<?php  echo $row['is_over'];?>" name="is_over[]" data-id="<?php  echo $row['sid'];?>" <?php  if($row['is_over'] == 2) { ?>checked<?php  } ?>></td>
                         <td style="text-align:right;" class="qx_e_d"><a class="btn btn-default btn-sm qx_edit" href="<?php  echo $this->createWebUrl('semester', array('op' => 'post', 'sid' => $row['sid'], 'schoolid' => $schoolid))?>" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;<a class="btn btn-default btn-sm qx_delete" href="<?php  echo $this->createWebUrl('semester', array('op' => 'delete', 'sid' => $row['sid'], 'schoolid' => $schoolid))?>" onclick="return confirm('确认删除此分类吗？');return false;" title="删除"><i class="fa fa-times"></i></a></td>
                     </tr>
                     <?php  } } ?>
@@ -207,6 +209,9 @@ $(document).ready(function() {
 		$(".qx_edit").hide();
 		e_d = e_d - 1 ;
 	<?php  } ?>
+	<?php  if(!(IsHasQx($tid_global,1000214,1,$schoolid))) { ?>
+		$(".qx_00214").hide();
+	<?php  } ?>
 	<?php  if(!(IsHasQx($tid_global,1000213,1,$schoolid))) { ?>
 		$(".qx_delete").hide();
 		e_d = e_d - 1 ;
@@ -215,6 +220,22 @@ $(document).ready(function() {
 		$(".qx_e_d").hide();
 	}
 });	
+require(['jquery', 'util', 'bootstrap.switch'], function($, u){
+	<?php  if((IsHasQx($tid_global,1000214,1,$schoolid))) { ?>
+	
+	
+	$(':checkbox[name="is_over[]"]').bootstrapSwitch();
+	$(':checkbox[name="is_over[]"]').on('switchChange.bootstrapSwitch', function(e, state){
+		var is_over = this.checked ? 2 : 1;
+		var id = $(this).data('id');
+		$.post("<?php  echo $this->createWebUrl('semester', array('op' => 'change_over','schoolid' => $schoolid))?>", {is_over: is_over, id: id}, function(resp){
+			setTimeout(function(){
+				//location.reload();
+			}, 500)
+		});
+	});
+	<?php  } ?>
+});
 </script>
 <?php  } ?>
 <?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('public/footer', TEMPLATE_INCLUDEPATH)) : (include template('public/footer', TEMPLATE_INCLUDEPATH));?>

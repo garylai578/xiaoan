@@ -219,7 +219,7 @@
 			$title .= '对公开课\"' . $gkkinfo['name'].'\"的评价';  
 			$sharetitle = $title;
 			$sharedesc = $title;
-			$shareimgUrl = tomedia($school['thumb']);
+			$shareimgUrl = tomedia($school['logo']);
 			$links = $_W['siteroot'] .'app/'.$this->createMobileUrl('gkkpjshare', array('schoolid' => $schoolid,'gkkid' => $gkkid,'userid'=>$userid,'fenxiang'=> 'fenxiang','op'=>'check'));
 			//end
 			include $this->template(''.$school['style1'].'/gkkpingjia');

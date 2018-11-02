@@ -33,8 +33,9 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
         <div class="panel panel-default">
             <div class="panel-heading">班级分类编辑</div>
             <div class="panel-body">
-				<div id="custom-url">
+				
 				<?php  if($theclass) { ?>
+				<div id="custom-url">
 					<input type="hidden" name="old" value="111" />
 					<div class="form-group">
 						<div class="col-sm-2 col-lg-2">
@@ -66,7 +67,13 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 						<div class="col-sm-2 col-lg-2">
 							<input type="text" name="cost" placeholder="报名费/元" class="form-control" value="<?php  echo $theclass['cost'];?>" />
 							报名需要付费,留空不付
-						</div>						
+						</div>	
+                        <!--修改开始-->
+                        <div class="col-sm-2 col-lg-2">
+							<input type="text" name="class_device" placeholder="班级播报ID" class="form-control" value="<?php  echo $theclass['class_device'];?>" />
+							分班播报ID
+						</div>	
+                        <!--修改结束-->					
 					</div>
 					<?php  if($theclass['video']) { ?>
 					<div class="form-group">
@@ -90,8 +97,35 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 							是否运行评论本画面
 						</div>						
 					</div>	
-					<?php  } ?>	
+					<?php  } ?>
+				</div>	
+					<div class="panel panel-info"><div class="panel-heading">考勤时段设置</div>
+					<div class="panel-body">
+						<div class="form-group">早晚(提示：早上进校)
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">进校时段</label>
+							<div class="col-sm-9 col-xs-9 col-md-4">
+									<div class="input-group clockpicker" style="margin-bottom: 15px">
+										<?php  echo tpl_form_field_clock('jxstart', $reply['jxstart'])?>
+										<span class="input-group-addon">至</span>
+										<?php  echo tpl_form_field_clock('jxend', $reply['jxend'])?>
+										
+									</div>
+							</div>
+						</div>
+									
+					</div>	
+					<div class="clearfix template"> 
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
+						<div class="col-sm-9 col-xs-12">
+							<a href="javascript:;" id="custom-url-add"><i class="fa fa-plus-circle"></i> 添加班级</a>
+						</div>
+					</div>	
+				</div>	
+				</div>
+								
 				<?php  } else { ?>
+				<div id="custom-url">
 					<input type="hidden" name="new[]" value="222" />
 					<div class="form-group">
 						<div class="col-sm-2 col-lg-2">
@@ -124,9 +158,12 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 							<input type="text" name="cost_new[]" placeholder="报名费/元" class="form-control" value="<?php  echo $theclass['sname'];?>" />
 							报名需要付费,留空不付
 						</div>						
+                        <div class="col-sm-2 col-lg-2">
+							<input type="text" name="class_device" placeholder="班级播报ID" class="form-control" value="<?php  echo $theclass['class_device'];?>" />
+							分班播报ID
+					</div>
 					</div>			
-				<?php  } ?>	
-                </div>	
+				</div>	
 				<div class="clearfix template"> 
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
@@ -134,7 +171,9 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 							<a href="javascript:;" id="custom-url-add"><i class="fa fa-plus-circle"></i> 添加班级</a>
 						</div>
 					</div>	
-				</div>				
+				</div>						
+				<?php  } ?>	
+               			
             </div>			
         </div>
         <div class="form-group col-sm-12">
@@ -172,12 +211,15 @@ $('#custom-url-add').click(function(){
 				'		<div class="col-sm-2 col-lg-2">'+
 				'			<input type="text" name="cost_new[]" placeholder="报名费/元" class="form-control" value="" />报名需要付费,留空不付'+
 				'		</div>'+
+				'		<div class="col-sm-2 col-lg-2">'+
+				'			<input type="text" name="class_device" placeholder="班级播报ID" class="form-control" value="" /班级播报ID'+
+				'		</div>'+
 				'	<div class="col-sm-1" style="margin-top:5px">'+
 				'   	<a href="javascript:;" class="custom-url-del"><i class="fa fa-times-circle"></i></a>'+
 				'	</div>'+				
 				'	</div>'+
 				'</div>';
-			;
+			
 	$('#custom-url').append(html);
 });
 $(document).on('click', '.custom-url-del', function(){
@@ -243,6 +285,7 @@ $(document).on('click', '.btn-default', function(){
 						<th>学生人数</th>
 						<th>班级圈消息</th>
 						<th>班级之星</th>
+						<th class="qx_00224">是否毕业</th>
 						<th>报名费</th>
                         <th class="qx_e_d" style="text-align:right;">编辑/删除</th>
                     </tr>
@@ -257,6 +300,7 @@ $(document).on('click', '.btn-default', function(){
 						<td><span class="label label-danger"><?php  echo $row['renshu'];?>人</span></td>
 						<td><span class="label label-info"><?php  echo $row['bjqsm'];?>条</span></td>
 						<td><input type="checkbox" value="<?php  echo $row['is_bjzx'];?>" name="is_on[]" data-id="<?php  echo $row['sid'];?>" <?php  if($row['is_bjzx'] == 1) { ?>checked<?php  } ?>></td>
+						<td class="qx_00224"><input type="checkbox" value="<?php  echo $row['is_over'];?>" name="is_over[]" data-id="<?php  echo $row['sid'];?>" <?php  if($row['is_over'] == 2) { ?>checked<?php  } ?>></td>
 						<td><?php  if(!empty($row['cost'])) { ?><span class="label label-success">￥<?php  echo $row['cost'];?></span><?php  } else { ?><span class="label label-danger">未启用</span><?php  } ?></td>
                         <td style="text-align:right;" class="qx_e_d"><a class="btn btn-default btn-sm qx_edit" href="<?php  echo $this->createWebUrl('theclass', array('op' => 'post', 'sid' => $row['sid'], 'schoolid' => $schoolid))?>" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;<a class="btn btn-default btn-sm qx_delete" href="<?php  echo $this->createWebUrl('theclass', array('op' => 'delete', 'sid' => $row['sid'], 'schoolid' => $schoolid))?>" onclick="return confirm('删除本班将清空本班所有班级圈消息和相册照片,确认吗？');return false;" title="删除"><i class="fa fa-times"></i></a></td>
                     </tr>
@@ -285,22 +329,38 @@ $(document).ready(function() {
 		$(".qx_delete").hide();
 		e_d = e_d - 1 ;
 	<?php  } ?>
+	<?php  if(!(IsHasQx($tid_global,1000224,1,$schoolid))) { ?>
+		$(".qx_00224").hide();
+	<?php  } ?>
 	if(e_d == 0){
 		$(".qx_e_d").hide();
 	}
 });	
 require(['jquery', 'util', 'bootstrap.switch'], function($, u){
-
-	$(':checkbox[name="is_on[]"]').bootstrapSwitch();
-	$(':checkbox[name="is_on[]"]').on('switchChange.bootstrapSwitch', function(e, state){
-		var is_on = this.checked ? 1 : 2;
+	
+		$(':checkbox[name="is_on[]"]').bootstrapSwitch();
+		$(':checkbox[name="is_on[]"]').on('switchChange.bootstrapSwitch', function(e, state){
+			var is_on = this.checked ? 1 : 2;
+			var id = $(this).data('id');
+			$.post("<?php  echo $this->createWebUrl('theclass', array('op' => 'change','schoolid' => $schoolid))?>", {is_on: is_on, id: id}, function(resp){
+				setTimeout(function(){
+					//location.reload();
+				}, 500)
+			});
+		});
+	
+	<?php  if((IsHasQx($tid_global,1000224,1,$schoolid))) { ?>
+	$(':checkbox[name="is_over[]"]').bootstrapSwitch();
+	$(':checkbox[name="is_over[]"]').on('switchChange.bootstrapSwitch', function(e, state){
+		var is_over = this.checked ? 2 : 1;
 		var id = $(this).data('id');
-		$.post("<?php  echo $this->createWebUrl('theclass', array('op' => 'change','schoolid' => $schoolid))?>", {is_on: is_on, id: id}, function(resp){
+		$.post("<?php  echo $this->createWebUrl('theclass', array('op' => 'change_over','schoolid' => $schoolid))?>", {is_over: is_over, id: id}, function(resp){
 			setTimeout(function(){
 				//location.reload();
 			}, 500)
 		});
 	});
+	<?php  } ?>
 });
 </script>
 <?php  } ?>

@@ -240,6 +240,35 @@ line-height: 129px;text-align: center;display: none;}
 			</div>
 		</div>
 	</div>
+	{if $schooltype}
+	<div class="col-md-4 span_8">
+		<div class="activity_box">
+			<div class="panel-heading">
+                    <h4 class="panel-title">消课记录</h4>
+            </div>		
+			<div class="scrollbar" id="style-2">
+			{loop $lastxk $item}
+				<div class="activity-row1">
+					 <div class="col-xs-1"> <i class="fa fa-comment text-info"></i></div>
+					 <div class="col-xs-3 activity-img" style="width:auto;">
+					 <img style="width:50px;height:50px;border-radius:50%;" src="{if $item['sicon']}{php echo tomedia($item['sicon'])}{else}{php echo tomedia($logo['spic'])}{/if}" class="img-responsive" alt="">
+					 </div>
+					 <div class="col-xs-8 activity-desc">
+						<h5>
+							<a href="#"><span class="label label-success">学生</span>{$item['s_name']}</a> 
+							<span class="label label-info">{$item['kcname']}</span> 
+						</h5>
+						 
+						<h6>{$item['time']}前</h6>
+					 </div>
+					 <div class="clearfix"> </div>
+				 </div>
+			{/loop}
+			<a href="{php echo $this->createWebUrl('checklog', array('op' => 'display', 'schoolid' => $schoolid))}">点击查看更多</a>
+			</div>
+		</div>
+	</div>
+	{else}
 	<div class="col-md-4 span_8">
 		<div class="activity_box">
 			<div class="panel-heading">
@@ -250,7 +279,7 @@ line-height: 129px;text-align: center;display: none;}
 				<div class="activity-row1">
 					 <div class="col-xs-1">{if $item['checktype'] == 1}<i class="fa fa-credit-card text-info icon_12">{else}<i class="fa fa-weixin text-info icon_12">{/if}</i></div>
 					 <div class="col-xs-3 activity-img" style="width:auto;">
-					 <img style="width:50px;height:50px;border-radius:50%;" src="{if !empty($item['sid'])}{if $item['siocn']}{php echo tomedia($item['siocn'])}{else}{php echo tomedia($logo['spic'])}{/if}
+					 <img style="width:50px;height:50px;border-radius:50%;" src="{if !empty($item['sid'])}{if $item['sicon']}{php echo tomedia($item['sicon'])}{else}{php echo tomedia($logo['spic'])}{/if}
 					 {else}{if $item['thumb']}{php echo tomedia($item['thumb'])}{else}{php echo tomedia($logo['tpic'])}{/if}{/if}" class="img-responsive" alt="">
 					 </div>
 					 <div class="col-xs-8 activity-desc">
@@ -269,6 +298,7 @@ line-height: 129px;text-align: center;display: none;}
 			</div>
 		</div>
 	</div>	
+	{/if}
 </div>	
 
 	<div class="row">
@@ -300,7 +330,11 @@ line-height: 129px;text-align: center;display: none;}
 					<div class="account-stat-btn">
 						{if $logo['is_cost'] == 1 || $_W['isfounder'] || $_W['role'] == 'vice_founder'}<div class="col-12" style="width:8%">已付总额<span style="font-size: 24px;color: #FF8000;" id="cose1">{$cose1}</span></div>{/if}
 						<div class="col-12" style="width:8%">报名数<span style="font-size: 24px;color: #FF8000;" id="baomzj">{$baomzj}人</span></div>
+						{if !$_W['schooltype']}
 						<div class="col-12" style="width:8%">考勤数<span style="font-size: 24px;color: #FF8000;" id="checklogzj">{$checklogzj}次</span></div>
+						{else}
+						<div class="col-12" style="width:8%">消课数<span style="font-size: 24px;color: #FF8000;" id="checklogzj">{$checklogzj}次</span></div>
+						{/if}
 						<div class="col-12" style="width:8%">班级圈<span style="font-size: 24px;color: #FF8000;" id="bjqzj">{$bjqzj}条</span></div>	
 						<div class="col-12" style="width:8%">照片数<span style="font-size: 24px;color: #FF8000;" id="xczj">{$xczj}张</span></div>
 						<div class="col-12" style="width:8%">已绑教师<span style="font-size: 24px;color: #FF8000;" id="ybjs">{$ybjs}人</span></div>
@@ -328,9 +362,9 @@ line-height: 129px;text-align: center;display: none;}
 						</div>
 						<div class="col-sm-2 col-lg-2" style="float:left;left:120px">
 							<select style="width: 147px;" id="kc_id" class="form-control">
-							{loop $njchecklog $row}
-								<option value="{$row['sid']}">{$row['sname']}</option>
-							{/loop}	
+							
+								<option value="0">请选择课程</option>
+							
 							</select>
 						</div>
 					</div>

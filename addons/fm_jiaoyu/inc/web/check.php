@@ -77,6 +77,13 @@
 					$temp = array(
 						'isflow'   => 1,
 						'pop'      => $_GPC['pop'],
+						//开始修改
+						'welcome'      => $_GPC['welcome'],
+						'password'      => $_GPC['password'],
+						'starttime'      => $_GPC['starttime'],
+						'shutdowntime'      => $_GPC['shutdowntime'],
+						'voice'=> $_GPC['voice'],
+						//结束修改
 						'video'    => $_GPC['video'],
 						'pic1'     => $_GPC['pic1'],
 						'pic2'     => $_GPC['pic2'],

@@ -11,7 +11,7 @@
         
         //查询是否用户登录
 
-		$njlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 'semester' ORDER BY ssort DESC");
+		$njlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 'semester' and is_over != 2 ORDER BY ssort DESC");
 		$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where weid = :weid AND id=:id", array(':weid' => $weid, ':id' => $schoolid));
 		$signset = unserialize($school['signset']);
 		$picarrSet_out = unserialize($school['picarrset']);

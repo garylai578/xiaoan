@@ -10,9 +10,9 @@
 		$this1             = 'no2';
 		$GLOBALS['frames'] = $this->getNaveMenu($_GPC['schoolid'], $action);
 		$schoolid          = intval($_GPC['schoolid']);
+		$schooltype         = $_W['schooltype'];
 		$school            = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where id = :id ", array(':id' => $schoolid));
-		$logo              = pdo_fetch("SELECT logo,title,is_stuewcode,spic FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");	
-				
+		$logo              = pdo_fetch("SELECT logo,title,is_stuewcode,spic FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");			
 		$operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
 		$tid_global = $_W['tid'];
 		if($operation == 'post'){
@@ -76,6 +76,7 @@
 					's_name'         => trim($_GPC['s_name']),
 					'icon'           => trim($_GPC['icon']),
 					'sex'            => intval($_GPC['sex']),
+					's_type'            => intval($_GPC['s_type']),
 					'bj_id'          => trim($_GPC['bj']),
 					'xq_id'          => trim($_GPC['xueqi']),
 					'numberid'       => trim($_GPC['numberid']),
@@ -378,15 +379,18 @@
 			}
 			if(!empty($_GPC['bd_type'])){
 				if($_GPC['bd_type'] == 1){
-					$condition .= " AND (ouid != '' Or muid != '' Or duid != '' Or otheruid != '')";
+					$condition .= " AND (ouserid != 0 Or muserid != 0 Or duserid != 0 Or otheruserid != 0)";
 				}
 				if($_GPC['bd_type'] == 2){
-					$condition .= " AND ouid = '' AND muid = '' AND duid = '' AND otheruid = '' ";
+					$condition .= " AND ouserid = 0 AND muserid = 0 AND duserid = 0 AND otheruserid = 0 ";
 				}				
 			}
 			if(!empty($_GPC['nj_id'])){
 				$condition .= " AND xq_id = '{$_GPC['nj_id']}'";
-			}			
+			}
+			if(!empty($_GPC['s_type'])){
+				$condition .= " AND s_type = '{$_GPC['s_type']}'";
+			}
 			if(!empty($_GPC['bj_id'])){
 				$condition .= " AND bj_id = '{$_GPC['bj_id']}'";
 			}
@@ -415,16 +419,16 @@
 			$chong = 0;
 			foreach($list as $key => $value){
 			
-				if($value['ouid']){
+				if($value['ouid'] || $value['ouserid']){
 					$ybdxs ++;
 				}
-				if($value['muid']){
+				if($value['muid'] || $value['muserid']){
 					$ybdxs ++;
 				}
-				if($value['duid']){
+				if($value['duid'] || $value['duserid']){
 					$ybdxs ++;
 				}
-				if($value['otheruid']){
+				if($value['otheruid'] || $value['otheruserid']){
 					$ybdxs ++;
 				}	
 

@@ -33,7 +33,8 @@
 			if(!empty($id)){
 				$item = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " WHERE id = :id", array(':id' => $id));
 		
-				$bjlists = get_mylist($schoolid,$item['id'],'teacher');
+				$bjlists = get_mylist($schoolid,$item['id'],'teacher',1);
+				//var_dump($bjlists);
 				if(empty($item)){
 					$this->imessage('抱歉，教师不存在或是已经删除！', referer(), 'error');
 				}else{
@@ -106,6 +107,8 @@
 					pdo_update($this->table_teachers, $data, array('id' => $id));
 					$thistid = $id;
 				}
+				//var_dump($_GPC);
+				//die();
 				if(!empty($_GPC['thisid'])){
 					if(!empty($_GPC['old'])){
 						foreach($_GPC['thisid'] as $key => $thisid){
@@ -143,7 +146,7 @@
 						);
 						pdo_insert($this->table_class, $data3);
 					}
-				}				
+				}		
 				$this->imessage('操作成功', $this->createWebUrl('assess', array('op' => 'display', 'schoolid' => $schoolid)), 'success');
 			}
 		}elseif($operation == 'changebjdata'){
@@ -259,16 +262,26 @@
 					$uid = $value['uid'];
 				}
 				$member = pdo_fetch("SELECT nickname,avatar FROM " . tablename('mc_members') . " where uniacid = :uniacid And uid = :uid ", array(':uniacid' => $_W ['uniacid'], ':uid' => $uid));	
-				$kcnum = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_tcourse)." WHERE tid like '%".$value['id']."%'");
+				$kcnum = pdo_fetchall("select id,name,OldOrNew FROM ".tablename($this->table_tcourse)." WHERE schoolid = '{$schoolid}' and weid = '{$weid}' and (tid like '%,{$value['id']},%'  or tid like '%,{$value['id']}' or tid like '{$value['id']},%' or tid ='{$value['id']}') ");
+				if(!empty($kcnum)){
+					foreach($kcnum as $key_k=>$value_k){
+						$ksnum_k = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_kcbiao)." WHERE tid = '".$value['id']."' and kcid = '{$value_k['id']}'");
+						$kcnum[$key_k]['ksnum'] = $ksnum_k;
+						$ksnum_yq = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_kcsign)." WHERE tid = '".$value['id']."' and kcid = '{$value_k['id']}'");
+						$kcnum[$key_k]['ksnum_yq'] = $ksnum_yq;
+					}	
+				}
 				$nowtime = time();
 				$zks = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_kcbiao)." WHERE tid = '".$value['id']."'");
 				$wwks = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_kcbiao)." WHERE date > '".$nowtime."' And  tid = '".$value['id']."'");
 				$ywks = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_kcbiao)." WHERE date < '".$nowtime."' And  tid = '".$value['id']."'");
 				$list[$key]['nickname'] = $member['nickname'];
 				$list[$key]['avatar']   = $member['avatar'];
-				$list[$key]['kcnum'] = $kcnum;
+				$list[$key]['kcnum'] = count($kcnum);
+				$list[$key]['kclist'] = $kcnum;
+				//var_dump($kcnum);
 				$list[$key]['Ttitle'] = GetTeacherTitle($value['status'],$value['fz_id']);
-				$bjlists = get_mylist($schoolid,$value['id'],'teacher');
+				$bjlists = get_mylist($schoolid,$value['id'],'teacher',1);
 				$list[$key]['bjlist'] = $bjlists;
 				$list[$key]['zks'] = $zks;
 				$list[$key]['wwks'] = $wwks;

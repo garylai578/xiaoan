@@ -137,6 +137,42 @@
 				</div>
 				</div>
 				{/if}					
+		{if $leave['usertype'] == 'send_class' || $leave['usertype'] == 'student'}
+		<div class="commentBox">
+			<div class="mobile_comment" >
+				<div class="commentTitle">
+					<span class="l">
+						{if $leave['usertype'] == 'send_class'}指定班级{/if}
+						{if $leave['usertype'] == 'student'}指定学生{/if}
+					</span>
+					<span class="r vvv">查看详情</span>
+				</div>
+				<ul class="commentList">
+				{if $leave['usertype'] == 'send_class'}
+					{loop $arr $row}
+					<li class="comment_li">
+						<span style="margin-left:5px;">{$row['name']}</span></br>							
+					</li>
+					{/loop}	
+				{else}
+					
+					{loop $arr $row}
+					<li class="comment_li">
+						<span style="margin-left:5px;">{$row['bjname']}</span></br>
+						{loop $row['stulist'] $item}
+						<a class="headImg">
+							<img src="{$item['icon']}">
+							<span>{$item['name']}</span>
+						</a>
+						{/loop}
+					</li>	
+					{/loop}		
+									
+				{/if}					
+				</ul>
+			</div>			
+		</div>
+		{/if}
 {php include $this->template('comad');}
 </body>
 <script src="{OSSURL}public/mobile/js/faceMap.js?v=5.61" type="text/javascript"></script>
@@ -149,9 +185,18 @@ setTimeout(function() {
 		document.title="内容详情";
 	}
 }, 100);
- 
 </script>
 <script>
+$(".vvv").on("click", function() {
+	gotodetail();
+});
+function gotodetail(){
+	{if !empty($ZY_contents)}
+		window.location.href = "{php echo $this->createMobileUrl('questatistics', array('schoolid' => $schoolid,'leaveid'=>$leaveid), true)}"
+	{else}
+		showCheckBox();
+	{/if}
+}
 	$(".queryResult").on("click", function() {
 	{if !empty($ZY_contents)}
 		window.location.href = "{php echo $this->createMobileUrl('questatistics', array('schoolid' => $schoolid,'leaveid'=>$leaveid), true)}"

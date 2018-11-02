@@ -21,7 +21,7 @@
 </style>
 {php echo register_jssdks();}
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>		
+<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="{OSSURL}public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
 <style>
 .black_overlay{
@@ -186,14 +186,6 @@ z-index:1001;
 									<button class="btn btn-success btn-block col-sm-12" disabled="disabled" type="button" id="wBtn"  onclick="submitForm()" value="wechat">微信支付(必须使用微信内置浏览器)</button>
 								</form>
 							</div>
-							<script type="text/javascript">
-								setTimeout(function() {
-									document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
-										$('#wBtn').removeAttr('disabled');
-										$('#wBtn').html('微信支付');
-									});
-								}, 100);
-							</script>
 							{/if}
 							{if !empty($setting['payment']['alipay']['switch'])}
 							<div class="pay-btn" id="alipay-panel">
@@ -331,7 +323,12 @@ function zhifu() {
 $("#pay").click(function(){
 	$("#bodyhidden").hide();
 });
-
+setTimeout(function() {
+	document.addEventListener('WeixinJSBridgeReady', function onBridgeReady() {
+		$('#wBtn').removeAttr('disabled');
+		$('#wBtn').html('微信支付');
+	});
+}, 100);
 	
 </script>
 </html>

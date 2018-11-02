@@ -8,7 +8,7 @@
         $weid = $_W['uniacid'];
 		$schoolid = intval($_GPC['schoolid']);
 		$openid = $_W['openid'];
-        
+        $schooltype  = $_W['schooltype'];
         //查询是否用户登录		
 		$userid = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where :schoolid = schoolid And :weid = weid And :openid = openid And :sid = sid", array(':weid' => $weid, ':schoolid' => $schoolid, ':openid' => $openid, ':sid' => 0), 'id');
 		$it = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where weid = :weid AND id=:id ORDER BY id DESC", array(':weid' => $weid, ':id' => $userid['id']));	
@@ -17,43 +17,31 @@
 			message('您无权查看本页面');
 		}
 		$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where weid = :weid AND id=:id ORDER BY ssort DESC", array(':weid' => $weid, ':id' => $schoolid));
-		$teachers = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " where weid = :weid AND id = :id", array(':weid' => $weid, ':id' => $it['tid']));		
-		if(is_njzr($teachers['id'])){
-			$myfisrtnj =  pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And tid = '{$it['tid']}' And type = 'semester'");
-			$fisrtbj =  pdo_fetch("SELECT sid as bj_id FROM " . tablename($this->table_classify) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And parentid = '{$myfisrtnj['sid']}'");
-		}else{
-			$fisrtbj =  pdo_fetch("SELECT bj_id FROM " . tablename($this->table_class) . " where weid = '{$weid}' And schoolid = '{$schoolid}'  And tid = {$it['tid']} ");
-			if($teachers['status'] == 2){
-				$myfisrtnj =  pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 'semester'");
-				$fisrtbj =  pdo_fetch("SELECT sid as bj_id FROM " . tablename($this->table_classify) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And parentid = '{$myfisrtnj['sid']}'");
-			}			
-		}
+		$teachers = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " where weid = :weid AND id = :id", array(':weid' => $weid, ':id' => $it['tid']));	
+		mload()->model('tea');
+		$bjlists = GetAllClassInfoByTid($schoolid,2,$schooltype,$it['tid']);
 		if(!empty($_GPC['bj_id'])){
 			$bj_id = intval($_GPC['bj_id']);			
 		}else{
-			$bj_id = $fisrtbj['bj_id'];
+			$bj_id = intval($bjlists[0]['sid']);
 		}
-		$bjlists = get_mylist($schoolid,$it['tid'],'teacher');
-		$nowbj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $bj_id));
-		if(is_njzr($teachers['id'])){
-			$mynjlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And tid = '{$it['tid']}' And type = 'semester' ORDER BY ssort DESC");
-			foreach($mynjlist as $key =>$row){
-				$mynjlist[$key]['bjlist'] = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And parentid = '{$row['sid']}' And type = 'theclass' ORDER BY sid ASC, ssort DESC");
-				foreach($mynjlist[$key]['bjlist'] as $k => $v){
-
-				}
-			}
+		if($schooltype){
+			$nowbj = pdo_fetch("SELECT name as sname FROM " . tablename($this->table_tcourse) . " where id = :id ", array(':id' => $bj_id));
+			$condition2 = " AND kc_id = '{$bj_id}' ";
 		}else{
-			if($teachers['status'] == 2){
-				$bjlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 'theclass' ORDER BY sid ASC, ssort DESC");
-			}			
+			$nowbj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $bj_id));
+			$condition2 = " AND bj_id = '{$bj_id}' ";
 		}
 		$thistime = trim($_GPC['limit']);
 		if($thistime){
-			$condition = " AND createtime < '{$thistime}'";	
-			$leave1 = pdo_fetchall("SELECT id,bj_id,title,tname,tid,createtime,content,ismobile FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 1 And bj_id = '{$bj_id}' $condition ORDER BY createtime DESC LIMIT 0,10 ");
+			$condition = " AND createtime < '{$thistime}'";
+			$leave1 = pdo_fetchall("SELECT id,bj_id,kc_id,title,tname,tid,createtime,content,ismobile,usertype FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 1 $condition $condition2 ORDER BY createtime DESC LIMIT 0,10 ");
 			foreach($leave1 as $key =>$row){
-				$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
+				if($schooltype){
+					$banji = pdo_fetch("SELECT name as sname FROM " . tablename($this->table_tcourse) . " where id = :id ", array(':id' => $row['kc_id']));
+				}else{
+					$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $row['bj_id']));
+				}
 				$teach = pdo_fetch("SELECT status,thumb,tname FROM " . tablename($this->table_teachers) . " where id = :id ", array(':id' => $row['tid']));
 				$leave1[$key]['banji'] = $banji['sname'];
 				$leave1[$key]['name'] = $teach['tname'];
@@ -65,10 +53,14 @@
 			} 
 			include $this->template('comtool/notelist'); 
 		}else{
-			$leave = pdo_fetchall("SELECT id,bj_id,title,tname,tid,createtime,content,ismobile FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 1 And bj_id = '{$bj_id}' ORDER BY createtime DESC LIMIT 0,10 ");
+			$leave = pdo_fetchall("SELECT id,bj_id,kc_id,title,tname,tid,createtime,content,ismobile,usertype FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 1 $condition2 ORDER BY createtime DESC LIMIT 0,10 ");
 			//print_r($leave1);
 			foreach($leave as $key =>$row){
-				$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
+				if($schooltype){
+					$banji = pdo_fetch("SELECT name as sname FROM " . tablename($this->table_tcourse) . " where id = :id ", array(':id' => $row['kc_id']));
+				}else{
+					$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $row['bj_id']));
+				}
 				$teach = pdo_fetch("SELECT status,thumb,tname FROM " . tablename($this->table_teachers) . " where id = :id ", array(':id' => $row['tid']));
 				$leave[$key]['banji'] = $banji['sname'];
 				$leave[$key]['name'] = $teach['tname'];

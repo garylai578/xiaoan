@@ -171,7 +171,7 @@ font-weight:bold;
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
 						<div class="col-sm-9 col-xs-12">
-							<a href="javascript:;" id="custom-url-add"><i class="fa fa-plus-circle"></i> 添加科目</a>
+							<a href="javascript:;" id="custom-url-add"><i class="fa fa-plus-circle"></i> 添加地址</a>
 						</div>
 					</div>	
 				</div>				

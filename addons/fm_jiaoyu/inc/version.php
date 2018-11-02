@@ -1,1 +1,1 @@
-<?php if(!defined('IN_IA')) {exit('Access Denied');}if(!defined('FM_JIAOYU_VERSION')) {define('FM_JIAOYU_VERSION', '4.06');}if(!defined('FM_JIAOYU_TIME')) {define('FM_JIAOYU_TIME', '2018-06-06 16:10');}
+<?php if(!defined('IN_IA')) {exit('Access Denied');}if(!defined('FM_JIAOYU_VERSION')) {define('FM_JIAOYU_VERSION', '4.10');}if(!defined('FM_JIAOYU_TIME')) {define('FM_JIAOYU_TIME', '2018-06-06 16:10');}

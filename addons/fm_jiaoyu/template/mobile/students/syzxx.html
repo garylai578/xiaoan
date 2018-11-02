@@ -252,41 +252,7 @@ function createtodo(){
 		//请假处理
 	
 
-		$(".confirm_jujue").click(function() {
-				var id = $(self).attr("data-id");
-				var beizhu_jujue = $("#beizhu_jujue").val();
-				//alert(beizhu_jujue);
-				//return;
-				PB.prompt("数据提交中，请稍等~","forever");
-				$.ajax({
-					type: "POST",
-					dataType: 'json',
-					url: "{php echo $this->createMobileUrl('comajax',array('op'=>'DealWithTodo'))}",
-					data: { 
-						id        : id,
-						agreetype : agreetype,
-						status    : status,
-						schoolid  : "{$schoolid}",
-						weid      : "{$weid}",
-						beizhu_jujue :beizhu_jujue
-					},
-					success: function(data) {
-						if (data.result) {
-							//console.log(data);
-							jTips(data.msg, function() {
-								window.location.reload();
-							});
-						}else{
-							//console.log(data);
-							jTips(data.msg, function() {
-								window.location.reload();
-							});
-						}
-					},
-				});
-			
-			$("#jujue").css("display", "none");
-		});
+
 	});
 </script>
 {php include $this->template('footer');}

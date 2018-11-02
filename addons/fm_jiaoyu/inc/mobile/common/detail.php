@@ -41,8 +41,24 @@
 				 ':schoolid' => $schoolid,
 				 ':type' => 'wenzhang'
 				 ));
-		 $list_jpk = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid=:weid And schoolid=:schoolid And is_hot =:is_hot  And end > :timeEnd ORDER BY  RAND() LIMIT 0,5 ", array(':weid'=>$weid,':schoolid'=>$schoolid,'is_hot'=>1,':timeEnd'=>TIMESTAMP));	
-		$list_tuijian = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid=:weid And schoolid=:schoolid And is_tuijian =:is_tuijian  And end > :timeEnd ORDER BY  RAND() LIMIT 0,3 ", array(':weid'=>$weid,':schoolid'=>$schoolid,'is_tuijian'=>1,':timeEnd'=>TIMESTAMP));			
+				 
+				 
+				 
+		$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
+		$nj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
+		$bj_str_temp = '0,';
+		foreach($bj as $key_b=>$value_b){
+			$bj_str_temp .=$value_b['sid'].",";
+		}
+		$bj_str = trim($bj_str_temp,",");
+		$nj_str_temp = '0,';
+		foreach($nj as $key_n=>$value_n){
+			$nj_str_temp .=$value_n['sid'].",";
+		}
+		$nj_str = trim($nj_str_temp,",");
+
+		 $list_jpk = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid=:weid And schoolid=:schoolid And is_hot =:is_hot  And end > :timeEnd and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str) ORDER BY  RAND() LIMIT 0,5 ", array(':weid'=>$weid,':schoolid'=>$schoolid,'is_hot'=>1,':timeEnd'=>TIMESTAMP,':bj_str'=>$bj_str,':nj_str'=>$nj_str));	
+		$list_tuijian = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE weid=:weid And schoolid=:schoolid And is_tuijian =:is_tuijian  And end > :timeEnd and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str) ORDER BY  RAND() LIMIT 0,3 ", array(':weid'=>$weid,':schoolid'=>$schoolid,'is_tuijian'=>1,':timeEnd'=>TIMESTAMP,':bj_str'=>$bj_str,':nj_str'=>$nj_str));			
 				
         $item1 = pdo_fetch("SELECT * FROM " . tablename($this->table_news) . " WHERE id = :id ", array(':id' => $id));		
 

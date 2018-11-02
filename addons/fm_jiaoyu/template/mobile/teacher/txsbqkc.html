@@ -240,6 +240,7 @@ setTimeout(function() {
         if ("True" == "True") {
             //上午
             parseInt($('#signInNotSureNum').text(), 10) > 0 ? $('#top_rightNo').show() : $('#top_rightNo').hide();
+			parseInt($('#signInNotSureNum').text(), 10) > 0 ? $('#top_rightNoQ').show() : $('#top_rightNoQ').hide();
 			{if $_GPC['notOwner'] != 'notOwner'}
 				{if !IsHasQx($tid_global,2001407,2,$schoolid) }
 					$(".qx_01407").hide();
@@ -252,6 +253,7 @@ setTimeout(function() {
 			{/if}
         } else {
             $('#top_rightNo').hide();
+			$('#top_rightNoQ').hide();
         }
     }
 

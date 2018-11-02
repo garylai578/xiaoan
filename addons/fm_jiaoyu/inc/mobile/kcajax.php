@@ -9,7 +9,7 @@
     if ($operation == 'default') {
        	die ( json_encode ( array (
 	        'result' => false,
-	        'msg' => '对不起，你的请求不存在！'
+	        'msg' => '参数错误'
             ) ) );
   	}
     if ($operation == 'getxgtemplte') {
@@ -672,6 +672,10 @@
                     'msg' => '非法请求！' 
 		               ) ) );
 	         }
+			 
+			 
+		$shareuserid = $_GPC['shareuserid'];
+	
         $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
 		$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " WHERE :id = id", array(':id' => $_GPC['schoolid']));
 		$user = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " WHERE :weid = weid And :schoolid = schoolid And :id = id", array(':weid' => $_GPC['weid'], ':schoolid' => $_GPC['schoolid'], ':id' => $_GPC['user']));
@@ -756,8 +760,15 @@
 					'spoint' => $point_dy
 			);
 			
-				$temp['ksnum'] = $cose['FirstNum'];
+			$temp['ksnum'] = $cose['FirstNum'];
 			
+			if(!empty($shareuserid)){
+				$ShareUserInfo = pdo_fetch("SELECT sid FROM " . tablename($this->table_user) . " WHERE :weid = weid And :schoolid = schoolid And :id = id", array(':weid' => $_GPC['weid'], ':schoolid' => $_GPC['schoolid'], ':id' => $shareuserid));
+				if($ShareUserInfo['sid'] != $_GPC['sid']){
+					$temp['shareuserid'] = $shareuserid;
+				}
+				
+			}
 			pdo_insert($this->table_order, $temp);
 			$order_id = pdo_insertid();
 			$data ['result'] = true;
@@ -792,6 +803,7 @@
 			    $nj_id    = $_GPC['nj'];
 			    $bj_id    = $_GPC['bj'];
 			    $pard     = $_GPC['pard'];
+				$shareuserid = $_GPC['shareuserid'];
 				$checknewstu = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " WHERE weid = {$weid} And schoolid = {$schoolid} And s_name like '{$sname}' And mobile={$mobile} And sex = {$sex} "); 
 				if(!empty($checknewstu)){
 					 die ( json_encode ( array (
@@ -832,7 +844,7 @@
 				$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " WHERE :id = id", array(':id' => $_GPC['schoolid']));
 				$cose = pdo_fetch("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE :id = id", array(':id' => $_GPC['kcid'])); 
 				$final_cose =$cose['cose'];
-				$yb = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$cose['id']."' And (status = 2 or type = 2) ");
+				$yb = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_order)." WHERE kcid = '".$cose['id']."' And (status = 2 or type = 2) ");
 				$rest = $cose['minge'] - $yb;
 				if ($rest < 1){
 		            die ( json_encode ( array (
@@ -861,8 +873,10 @@
 						'orderid' => $orderid,
 						'createtime' => time(),
 				);
-				if($cose['OldOrNew'] == 1 ){
-					$temp['ksnum'] = $cose['FirstNum'];
+				
+				$temp['ksnum'] = $cose['FirstNum'];
+				if(!empty($shareuserid)){
+					$temp['shareuserid'] = $shareuserid;
 				}
 				pdo_insert($this->table_order, $temp);
 				$order_id = pdo_insertid();

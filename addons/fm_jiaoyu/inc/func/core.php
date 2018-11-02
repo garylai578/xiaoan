@@ -205,15 +205,14 @@ class Core extends WeModuleSite {
 			}
 			if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'10009')    ){
 				if( strstr($qxarr,'1000901') || strstr($qxarr,'1000921') || strstr($qxarr,'1000941') || (is_showgkk() && strstr($qxarr,'1000951')) || $_W['isfounder'] || $_W['role'] == 'owner' ){
-					if($school['issale'] == 1){
-						$navemenu[$tag]['items'][3] = array(
-							'title' => '课程管理', 'url' => $do != 'kecheng' ? $this->createWebUrl('kecheng', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
-							'active' => $action == 'kecheng' ? ' active' : '',
-							'append' => array(
-								'title' => '<i style="color:#7228b5;" class="fa fa-graduation-cap"></i>',
-							),
-						);
-					}
+					$navemenu[$tag]['items'][3] = array(
+						'title' => '课程管理', 'url' => $do != 'kecheng' ? $this->createWebUrl('kecheng', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
+						'active' => $action == 'kecheng' ? ' active' : '',
+						'append' => array(
+							'title' => '<i style="color:#7228b5;" class="fa fa-graduation-cap"></i>',
+						),
+					);
+					
 				}
 			}
 			if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'100100')    ){
@@ -379,7 +378,7 @@ class Core extends WeModuleSite {
 					'url' => $do != 'checkdateset' ? $this->createWebUrl('checkdateset', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
                     'active' => $action == 'checkdateset' ? ' active' : '',
                     'append' => array(
-                        'title' => '<i style="color:#077ccc;" class="fa fa-table"></i>',
+                        'title' => '<i style="color:#077ccc;" class="fa fa-indent"></i>',
                     ),							
 				);	
 			}
@@ -840,7 +839,119 @@ class Core extends WeModuleSite {
 		}
 		$this->imessage('发送成功！', $this -> createWebUrl('notice', array('op' => 'display5','schoolid' => $schoolid,'notice_id' => $notice_id)));
 	}
-	
+	public function sendMobileZytzToUserArr($schoolid,$schooltype, $weid, $tname, $arr, $noticearr, $usertaype, $pindex='1', $psize='20'){ //向指定用户发送班级通知
+		global $_GPC,$_W;
+		$smsset = get_weidset($weid,'zuoye');	
+		$sms_set = get_school_sms_set($schoolid);
+		if($sms_set['zuoye'] == 1 || !empty($smsset['zuoye'])) {
+			$school = pdo_fetch("SELECT title FROM ".tablename($this->table_index)." WHERE :weid = weid And :id = id", array(':weid' => $weid, ':id' => $schoolid));
+			$newArray = array_slice($arr,($pindex-1)*$psize,$psize);
+			foreach($newArray as $key=> $val){	
+				if($usertaype == 'tostu'){					
+					$student = pdo_fetch("select s_name,bj_id from ".tablename($this->table_students)." where id = '{$val}' ");
+					foreach($noticearr as $item){
+						$nownotice = pdo_fetch("SELECT id,title,outurl,createtime,bj_id,kc_id,km_id FROM ".tablename($this->table_notice)." WHERE :id = id ", array(':id' => $item));
+						if($schooltype){
+							$stuallkc = pdo_fetchall("SELECT distinct kcid FROM ".tablename($this->table_order)." where sid = '{$val}' And type = 1 And status = 2 And sid != 0 ");
+							$kclallsarr = array();
+							foreach($stuallkc as $key){
+								$kclallsarr[] = $key['kcid'];
+							}
+							if(in_array($nownotice['kc_id'],$kclallsarr)){
+								$checknow = pdo_fetch("SELECT id FROM ".tablename($this->table_record)." where weid = :weid And schoolid = :schoolid And noticeid = :noticeid And sid = :sid ",array(':weid'=>$weid,':schoolid'=>$schoolid,':noticeid'=>$nownotice['id'],':sid'=>$val));
+								if($checknow){
+									continue;
+								}else{
+									$notice = $nownotice;
+									$notice_id = $notice['id'];	
+								}
+							}else{
+								continue;
+							}
+						}else{
+							if($student['bj_id'] == $nownotice['bj_id']){
+								$notice = $nownotice;
+								$notice_id = $notice['id'];
+							}
+						}
+
+					}
+					if($schooltype){
+						$category = pdo_fetch("SELECT name as sname FROM " . tablename($this->table_tcourse) . " WHERE :id = id ", array(':id' => $notice['kc_id']));
+						$title ="{$tname}发来一条作业消息!";
+					}else{
+						$category = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE :sid = sid ", array(':sid' => $notice['bj_id']));
+						$km = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE :sid = sid ", array(':sid' => $notice['km_id']));
+						$title ="【{$km['sname']}】-{$tname}发来一条作业消息!";
+					}
+					$openidall = pdo_fetchall("select id,sid,tid,pard,userinfo,openid from ".tablename($this->table_user)." where sid = '{$val}' ");
+					$bjname  = "{$category['sname']}";
+					$body  = "点击本条消息查看详情 ";
+					foreach ($openidall as $values) {
+						$openid = $values['openid'];
+						$mobileinfo = $values['userinfo'];
+						$record = pdo_fetch("SELECT id FROM ".tablename($this->table_record)." where weid = :weid And schoolid = :schoolid And noticeid = :noticeid And openid = :openid And sid = :sid And userid = :userid And type = :type",array(
+							':weid'=>$weid,
+							':schoolid'=>$schoolid,
+							':noticeid'=>$notice_id,
+							':openid'=>$openid,
+							':sid'=>$values['sid'],
+							':userid'=>$values['id'],
+							':type'=>1
+						));
+						$datas=array(
+							'name'=>array('value'=>$_W['account']['name'],'color'=>'#173177'),
+							'first'=>array('value'=>$title,'color'=>'#1587CD'),
+							'keyword1'=>array('value'=>$bjname,'color'=>'#1587CD'),
+							'keyword2'=>array('value'=>$notice['title'],'color'=>'#2D6A90'),
+							'remark'=> array('value'=>$body,'color'=>'#FF9E05')
+						);
+						$data = json_encode($datas); //发送的消息模板数据
+
+						if(empty($record['id'])){
+							if($values['sid']){
+								$date = array(
+									'weid' =>  $weid,
+									'schoolid' => $schoolid,
+									'noticeid' => $notice_id,
+									'sid' => $values['sid'],
+									'userid' => $values['id'],
+									'openid' => $openid,
+									'type' => 1,
+									'createtime' => $notice['createtime']
+								);
+								pdo_insert($this->table_record, $date);
+								$record_id = pdo_insertid();
+								if(!empty($notice['outurl'])){
+									$url = $notice['outurl'];
+								}else{
+									$url =  $_W['siteroot'] .'app/'.$this->createMobileUrl('szuoye', array('schoolid' => $schoolid,'record_id' => $record_id,'id' => $notice_id,'userid' => $values['id']));
+								}
+								if(isallow_sendsms($schoolid,'zuoye')){
+									$mobile = unserialize($mobileinfo);
+									if($mobile['mobile']){
+										$ttimes = date('m月d日 H:i', TIMESTAMP);
+										$content = array(
+											'name' => "(".$km['sname'].")-".$tname."老师",
+											'time' => $ttimes,
+										);
+										if($schooltype){
+											$content['name'] = $tname."老师";
+										}
+										mload()->model('sms');
+										sms_send($mobile['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'zuoye', $weid, $schoolid);
+									}
+								}
+								if(!empty($smsset['zuoye'])){	
+									$this->sendtempmsg($smsset['zuoye'], $url, $data, '#FF0000', $openid);
+								}
+							}
+						}
+					}
+				}
+			}
+		}		
+	}	
 	public function sendMobileZuoye($notice_id, $schoolid, $weid, $tname, $bj_id, $pindex='1', $psize='1000') {  //作业群发通知
 		global $_GPC,$_W;
 		$smsset = get_weidset($weid,'zuoye');	
@@ -1022,7 +1133,129 @@ class Core extends WeModuleSite {
 		}
 
 	}
+	public function sendMobileBjtzToUserArr($schoolid,$schooltype, $weid, $tname, $arr, $noticearr, $usertaype, $pindex='1', $psize='20'){ //向指定用户发送班级通知
+		global $_GPC,$_W;
+		$smsset = get_weidset($weid,'bjtz');	
+		$sms_set = get_school_sms_set($schoolid);
+		if($sms_set['bjtz'] == 1 || !empty($smsset['bjtz'])) {
+			$school = pdo_fetch("SELECT title FROM ".tablename($this->table_index)." WHERE :weid = weid And :id = id", array(':weid' => $weid, ':id' => $schoolid));
+			$newArray = array_slice($arr,($pindex-1)*$psize,$psize);
+			foreach($newArray as $key=> $val){	
+				if($usertaype == 'tostu'){					
+					$student = pdo_fetch("select s_name,bj_id from ".tablename($this->table_students)." where id = '{$val}' ");
+					foreach($noticearr as $item){
+						$nownotice = pdo_fetch("SELECT id,title,outurl,createtime,bj_id,kc_id FROM ".tablename($this->table_notice)." WHERE :id = id ", array(':id' => $item));
+						if($schooltype){
+							$stuallkc = pdo_fetchall("SELECT distinct kcid FROM ".tablename($this->table_order)." where sid = '{$val}' And type = 1 And status = 2 And sid != 0 ");
+							$kclallsarr = array();
+							foreach($stuallkc as $key){
+								$kclallsarr[] = $key['kcid'];
+							}
+							if(in_array($nownotice['kc_id'],$kclallsarr)){
+								$checknow = pdo_fetch("SELECT id FROM ".tablename($this->table_record)." where weid = :weid And schoolid = :schoolid And noticeid = :noticeid And sid = :sid ",array(':weid'=>$weid,':schoolid'=>$schoolid,':noticeid'=>$nownotice['id'],':sid'=>$val));
+								if($checknow){
+									continue;
+								}else{
+									$notice = $nownotice;
+									$notice_id = $notice['id'];	
+								}
+							}else{
+								continue;
+							}
+						}else{
+							if($student['bj_id'] == $nownotice['bj_id']){
+								$notice = $nownotice;
+								$notice_id = $notice['id'];
+							}
+						}
 
+					}
+					if($schooltype){
+						$category = pdo_fetch("SELECT name as sname FROM " . tablename($this->table_tcourse) . " WHERE :id = id ", array(':id' => $notice['kc_id']));
+					}else{
+						$category = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE :sid = sid ", array(':sid' => $notice['bj_id']));
+					}
+					$openidall = pdo_fetchall("select id,sid,tid,pard,userinfo,openid from ".tablename($this->table_user)." where sid = '{$val}' ");
+					$name  = "{$tname}老师";
+					$bjname  = "{$category['sname']}";
+					$ttime = date('Y-m-d H:i:s', $notice['createtime']);
+					$body  = "点击本条消息查看详情 ";
+					foreach ($openidall as $values) {
+						$openid = $values['openid'];
+						$mobileinfo = $values['userinfo'];
+						$record = pdo_fetch("SELECT id FROM ".tablename($this->table_record)." where weid = :weid And schoolid = :schoolid And noticeid = :noticeid And openid = :openid And sid = :sid And userid = :userid And type = :type",array(
+							':weid'=>$weid,
+							':schoolid'=>$schoolid,
+							':noticeid'=>$notice_id,
+							':openid'=>$openid,
+							':sid'=>$values['sid'],
+							':userid'=>$values['id'],
+							':type'=>1
+						));
+						if($values['pard'] == 2){
+							$guanxi = "妈妈";
+						}else if($values['pard'] == 3){
+							$guanxi = "爸爸";
+						}else if($values['pard'] == 4){
+							$guanxi = "";
+						}else if($values['pard'] == 5){
+							$guanxi = "家长";
+						}
+						$title = "【{$student['s_name']}】{$guanxi}，您收到一条班级通知";
+						$datas=array(
+							'name'=>array('value'=>$_W['account']['name'],'color'=>'#173177'),
+							'first'=>array('value'=>$title,'color'=>'#1587CD'),
+							'keyword1'=>array('value'=>$bjname,'color'=>'#1587CD'),
+							'keyword2'=>array('value'=>$name,'color'=>'#2D6A90'),
+							'keyword3'=>array('value'=>$ttime,'color'=>'#1587CD'),
+							'keyword4'=>array('value'=>$notice['title'],'color'=>'#1587CD'),
+							'remark'=> array('value'=>$body,'color'=>'#FF9E05')
+									);
+						$data = json_encode($datas); //发送的消息模板数据
+
+						if(empty($record['id'])){
+							if($values['sid']){
+								$date = array(
+									'weid' =>  $weid,
+									'schoolid' => $schoolid,
+									'noticeid' => $notice_id,
+									'sid' => $values['sid'],
+									'userid' => $values['id'],
+									'openid' => $openid,
+									'type' => 1,
+									'createtime' => $notice['createtime']
+								);
+								pdo_insert($this->table_record, $date);
+								$record_id = pdo_insertid();
+								if(!empty($notice['outurl'])){
+									$url = $notice['outurl'];
+								}else{
+									$url =  $_W['siteroot'] .'app/'.$this->createMobileUrl('snotice', array('schoolid' => $schoolid,'record_id' => $record_id,'id' => $notice_id,'userid' => $values['id']));
+								}
+								if(isallow_sendsms($schoolid,'bjtz')){
+									$mobile = unserialize($mobileinfo);
+									if($mobile['mobile']){
+										$ttimes = date('m月d日 H:i', TIMESTAMP);
+										$content = array(
+											'name' => "(".$student['s_name'].")".$guanxi,
+											'time' => $ttimes,
+											'type' => "班级通知",
+										);
+										mload()->model('sms');
+										sms_send($mobile['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'bjtz', $weid, $schoolid);
+									}
+								}
+								if(!empty($smsset['bjtz'])){
+									$this->sendtempmsg($smsset['bjtz'], $url, $data, '#FF0000', $openid);
+									
+								}
+							}
+						}
+					}
+				}
+			}
+		}		
+	}
 	public function sendMobileBjtz($notice_id, $schoolid, $weid, $tname, $bj_id, $pindex, $psize) { //班级群发通知
 		global $_GPC,$_W;
 		$smsset = get_weidset($weid,'bjtz');	
@@ -1986,9 +2219,6 @@ class Core extends WeModuleSite {
 		if($sms_set['xxtongzhi'] == 1 || !empty($smsset['xxtongzhi'])) {
 			$notice = pdo_fetch("SELECT title,outurl,createtime FROM ".tablename($this->table_notice)." WHERE :weid = weid AND :id = id AND :schoolid = schoolid", array(':weid' => $weid, ':id' => $notice_id, ':schoolid' => $schoolid));
 			$school = pdo_fetch("SELECT title FROM ".tablename($this->table_index)." WHERE :weid = weid AND :id = id", array(':weid' => $weid, ':id' => $schoolid));
-			if ($groupid >= 4) {
-				$userinfo = pdo_fetchall("SELECT id,tname,mobile FROM ".tablename($this->table_teachers)." where weid = :weid And schoolid = :schoolid And fz_id = :fz_id LIMIT " . ($pindex - 1) * $psize . ',' . $psize,array(':weid'=>$weid, ':schoolid'=>$schoolid, ':fz_id'=>$groupid));			
-			}else{
 				if ($groupid == 1) {
 				$userinfo = pdo_fetchall("SELECT id,sid,tid,pard,userinfo FROM ".tablename($this->table_user)." where weid = :weid And schoolid = :schoolid LIMIT " . ($pindex - 1) * $psize . ',' . $psize,array(':weid'=>$weid, ':schoolid'=>$schoolid));
 				}
@@ -1998,74 +2228,9 @@ class Core extends WeModuleSite {
 				if ($groupid == 3) {
 					$userinfo = pdo_fetchall("SELECT id,s_name FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid ORDER BY id DESC LIMIT " . ($pindex - 1) * $psize . ',' . $psize,array(':weid'=>$weid, ':schoolid'=>$schoolid));
 				}
-			}
+			
 			foreach ($userinfo as $key => $value) {
 				$openid = "";
-				if ($groupid >= 4) {
-					$openid = pdo_fetch("select * from ".tablename($this->table_user)." where tid = '{$value['id']}' ");
-					$title = "【{$value['tname']}】老师，您收到一条学校通知";
-					$schoolname ="{$school['title']}";
-					$name  = "{$tname}老师";
-					$ttime = date('Y-m-d H:i:s', $notice['createtime']);
-					$body  = "点击本条消息查看详情 ";
-					$datas=array(
-						'name'=>array('value'=>$_W['account']['name'],'color'=>'#173177'),
-						'first'=>array('value'=>$title,'color'=>'#1587CD'),
-						'keyword1'=>array('value'=>$schoolname,'color'=>'#1587CD'),
-						'keyword2'=>array('value'=>$name,'color'=>'#2D6A90'),
-						'keyword3'=>array('value'=>$ttime,'color'=>'#1587CD'),
-						'keyword4'=>array('value'=>$notice['title'],'color'=>'#1587CD'),
-						'remark'=> array('value'=>$body,'color'=>'#FF9E05')
-								);
-					$data = json_encode($datas); //发送的消息模板数据
-					//message($datas);
-
-					$record = pdo_fetch("SELECT id FROM ".tablename($this->table_record)." where weid = :weid And schoolid = :schoolid And noticeid = :noticeid And openid = :openid And tid = :tid And userid = :userid And type = :type",array(
-										':weid'=>$_W['uniacid'],
-										':schoolid'=>$schoolid,
-										':noticeid'=>$notice_id,
-										':openid'=>$openid['openid'],
-										':tid'=>$openid['tid'],
-										':userid'=>$openid['id'],
-										':type'=>3,
-					));
-					if(empty($record['id'])){
-						if($openid['tid']){
-							$date = array(
-								'weid' =>  $_W['uniacid'],
-								'schoolid' => $schoolid,
-								'noticeid' => $notice_id,
-								'tid' => $openid['tid'],
-								'userid' => $openid['id'],
-								'openid' => $openid['openid'],
-								'type' => 3,
-								'createtime' => $notice['createtime']
-							);
-							pdo_insert($this->table_record, $date);
-							$record_id = pdo_insertid();
-						
-							if(!empty($notice['outurl'])){
-								$url = $notice['outurl'];
-							}else{
-								$url =  $_W['siteroot'] .'app/'.$this->createMobileUrl('mnotice', array('schoolid' => $schoolid,'id' => $notice_id,'record_id' => $record_id));
-							}
-							if(isallow_sendsms($schoolid,'xxtongzhi')){
-								if($value['mobile']){
-									$ttimes = date('m月d日 H:i', TIMESTAMP);
-									$content = array(
-										'name' => $value['tname']."老师",
-										'time' => $ttimes,
-									);
-									mload()->model('sms');
-									sms_send($value['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'xxtongzhi', $weid, $schoolid);
-								}
-							}								
-							if(!empty($smsset['xxtongzhi'])){
-								$this->sendtempmsg($smsset['xxtongzhi'], $url, $data, '#FF0000', $openid['openid']);
-							}
-						}
-					}					
-				}else{
 					if ($groupid == 2) {
 						$openid = pdo_fetch("select * from ".tablename($this->table_user)." where tid = '{$value['id']}' ");
 						$title = "【{$value['tname']}】老师，您收到一条学校通知";
@@ -2333,7 +2498,7 @@ class Core extends WeModuleSite {
 							}
 						}
 					}
-				}	
+					
 			}
 		}
 	}

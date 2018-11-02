@@ -28,6 +28,10 @@
 							{if $v['shenfen'] == '校长'}<div class="JobLeaderBox">{$v['shenfen']}</div>{/if}
 							{if $v['shenfen'] == '主任'}<div class="JobTeacherBox">{$v['shenfen']}</div>{/if}
 							{if $v['shenfen'] == '老师'}<div class="JobTeacherBox">{$v['shenfen']}</div>{/if}
+							{if $v['usertype'] == 'send_class'}<div class="Tip_usertype">指定班级</div>{/if}
+							{if $v['usertype'] == 'student'}<div class="Tip_usertype">指定学生</div>{/if}
+							{if $v['usertype'] == 'staff_jsfz'}<div class="Tip_usertype">指定老师组</div>{/if}
+							{if $v['usertype'] == 'staff'}<div class="Tip_usertype">指定老师</div>{/if}
 					</div>
 					<p class="notifyCreateTime">{$v['banji']}&nbsp;{$v['time']}</p>
 				</div>

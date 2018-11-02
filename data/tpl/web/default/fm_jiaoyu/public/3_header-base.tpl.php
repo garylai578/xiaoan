@@ -42,10 +42,14 @@
 	<script>var require = {urlArgs: 'v=<?php  echo date('YmdH');?>' };</script>
 	<?php  if(IMS_VERSION >= 1.5) { ?>
 	<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
+	<?php  if($_GPC['do'] != checkdatedetail) { ?>
 	<script type="text/javascript" src="./resource/js/lib/bootstrap.min.js"></script>
+	<?php  } else { ?>
+	<script type="text/javascript" src="<?php echo MODULE_URL;?>public/web/js/amazeui.min.js"></script>
+	<?php  } ?>
 	<script type="text/javascript" src="./resource/js/app/util.js"></script>
 	<script type="text/javascript" src="./resource/js/app/common.min.js"></script>
-	<?php  if(( $_GPC['do'] != photos || ( $_GPC['do'] == photos && $_GPC['op'] == 'display' ) ) &&  ($_GPC['do'] != bjquan) &&  ($_GPC['do'] != checklog)  &&  ($_GPC['do'] != signup) && ($_GPC['do'] != 'template' || ( $_GPC['do'] == template && $_GPC['op'] != 'display4' ))) { ?>
+	<?php  if((  $_GPC['do'] != photos || ( $_GPC['do'] == photos && $_GPC['op'] == 'display' ) ) &&  ($_GPC['do'] != bjquan) &&  ($_GPC['do'] != checklog)  &&  ($_GPC['do'] != signup) && ($_GPC['do'] != 'template' || ( $_GPC['do'] == template && $_GPC['op'] != 'display4' ))) { ?>
 	<script type="text/javascript" src="./resource/js/require.js"></script>
 	<?php  } ?>
 	
@@ -54,7 +58,7 @@
 	<script type="text/javascript" src="./resource/js/lib/jquery-1.11.1.min.js"></script>
 	
 	<script src="<?php  echo $_W['siteroot'];?>web/resource/js/app/util.js"></script>
-	<?php  if(( $_GPC['do'] != photos || ( $_GPC['do'] == photos && $_GPC['op'] == 'display' ) ) &&  ($_GPC['do'] != bjquan) &&  ($_GPC['do'] != checklog)  &&  ($_GPC['do'] != signup) && ($_GPC['do'] != 'template' || ( $_GPC['do'] == template && $_GPC['op'] != 'display4' ))) { ?>
+	<?php  if(($_GPC['do'] != photos || ( $_GPC['do'] == photos && $_GPC['op'] == 'display' ) ) &&  ($_GPC['do'] != bjquan) &&  ($_GPC['do'] != checklog)  &&  ($_GPC['do'] != signup) && ($_GPC['do'] != 'template' || ( $_GPC['do'] == template && $_GPC['op'] != 'display4' ))) { ?>
 	<script type="text/javascript" src="./resource/js/require.js"></script>
 	<?php  } ?>
 	<script src="<?php  echo $_W['siteroot'];?>web/resource/js/app/config.js"></script>	
@@ -67,10 +71,11 @@
 	<!--daozhelile-->
 </head>
 <!--zhli-->
-<script type="text/javascript" src="../addons/fm_jiaoyu/public/web/js/velocity.min.js"></script> 
-		<script type="text/javascript" src="../addons/fm_jiaoyu/public/web/js/hammer.min.js"></script> 
+
 <body>
 <?php  if(($_GPC['do'] == template && $_GPC['op'] == 'display4' )) { ?>
+<script type="text/javascript" src="../addons/fm_jiaoyu/public/web/js/velocity.min.js"></script> 
+		<script type="text/javascript" src="../addons/fm_jiaoyu/public/web/js/hammer.min.js"></script> 
 	<script type="text/javascript" src="../addons/fm_jiaoyu/public/web/js/muuri.js"></script> 
 	<script type="text/javascript" src="../addons/fm_jiaoyu/public/web/js/demo-grid.js"></script> 
 <?php  } ?>

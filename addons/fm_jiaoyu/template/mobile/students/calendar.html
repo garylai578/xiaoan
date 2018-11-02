@@ -237,6 +237,7 @@ $(date).each(function (index, obj) {
 
 	if (rest.indexOf(parseInt($(this).find('.dateBox').text())) != -1) {
 		$(this).find('.tipBox').text('休');
+		$(this).find('.dateBox').removeClass('absentTip');
 		$(this).find('.tipBox').addClass('signin');
 		$(this).find('.tipBox').css('display', 'block');
 	}
@@ -316,7 +317,7 @@ function GetAttendData(time) {
 			$(".monthData").find("span").text(count);
 			var lstAttendInfo = dt.lstAttendInfo;
 			initAttendData(lstAttendInfo);
-
+			GetHolidayData(time);
 		}
 	});
 }
@@ -324,7 +325,7 @@ function GetAttendData(time) {
 //获取公休日
 function GetHolidayData(time) {
 $.ajax({
-	url: "/1046/AttendCalendar/GetHoliday",
+	url: "{php echo $this->createMobileUrl('dongtaiajax', array('op' => 'GetHolidayData','schoolid' => $schoolid,'bj_id'=>$student['bj_id']), true)}",
 	type: "post",
 	dataType: "html",
 	data: {
@@ -396,6 +397,8 @@ $(date).each(function (index, obj) {
 	if (holidayData.indexOf(parseInt($(this).find('.dateBox').text())) != -1) {
 		$(this).find('.tipBox').text('休');
 		$(this).find('.tipBox').addClass('signin');
+		$(this).find('.dateBox').removeClass('absentTip');
+		$(this).find('.tipBox').css('display', 'block');
 	}
 });
 }
@@ -483,10 +486,10 @@ $(".slide_left_menu_bg").on("click", function () {
 //日期点击
 $('.datePickerBox').on('click', '.item', function (e) {
 	if (checkClick(e, $(this))) {
-		if ($(this).find('.dateBox').hasClass('weekBox') && $(this).find('.tipBox') == '') {
-			setClickDate($(this));
-			return;
-		} else {
+		//if ($(this).find('.dateBox').hasClass('weekBox') && $(this).find('.tipBox') == '') {
+		//	setClickDate($(this));
+		//	return;
+		//} else {
 			$('.outSide').css('display', '');
 			$('.outSide').removeClass('currentItemOutSide');
 			$(this).find('.outSide').css('display', 'inline-block');
@@ -578,11 +581,58 @@ $('.datePickerBox').on('click', '.item', function (e) {
 					//                    无标注：正常打卡
 				case "休":
 					ajax_stop_loading();
+					$.ajax({
+						url: "{php echo $this->createMobileUrl('dongtaiajax', array('op' => 'checklogbyid','bj_id' => $student['bj_id'],'schoolid' => $schoolid), true)}",
+						type: "post",
+						dataType: "html",
+						data: {
+							time: time,
+							sid: "{$it['sid']}"
+						},						
+						success: function (data) {
+							ajax_stop_loading();
+							var dt = eval(data);
+							$('.commonAlert').find(".wxAlertContent").children().remove();
+							var alertHtml = "";
+							for (var i = 0; i < dt.length; i++) {
+								var url = dt[i].Url;
+								var type = dt[i].Type;
+								var url2 = dt[i].Url2;
+								if (type == "card") {
+									if (!url2){
+										alertHtml += "<div class=\"schoolBox\">";
+										alertHtml += "<div class=\"schoolCard\">刷卡:" + dt[i].Name + "</div>";
+										alertHtml += "<div class=\"schoolCard\">体温:" + dt[i].Temp + "</div>";
+										alertHtml += "<div class=\"schoolCardTime\">时间：" + dt[i].Time + dt[i].Macname + "</div>";
+										alertHtml += "<div class=\"schoolCardCardImg\"><img src=\"" + url + "\" class=\"img-responsive\"></div>";
+										alertHtml += "</div>";
+									}else{
+										alertHtml += "<div class=\"schoolBox\">";
+										alertHtml += "<div class=\"schoolCard\">刷卡:" + dt[i].Name + "</div>";
+										alertHtml += "<div class=\"schoolCard\">体温:" + dt[i].Temp + "</div>";
+										alertHtml += "<div class=\"schoolCardTime\">时间：" + dt[i].Time + dt[i].Macname + "</div>";
+										alertHtml += "<div class=\"schoolCardCardImg\"><img src=\"" + url + "\" class=\"img-responsive\"></div></br>";
+										alertHtml += "<div class=\"schoolCardCardImg\"><img src=\"" + url2 + "\" class=\"img-responsive\"></div>";
+										alertHtml += "</div>";									
+									}
+								} else {
+									alertHtml += "<div class=\"schoolBox\">";
+									alertHtml += "<div class=\"schoolCard\">微信签到:" + dt[i].Name + "</div>";
+									alertHtml += "<div class=\"schoolCardTime\">签到时间：" + dt[i].Time + "</div>"
+									alertHtml += "</div>";
+								}
+							}
+
+							$('.commonAlert').find(".wxAlertContent").append(alertHtml);
+							$('.commonAlert').show();
+							setbodyNoscroll();
+						}
+					});
 					break;
 				default:
 					ajax_stop_loading();
 					break;
-			}
+			//}
 		}
 	} else {
 		setClickDate($(this));
@@ -830,7 +880,7 @@ CreateCalendar: function (y, m, d) {
 	//获取当月第一天是星期几
 
 	var nowWeek = parseInt(this.CalculateWeek(nowYear, nowMonth, 1));
-	console.log(nowWeek);
+	//console.log(nowWeek);
 
 	//获取上个月的天数
 	var t = -1;
@@ -904,7 +954,7 @@ CreateCalendar: function (y, m, d) {
 	$dayItem.append("<div class=\"borderLine\"></div>");
 	$dayItem.append("<div class='bottomBoxNav'><div class='itemBox'><span class='itemDots'></span><span class='itemNav'>签到</span></div><div class='itemBox'><span class='itemDotsQx'></span><span class='itemNav'>缺席</span></div><div class='itemBox'><span class='itemDotsQj'></span><span class='itemNav'>请假</span></div></div>");
 
-	console.log($dayItem);
+	//console.log($dayItem);
 	return $dayItem;
 },
 CSS: function () {

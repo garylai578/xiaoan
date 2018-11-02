@@ -17,7 +17,7 @@
 		<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="{php echo $this->createMobileUrl('zuoyelist', array('schoolid' => $schoolid,'bj_id'=>$leave['bj_id']), true)}"></a>
 	</div>
 	<div class="m">
-		<span style="font-size: 18px">{$nowbj['sname']}{$nowkm['sname']}作业</span>   
+		<span style="font-size: 18px">{if $schooltype}{$kcinfo['name']}{else}{$nowbj['sname']}{$nowkm['sname']}作业{/if}</span>   
 	</div>
 	<div id="headerMenu" class="r">
 	</div>
@@ -137,6 +137,7 @@
 		</div>
 	</div>
 	{/if}
+	{if $leave['anstype']}
 	<div class="commentBox">
 		<div class="mobile_comment" >
 			<div class="commentTitle">
@@ -156,7 +157,44 @@
 			    </li>				
 			</ul>
 		</div>			
-	</div>	
+	</div>
+	{/if}
+	{if $leave['usertype'] == 'send_class' || $leave['usertype'] == 'student'}
+	<div class="commentBox">
+		<div class="mobile_comment" >
+			<div class="commentTitle">
+				<span class="l">
+					{if $leave['usertype'] == 'send_class'}指定班级{/if}
+					{if $leave['usertype'] == 'student'}指定学生{/if}
+				</span>
+				<span class="r vvv">查看详情</span>
+			</div>
+			<ul class="commentList">
+			{if $leave['usertype'] == 'send_class'}
+				{loop $arr $row}
+				<li class="comment_li">
+					<span style="margin-left:5px;">{$row['name']}</span></br>							
+				</li>
+				{/loop}	
+			{else}
+				
+				{loop $arr $row}
+				<li class="comment_li">
+					<span style="margin-left:5px;">{$row['bjname']}</span></br>
+					{loop $row['stulist'] $item}
+					<a class="headImg">
+						<img src="{$item['icon']}">
+						<span>{$item['name']}</span>
+					</a>
+					{/loop}
+				</li>	
+				{/loop}		
+								
+			{/if}					
+			</ul>
+		</div>			
+	</div>
+	{/if}	
 {php include $this->template('comad');}
 {php include $this->template('newfooter');}
 </body>

@@ -63,12 +63,18 @@
 						<input class="form-control" id="keyword" name="keyword" placeholder="标题(标题关键字)" type="search">
 					</div>
 					 <div class="form-group">
-						<label class="sr-only" for="q_name">按班级</label>
+						<label class="sr-only" for="q_name">{if $schooltype}按课程{else}按班级{/if}</label>
 							<select style="margin-right:15px;" name="bj_id" class="form-control">
 								<option value="">请选择班级搜索</option>
-								{loop $bjlist $row}
-								<option value="{$row['sid']}" {if $row['sid'] == $_GPC['bj_id']} selected="selected"{/if}>{$row['sname']}</option>
-								{/loop}
+								{if $schooltype}
+									{loop $kclist $row}
+									<option value="{$row['sid']}" {if $row['sid'] == $_GPC['bj_id']} selected="selected"{/if}>{$row['sname']}</option>
+									{/loop}
+								{else}
+									{loop $bjlist $row}
+									<option value="{$row['sid']}" {if $row['sid'] == $_GPC['bj_id']} selected="selected"{/if}>{$row['sname']}</option>
+									{/loop}
+								{/if}
 							</select>									
 					</div>
 					<input class="btn btn-sm btn-success" name="commit" type="submit" value="搜索">					
@@ -122,7 +128,7 @@
 						<span class="label label-success">{php echo date('Y-m-d H:m:s',$item['createtime'])}</span>
 					</td>
 					<td>
-						{$item['bjname']}
+						{$item['bjname']}	
 					</td>
 <!-- 					<td>
 						{$item['kmname']}
@@ -382,23 +388,33 @@ $(function(){
 						<label class="sr-only" for="q_name">标题(标题关键字)</label>
 						<input class="form-control" id="keyword" name="keyword" placeholder="标题(标题关键字)" type="search">
 					</div>
+					{if $schooltype}
 					<div class="form-group">
-							<select style="margin-right:15px;" name="bj_id" class="form-control">
-								<option value="">请选择班级搜索</option>
-								{loop $bjlist $row}
-								<option value="{$row['sid']}" {if $row['sid'] == $_GPC['bj_id']} selected="selected"{/if}>{$row['sname']}</option>
-								{/loop}
-							</select>							
+						<select style="margin-right:15px;" name="bj_id" class="form-control">
+							<option value="">请选择班级搜索</option>
+							{loop $kclist $row}
+							<option value="{$row['sid']}" {if $row['sid'] == $_GPC['bj_id']} selected="selected"{/if}>{$row['sname']}</option>
+							{/loop}
+						</select>							
+					</div>
+					{else}
+					<div class="form-group">
+						<select style="margin-right:15px;" name="bj_id" class="form-control">
+							<option value="">请选择班级搜索</option>
+							{loop $bjlist $row}
+							<option value="{$row['sid']}" {if $row['sid'] == $_GPC['bj_id']} selected="selected"{/if}>{$row['sname']}</option>
+							{/loop}
+						</select>							
 					</div>
 					<div class="form-group">
-							<select style="margin-right:15px;" name="km_id" class="form-control">
-								<option value="">请选择科目搜索</option>
-								{loop $kmlist $row}
-								<option value="{$row['sid']}" {if $row['sid'] == $_GPC['km_id']} selected="selected"{/if}>{$row['sname']}</option>
-								{/loop}
-							</select>						
-
+						<select style="margin-right:15px;" name="km_id" class="form-control">
+							<option value="">请选择科目搜索</option>
+							{loop $kmlist $row}
+							<option value="{$row['sid']}" {if $row['sid'] == $_GPC['km_id']} selected="selected"{/if}>{$row['sname']}</option>
+							{/loop}
+						</select>						
 					</div>
+					{/if}
 					<input class="btn btn-sm btn-success" name="commit" type="submit" value="搜索">					
 				</form>
 			</div>
@@ -456,7 +472,7 @@ $(function(){
 					</td>					
 					<td>
 						{if empty($item['tname'])}<span class="label label-success"><i class="fa fa-wechat"></i></span>&nbsp;无{else}&nbsp;
-						<span class="label label-warning">{$item['tname']}</span>{/if}
+						<span class="label label-info">{$item['tname']}</span>{/if}
 					</td>					
 					<td style="text-align:right; position:relative;">
 						<a class="qx_1223" href="{php echo $this->createWebUrl('notice', array('op' => 'display5', 'notice_id' => $item['id'], 'schoolid' => $schoolid))}" title="查看">发送记录</a>&nbsp;-&nbsp;
@@ -1163,7 +1179,7 @@ $(function(){
 							<select style="margin-right:15px;" name="kc_id" class="form-control">
 								<option value="0">请选择课程</option>
 								{loop $kclist $it}
-								<option value="{$it['id']}">{$it['name']}</option>
+								<option value="{$it['sid']}">{$it['sname']}</option>
 								{/loop}
 							</select>
 						</div>

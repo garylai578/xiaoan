@@ -448,6 +448,47 @@
 						pdo_insert($this->table_coursebuy,$data_coursebuy);
 					}
 	        	}
+				
+				$shareset_t = pdo_fetch("SELECT shareset FROM " . tablename($this->table_index) . " WHERE :schoolid = id AND weid=:weid ", array(':schoolid' => $temporder['schoolid'],':weid'=>$temporder['weid'] ));
+				$shareset = unserialize($shareset_t['shareset']);
+				
+				if($shareset['is_share'] != 0 ){
+					
+				 	if($temporder['shareuserid'] != 0){
+						$sharesid = pdo_fetch("SELECT sid FROM " . tablename($this->table_user) . " where :id = id", array(':id' => $temporder['shareuserid']));
+				 		$student_share = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where :id = id", array(':id' => $sharesid['sid']));
+						$temp_student = array();
+						//给分享源用户新增积分、余额、课时
+						if($shareset['is_share'] == 1){
+							//新增积分
+							$AddJF = $shareset['addJF'];
+							$oldJF = $student_share['points'];
+							$newJF = $AddJF + $oldJF;
+							//$temp_student['points'] = $newJF;
+							pdo_update($this->table_students, array('points' => $newJF ), array('id' => $sharesid['sid']));
+						}elseif($shareset['is_share'] == 2){
+							//新增余额
+							$AddYE = $shareset['addYE'];
+							$oldYE = $student_share['chongzhi'];
+							$newYE = $AddYE + $oldYE;
+							//$temp_student['chongzhi'] = $newYE;
+							pdo_update($this->table_students, array('chongzhi' => $newYE ), array('id' => $sharesid['sid']));
+						}elseif($shareset['is_share'] == 3){
+							//新增课时
+							$AddKC = $temporder['kcid'];
+							$AddKS = $shareset['addKS'];
+							$kcinfo_share =  pdo_fetch("SELECT * FROM " . tablename($this->table_tcourse) . " where :id = id", array(':id' => $AddKC));
+							$coursebuy =  pdo_fetch("SELECT ksnum,id FROM " . tablename($this->table_coursebuy) . " where kcid=:kcid AND :sid = sid", array(':kcid' => $AddKC,':sid'=>$sharesid['sid']));
+							if(!empty($coursebuy)){
+								$newksnum = $coursebuy['ksnum'] + $AddKS;
+								if($newksnum > $kcinfo_share['AllNum']){
+									$newksnum = $kcinfo_share['AllNum'];
+								}
+								pdo_update($this->table_coursebuy, array('ksnum' => $newksnum ),  array('id' => $coursebuy['id']));
+							}
+						} 
+					} 
+				}
        		}elseif($temporder['type'] == 8){
 				$sid = $temporder['sid'];
 				$students = pdo_fetch("SELECT chongzhi FROM " . tablename($this->table_students) . " where :id = id", array(':id' =>$sid));

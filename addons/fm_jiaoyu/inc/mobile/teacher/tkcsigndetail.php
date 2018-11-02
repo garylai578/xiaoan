@@ -25,13 +25,29 @@
 		$nj_temp .= $value_n['sid'].",";
 	}
 	$nj_after =trim($nj_temp,","); 
+	
+	
+	$bj_t = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
+			$nj_t = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
+			$bj_str_temp = '0,';
+			foreach($bj_t as $key_b=>$value_b){
+				$bj_str_temp .=$value_b['sid'].",";
+			}
+			$bj_str = trim($bj_str_temp,",");
+			$nj_str_temp = '0,';
+			foreach($nj_t as $key_n=>$value_n){
+				$nj_str_temp .=$value_n['sid'].",";
+			}
+			$nj_str = trim($nj_str_temp,",");
+			
+			
 	if(!empty($_GPC['limit'])){
 		$limit = trim($_GPC['limit']);
 		$page_start = $limit + 1 ;
 		if($teachers['status'] != 2){
-		   	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid}) And xq_id in({$nj_after}) ORDER BY end DESC LIMIT ".$page_start.",5");
+		   	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid})  And FIND_IN_SET(xq_id,'{$nj_after}') and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}') ORDER BY end DESC LIMIT ".$page_start.",5");
 	   }elseif($teachers['status'] ==2){
-	    	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid})  ORDER BY end DESC LIMIT ".$page_start.",5");
+	    	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid}) and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}')  ORDER BY end DESC LIMIT ".$page_start.",5");
 	   }
 	   	
 		foreach( $kclist as $key => $value )
@@ -51,9 +67,9 @@
 		include $this->template('comtool/tkcsigndetail'); 
 	}elseif(empty($_GPC['limit'])){
 			if($teachers['status'] != 2){
-		   	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid}) And xq_id in({$nj_after}) ORDER BY end DESC LIMIT 0,5");
+		   	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid}) And FIND_IN_SET(xq_id,'{$nj_after}') and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}') ORDER BY end DESC LIMIT 0,5");
 		   }elseif($teachers['status'] ==2){
-		    	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid})   ORDER BY end DESC LIMIT 0,5");
+		    	$kclist = pdo_fetchall("SELECT id,name,tid,start,end,adrr,bj_id,xq_id,OldOrNew FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And( tid like '%,{$checktid},%' or  tid like '{$checktid},%' or tid like '%,{$checktid}' or tid = {$checktid}) and FIND_IN_SET(bj_id,'{$bj_str}') and FIND_IN_SET(xq_id,'{$nj_str}')   ORDER BY end DESC LIMIT 0,5");
 		    	//var_dump($kclist);
 		   }
 			

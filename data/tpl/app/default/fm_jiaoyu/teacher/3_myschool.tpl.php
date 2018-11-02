@@ -111,7 +111,20 @@ position: relative;}
 				</div>
 				<div onclick="qingjia();" class="unbound">查看</div>
 			</div>
-			<?php  } ?>	
+			<?php  } ?>
+			<?php  if($_W['schooltype']) { ?>			
+			<div class="stuServer" style="height:auto;">
+				<label style="height:auto;">课程</label>
+				<div class="server" style="height:auto;">
+					<span>
+					<?php  echo $kclists_str;?>
+					</span>
+				</div>
+				<?php  if($muti == 1) { ?>
+				<div onclick="gotokecheng();" class="unbound">查看</div>
+				<?php  } ?>
+			</div>
+			<?php  } else { ?>
 			<div class="stuServer" style="height:auto;">
 				<label style="height:auto;">班级</label>
 				<div class="server" style="height:auto;">
@@ -132,6 +145,7 @@ position: relative;}
 					</span>
 				</div>
 			</div>
+			<?php  } ?>
 			<div class="stuServer">
 				<label>聊天</label>
 				<div class="server">
@@ -224,6 +238,10 @@ setTimeout(function() {
 <script type="text/javascript">
 function qingjia(){
     window.location.href = "<?php  echo $this->createMobileUrl('tcalendar', array('schoolid' => $schoolid), true)?>"
+}
+
+function gotokecheng(){
+    window.location.href = "<?php  echo $this->createMobileUrl('tmycourse', array('schoolid' => $schoolid), true)?>"
 }
 <?php  if(empty($_GPC['schoolid'])) { ?>
 $(".choice_baby").on("click", function(e) {

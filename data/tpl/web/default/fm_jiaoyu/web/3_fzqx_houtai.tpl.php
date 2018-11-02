@@ -21,10 +21,12 @@
                         	<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">基础设置&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1002)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1002)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1002" data_id="00201" type="checkbox" name="qxarr"  value="1000211" style="float: none;" <?php  if(in_array(1000211,$qx)) { ?> checked="checked" <?php  } ?>>查看所有<?php echo NJNAME;?></label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00201" type="checkbox" name="qxarr"  value="1000212" style="float: none;" <?php  if(in_array(1000212,$qx)) { ?> checked="checked" <?php  } ?>>新增/编辑<?php echo NJNAME;?></label>
-                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00201" type="checkbox" name="qxarr"  value="1000213" style="float: none;" <?php  if(in_array(1000213,$qx)) { ?> checked="checked" <?php  } ?>>删除<?php echo NJNAME;?></label><br/>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00201" type="checkbox" name="qxarr"  value="1000213" style="float: none;" <?php  if(in_array(1000213,$qx)) { ?> checked="checked" <?php  } ?>>删除<?php echo NJNAME;?></label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00201" type="checkbox" name="qxarr"  value="1000214" style="float: none;" <?php  if(in_array(1000214,$qx)) { ?> checked="checked" <?php  } ?>>设置<?php echo NJNAME;?>是否毕业</label><br/>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1002" data_id="00202" type="checkbox" name="qxarr"  value="1000221" style="float: none;" <?php  if(in_array(1000221,$qx)) { ?> checked="checked" <?php  } ?>>查看所有班级</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00202" type="checkbox" name="qxarr"  value="1000222" style="float: none;" <?php  if(in_array(1000222,$qx)) { ?> checked="checked" <?php  } ?>>新增/编辑班级</label>
-                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00202" type="checkbox" name="qxarr"  value="1000223" style="float: none;" <?php  if(in_array(1000223,$qx)) { ?> checked="checked" <?php  } ?>>删除班级</label><br/>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00202" type="checkbox" name="qxarr"  value="1000223" style="float: none;" <?php  if(in_array(1000223,$qx)) { ?> checked="checked" <?php  } ?>>删除班级</label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00202" type="checkbox" name="qxarr"  value="1000224" style="float: none;" <?php  if(in_array(1000224,$qx)) { ?> checked="checked" <?php  } ?>>设置班级是否毕业</label><br/>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1002" data_id="00203" type="checkbox" name="qxarr"  value="1000231" style="float: none;" <?php  if(in_array(1000231,$qx)) { ?> checked="checked" <?php  } ?>>查看所有成绩期号</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00203" type="checkbox" name="qxarr"  value="1000232" style="float: none;" <?php  if(in_array(1000232,$qx)) { ?> checked="checked" <?php  } ?>>新增/编辑成绩期号</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00203" type="checkbox" name="qxarr"  value="1000233" style="float: none;" <?php  if(in_array(1000233,$qx)) { ?> checked="checked" <?php  } ?>>删除成绩期号</label><br/>
@@ -215,6 +217,14 @@
                         	<?php  } ?>
 
                         	<?php  if(($school['is_recordmac'] == 1)) { ?>
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">时间设置&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1029)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1029)">全不选</a></p>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1029" data_id="02901" type="checkbox" name="qxarr"  value="1002901" style="float: none;" <?php  if(in_array(1002901,$qx)) { ?> checked="checked" <?php  } ?>>时间设置</label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1029" data_id="02901" type="checkbox" name="qxarr"  value="1002902" style="float: none;" <?php  if(in_array(1002903,$qx)) { ?> checked="checked" <?php  } ?>>编辑时间设置</label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1029" data_id="02901" type="checkbox" name="qxarr"  value="1002903" style="float: none;" <?php  if(in_array(1002903,$qx)) { ?> checked="checked" <?php  } ?>>编辑时间设置</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1029" data_id="02901" type="checkbox" name="qxarr"  value="1002904" style="float: none;" <?php  if(in_array(1002903,$qx)) { ?> checked="checked" <?php  } ?>>编辑时间设置</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1029" data_id="02901" type="checkbox" name="qxarr"  value="1002905" style="float: none;" <?php  if(in_array(1002904,$qx)) { ?> checked="checked" <?php  } ?>>删除时间设置</label><br/>
+							
+							
                         	<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">考勤记录&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1023)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1023)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1023" data_id="02301" type="checkbox" name="qxarr"  value="1002301" style="float: none;" <?php  if(in_array(1002301,$qx)) { ?> checked="checked" <?php  } ?>>查看考勤记录</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1023" data_id="02301" type="checkbox" name="qxarr"  value="1002303" style="float: none;" <?php  if(in_array(1002303,$qx)) { ?> checked="checked" <?php  } ?>>导出考勤记录</label>
@@ -378,4 +388,6 @@
 		});
 	}		
 
+
+	
 	</script>

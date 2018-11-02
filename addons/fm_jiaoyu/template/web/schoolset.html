@@ -730,53 +730,7 @@
 									<div class="help-block">启用后家长端显示订单入口</div>
 							</div>
 						</div>
-						<div class="form-group">
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">课程分享功能</label>
-							<div class="col-sm-2 col-lg-2">
-								<select class="form-control" name="kcshare" id="kcshare">
-									<option value="0" {if $shareset_from['is_share'] == 0}selected{/if}>不启用</option>
-									<option value="1" {if $shareset_from['is_share'] == 1}selected{/if}>赠送积分</option>
-									<option value="2" {if $shareset_from['is_share'] == 2}selected{/if}>赠送余额</option>
-									<option value="3" {if $shareset_from['is_share'] == 3}selected{/if}>赠送指定课程课时</option>
-								</select>
-								<div class="help-block">启用后用户可分享课程，其他用户购买后可获得相应奖励</div>
-							</div>
-						</div>
-						<div id="share_JF" class="form-group" {if $shareset_from['is_share'] != 1}style="display:none"{/if}>
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加积分</label>
-							<div class="input-group">
-									<label class="radio-inline">
-										<input type="text"  class="form-control" name="shareAddJF" value="{$shareset_from['addJF']}" >
-									</label>
-									<div class="help-block">分享后其他用户购买，给分享源用户增加多少积分</div>
-							</div>		
-						</div>	
-					 	<div id="share_YE" class="form-group" {if $shareset_from['is_share'] != 2}style="display:none"{/if}>
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加余额</label>
-							<div class="input-group">
-									<label class="radio-inline">
-										<input type="text"  class="form-control" name="shareAddYE" value="{$shareset_from['addYE']}" >
-									</label>
-									<div class="help-block">分享后其他用户购买，给分享源用户增加多少余额</div>
-							</div>		
-						</div>
-						<div id="share_KC" class="form-group" {if $shareset_from['is_share'] != 3}style="display:none"{/if}>
-							
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加课程:</label>
-							<div class="col-sm-2 col-lg-2" style="width:20%">
-								<select style="margin-right:15px;" name="shareAddKC" id="shareAddKC" class="form-control" > 
-									<option value="0" {if $shareset_from['addKC'] == 0}selected{/if} >当前课程（分享课程）</option>
-									{loop $kclist $row $v}
-									<option value="{$v['id']}" {if $shareset_from['addKC'] == $v['id']}selected{/if} >{$v['name']}</option>
-									{/loop}
-								</select>
-							</div>
-							<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">增加课时:</label>
-							<div class="col-sm-2 col-lg-2">
-								<input type="text"  class="form-control" name="shareAddKS" value="{$shareset_from['addKS']}" >
-							</div>
-							<div class="help-block">分享后其他用户购买，给分享源用户增加指定课程课时</div>							
-						</div>
+						
 						{if $_W['isfounder'] || $_W['role'] == 'owner'}
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">启用学生积分抵用</label>
@@ -954,7 +908,47 @@
 									为您的评价系统手册命名(例如，联系首次、在校表现、成长记录、家园共育、亲子记录)
 								</div>
 							</div>
-						</div>					
+						</div>
+						{if $_W['schooltype']}
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">课程分享功能</label>
+							<div class="col-sm-2 col-lg-2">
+								<select class="form-control" name="kcshare" id="kcshare">
+									<option value="0" {if $shareset_from['is_share'] == 0}selected{/if}>不启用</option>
+									<option value="1" {if $shareset_from['is_share'] == 1}selected{/if}>赠送积分</option>
+									<option value="2" {if $shareset_from['is_share'] == 2}selected{/if}>赠送余额</option>
+									<option value="3" {if $shareset_from['is_share'] == 3}selected{/if}>赠送课时</option>
+								</select>
+								<div class="help-block">启用后用户可分享课程，其他用户购买后可获得相应奖励</div>
+							</div>
+						</div>
+						<div id="share_JF" class="form-group" {if $shareset_from['is_share'] != 1}style="display:none"{/if}>
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加积分</label>
+							<div class="input-group">
+									<label class="radio-inline">
+										<input type="text"  class="form-control" name="shareAddJF" value="{$shareset_from['addJF']}" >
+									</label>
+									<div class="help-block">分享后其他用户购买，给分享源用户增加多少积分</div>
+							</div>		
+						</div>	
+					 	<div id="share_YE" class="form-group" {if $shareset_from['is_share'] != 2}style="display:none"{/if}>
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加余额</label>
+							<div class="input-group">
+									<label class="radio-inline">
+										<input type="text"  class="form-control" name="shareAddYE" value="{$shareset_from['addYE']}" >
+									</label>
+									<div class="help-block">分享后其他用户购买，给分享源用户增加多少余额</div>
+							</div>		
+						</div>
+						<div id="share_KC" class="form-group" {if $shareset_from['is_share'] != 3}style="display:none"{/if}>
+							<input type="hidden"  class="form-control" name="shareAddKC" value="0" >
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">增加课时:</label>
+							<div class="input-group">
+								<input type="text"  class="form-control" name="shareAddKS" value="{$shareset_from['addKS']}" >
+								<div class="help-block">分享后其他用户购买，给分享源用户增加当前课程（分享课程）课时</div>
+							</div>							
+						</div>	
+						{/if}						
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">班级圈审核</label>
 							<div class="col-sm-9">

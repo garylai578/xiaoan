@@ -6,7 +6,7 @@
 	global $_GPC, $_W;
 	
 
-	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video', 'start') ) ? $_GPC ['op'] : 'default';
+	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video', 'start','timeset','getleave') ) ? $_GPC ['op'] : 'default';
 	$weid = $_GPC['i'];
 	$schoolid = $_GPC['schoolid'];
 	$macid = $_GPC['macid'];
@@ -58,9 +58,10 @@
 					'SBTIME' => $school['jxend'],
 					'XBTIME' => $school['lxstart'],
 					'CHECK_URL' => $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkym&op=check&m=fm_jiaoyu',
+					'LEAVE_URL'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=getleave&m=fm_jiaoyu',
+					'OUTTIME_URL'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=timeset&m=fm_jiaoyu',
 				)			
 			);
-			
 			echo json_encode($result);
 			exit;
 		}
@@ -84,6 +85,8 @@
 					'SBTIME' => $school['jxend'],
 					'XBTIME' => $school['lxstart'],
 					'CHECK_URL' => $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkym&op=check&m=fm_jiaoyu',
+					'LEAVE_URL'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=getleave&m=fm_jiaoyu',
+					'OUTTIME_URL'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=timeset&m=fm_jiaoyu',
 				)			
 			);
 			$p1 = explode('/',$banner['pic1']);
@@ -174,7 +177,7 @@
 						$users[$key]['USERNAME'] = "02" .$row['TID'];
 						$users[$key]['CLASS_NAME'] = "老师";					
 					}else{
-						$student = pdo_fetch("SELECT s_name,icon  FROM " . tablename($this->table_students) . " WHERE id = '{$row['SID']}' ");
+						$student = pdo_fetch("SELECT s_name,icon ,s_type FROM " . tablename($this->table_students) . " WHERE id = '{$row['SID']}' ");
 						$bjinfo = pdo_fetch("SELECT sname  FROM " . tablename($this->table_classify) . " WHERE sid = '{$row['CLASS_ID']}' ");
 						$users[$key]['USER_ID'] = $row['USERID'];
 						$users[$key]['NAME'] = $student['s_name'];	
@@ -379,4 +382,107 @@
 			exit;
 		}	
 	}
+	
+	
+	if ($operation == 'timeset') {//获取班级信息
+		if(!empty($ckmac)){
+			$class = pdo_fetchall("SELECT sid as CLASS_ID, datesetid FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'theclass' And schoolid = {$school['id']} ORDER BY ssort DESC");
+			if($class){
+				$nowdate = date("Y-n-j",time());
+				$nowyear = date("Y",time());
+				$nowweek = date("w",time()); //今天是星期几
+				$result['returnCode'] = "000";	
+				 
+				foreach($class as $key =>$row) {
+					$todaytype = 0;
+					$todaytimeset = array(
+						array(
+							'start'=>'00:00',
+							'end'  =>'23:59'
+						),
+					); 
+					if(!empty($row['datesetid'])){
+						$checkdateset      =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdateset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  id = '{$row['datesetid']}'");
+						$checkdateset_holi =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdatedetail) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$row['datesetid']}' and year = '{$nowyear}' ");
+						
+						$checktime         =  pdo_fetchall("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$row['datesetid']}' and date = '{$nowdate}' ORDER BY id ASC ");
+						if(!empty($checktime)){
+							if($checktime[0]['type'] == 6){
+								//1放假2上课
+								$todaytype = 1;
+							}elseif($checktime[0]['type'] == 5){
+								$todaytype    = 2;
+								$todaytimeset = $checktime; 
+							}
+						}else{
+							if(($nowdate >= $checkdateset_holi['win_start'] && $nowdate <=$checkdateset_holi['win_end']) || ($nowdate >= $checkdateset_holi['sum_start'] && $nowdate <=$checkdateset_holi['sum_end'])){
+								$todaytype = 1;
+							}else{
+								$timeset_work = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$row['datesetid']}' and type=1 ORDER BY id ASC ");
+								//星期五
+								if($nowweek == 5){
+									$todaytype = 2;
+									if($checkdateset['friday'] == 1){
+										$timeset_fri = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$row['datesetid']}' and type=2 ORDER BY id ASC ");
+										$todaytimeset = $timeset_fri;
+									}else{
+										$todaytimeset = $timeset_work;
+									}
+								//星期六
+								}elseif($nowweek == 6){
+									if($checkdateset['saturday'] == 1){
+										$timeset_sat = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$row['datesetid']}' and type=3 ORDER BY id ASC ");
+										$todaytype = 2;
+										$todaytimeset = $timeset_sat;
+									}else{
+										$todaytype = 1;
+									}
+								
+								//星期天
+								}elseif($nowweek == 0){
+									if($checkdateset['sunday'] == 1){
+										$timeset_sun = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$row['datesetid']}' and type=4 ORDER BY id ASC ");
+										$todaytype    = 2;
+										$todaytimeset = $timeset_sun;
+									}else{
+										$todaytype    = 1;
+									}
+								//工作日	
+								}else{
+									$todaytype    = 2;
+									$todaytimeset = $timeset_work;
+								}
+							}
+						}
+						
+					}
+
+					$class[$key]['todaytype']    = $todaytype;
+					$class[$key]['todaytimeset'] = $todaytimeset;
+				}			
+				$result['data'] = $class;
+				 
+			}else{
+				$result['returnCode'] = "222";	
+				$result['msg'] = "本校未添加班级信息";				
+			}
+			echo json_encode($result);
+		}
+    }
+
+	if ($operation == 'getleave') {	
+		$time = $_GPC['signtime'];
+		$ckuser        = pdo_fetch("SELECT sid FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$_GPC['iccode']}' And weid = '{$weid}' And schoolid = '{$schoolid}' ");
+		$leave        =  pdo_fetch("SELECT sid,startime1,endtime1 FROM " . tablename($this->table_leave) . " WHERE weid = '{$weid}'  And schoolid = '{$schoolid}' and isliuyan = 0 and status = 1 and startime1 <= '{$time}' and endtime1 >= '{$time}' and sid = '{$ckuser['sid']}' ");
+		$result['returnCode'] = "000";
+		 
+		if(!empty($leave)){
+			$result['data']['openDoor']   = 0;	
+		}else{
+			$result['data']['openDoor']   = 1;
+		}
+		
+		echo json_encode($result);
+		exit;
+    }	
 ?>

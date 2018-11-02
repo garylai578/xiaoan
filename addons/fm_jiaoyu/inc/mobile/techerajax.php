@@ -10,7 +10,7 @@
     if ($operation == 'default') {
 	   die ( json_encode ( array (
 			 'result' => false,
-			 'msg' => '对不起，你的请求不存在！'
+			 'msg' => '参数错误'
 			) ) );		
     }
 	if ($operation == 'jzjb') {
@@ -344,10 +344,22 @@
     }
 	if ($operation == 'search_stu_info')  {
 		$bj_id = trim($_GPC['bj_id']);
+		$kc_id = trim($_GPC['kc_id']);
 		$search = trim($_GPC['search']);
 		$schoolid = trim($_GPC['schoolid']);
 		$condition = " AND (s_name LIKE '%{$search}%' Or mobile = '{$search}' Or numberid = '{$search}') ";	
-		$leave2 = pdo_fetchall("SELECT id,s_name,numberid,qrcode_id,bj_id,sex,icon FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And bj_id = '{$bj_id}' $condition ORDER BY id DESC ");
+		if($_W['schooltype']){
+			$thisKcStu = pdo_fetchall("SELECT distinct sid FROM " . tablename($this->table_order) . " where schoolid = '{$schoolid}' And kcid = '{$kc_id}' and type='1' and sid != 0 ORDER BY id DESC ");
+			$Stu_str_temp = '';
+			foreach($thisKcStu as $u){
+				$Stu_str_temp .=$u['sid'].",";
+			}
+			$stu_str = trim($Stu_str_temp,",");
+			$leave2 = pdo_fetchall("SELECT id,s_name,numberid,qrcode_id,bj_id,sex,icon FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And FIND_IN_SET(id,'{$stu_str}') $condition ORDER BY id DESC ");
+		}else{
+			$leave2 = pdo_fetchall("SELECT id,s_name,numberid,qrcode_id,bj_id,sex,icon FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And bj_id = '{$bj_id}' $condition ORDER BY id DESC ");
+		}
+
 		$school = pdo_fetch("SELECT spic FROM " . tablename($this->table_index) . " where id = :id ", array(':id' => $schoolid));
 		foreach($leave2 as $key =>$row){
 			$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));

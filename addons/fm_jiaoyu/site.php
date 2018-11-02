@@ -471,6 +471,18 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doWebKcallstusign() {
 		$this->getLogic ( __FUNCTION__, 'web' );
 	}
+	public function doWebCheckdateset() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebCheckdatedetail() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebChecktimeset() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
 	
 	// ====================== FUNC =====================
 	public function doMobileAuth() {
@@ -1445,6 +1457,7 @@ class Fm_jiaoyuModuleSite extends Core {
 		$insert['localdate_id'] = '';
 		$insert['note'] = '';
 		$insert['code'] = empty($strs[12]) ? $rand : trim($strs[12]);
+		$insert['s_type'] = empty($strs[13]) ? 0 : intval($strs[13]);
 		$insert['amount'] = '';
 		$insert['area'] = '';
 		$insert['own'] = '';
@@ -1803,7 +1816,7 @@ class Fm_jiaoyuModuleSite extends Core {
 				$src_file = tomedia($school['spic']);
 				if($sid == 9999999999){
 					$src_file = tomedia($school['logo']);
-				}
+				}				
 			}else{
 				$src_file = tomedia($student['icon']);
 			}
@@ -2104,34 +2117,22 @@ class Fm_jiaoyuModuleSite extends Core {
 							pdo_update($this->table_students, array('chongzhi' => $newYE ), array('id' => $sharesid['sid']));
 						}elseif($shareset['is_share'] == 3){
 							//新增课时
-							if($shareset['addKC'] != 0){
-								$AddKC = $shareset['addKC'];
-							}elseif($shareset['addKC'] == 0){
-								$AddKC = $order['kcid'];
-							}
-							
+							$AddKC = $order['kcid'];
 							$AddKS = $shareset['addKS'];
 							$kcinfo_share =  pdo_fetch("SELECT * FROM " . tablename($this->table_tcourse) . " where :id = id", array(':id' => $AddKC));
 							$coursebuy =  pdo_fetch("SELECT ksnum,id FROM " . tablename($this->table_coursebuy) . " where kcid=:kcid AND :sid = sid", array(':kcid' => $AddKC,':sid'=>$sharesid['sid']));
 							if(!empty($coursebuy)){
 								$newksnum = $coursebuy['ksnum'] + $AddKS;
-								pdo_update($this->table_students, array('ksnum' => $newksnum ), array('id' => $AddKC));
-							}elseif(empty($coursebuy)){
-								$temp_share_course = array(
-									'weid'       => $order['weid'],
-									'schoolid'   => $order['schoolid'],
-									'userid'     => $order['userid'],
-									'sid'        => $sharesid['sid'],
-									'kcid'       => $AddKC,
-									'ksnum'      => $kcinfo_share['FirstNum'],
-									'createtime' => time()
-								);
-								pdo_insert($this->table_students,$temp_share_course);
+								if($newksnum > $kcinfo_share['AllNum']){
+									$newksnum = $kcinfo_share['AllNum'];
+								}
+								pdo_update($this->table_coursebuy, array('ksnum' => $newksnum ), array('id' => $coursebuy['id']));
 							}
 						} 
 					} 
 					
 				} 
+				
 				$this->sendMobileJfjgtz($order['id']);
 			}else if($order['type'] == 5){
 				$school = pdo_fetch("SELECT cardset FROM " . tablename($this->table_index) . " WHERE id = :id ", array(':id' => $wxpay['schoolid']));

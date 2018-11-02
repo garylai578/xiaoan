@@ -10,7 +10,7 @@
     if ($operation == 'default') {
 	           die ( json_encode ( array (
 			         'result' => false,
-			         'msg' => '对不起，你的请求不存在！'
+			         'msg' => '参数错误'
 	                ) ) );
     }
 	if ($operation == 'setstar') {

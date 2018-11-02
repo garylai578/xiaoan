@@ -93,11 +93,52 @@
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>设备类型</label>
 							<div class="col-sm-9 col-xs-12">
 								<label class="radio-inline">
-									<input type="radio" value="1" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '1' || empty($item['is_bobao'])}checked{/if} {if $item && $item['is_bobao'] != 1}disabled{/if} id="credit7"> 考勤机
+									<input type="radio" value="1" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '1' || empty($item['is_bobao'])}checked{/if} {if $item && $item['is_bobao'] != 1}disabled{/if} id="credit7"> 考勤机
 								</label>
-								<label class="radio-inline">
-									<input type="radio" value="2" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '2'}checked{/if} {if $item && $item['is_bobao'] != 2}disabled{/if} id="credit8"> 播报机
-								</label>						
+                                
+                                
+                                <label class="radio-inline">
+
+									<input type="radio" value="2" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '2'}checked{/if} {if $item && $item['is_bobao'] != 2}disabled{/if} id="credit7"> 校车
+
+								</label>
+                                <label class="radio-inline">
+
+									<input type="radio" value="3" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '3'}checked{/if} {if $item && $item['is_bobao'] != 3}disabled{/if} id="credit7"> 门禁闸机
+
+								</label>
+                                <label class="radio-inline">
+
+									<input type="radio" value="4" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '4'}checked{/if} {if $item && $item['is_bobao'] != 4}disabled{/if} id="credit7"> 网络闸机
+
+								</label>
+                                <label class="radio-inline">
+
+									<input type="radio" value="5" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '5'}checked{/if} {if $item && $item['is_bobao'] != 5}disabled{/if} id="credit7"> 无障碍
+
+								</label>
+                                <label class="radio-inline">
+
+									<input type="radio" value="6" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '6'}checked{/if} {if $item && $item['is_bobao'] != 6}disabled{/if} id="credit7"> 人脸闸机
+
+								</label>
+                                <label class="radio-inline">
+
+									<input type="radio" value="7" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '7'}checked{/if} {if $item && $item['is_bobao'] != 7}disabled{/if} id="credit7"> 消费机
+
+								</label>
+                                <label class="radio-inline">
+
+									<input type="radio" value="8" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '8'}checked{/if} {if $item && $item['is_bobao'] != 8}disabled{/if} id="credit7"> 电子班牌
+
+								</label>
+                                
+                                <label class="radio-inline">
+
+									<input type="radio" value="9" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '9'}checked{/if} {if $item && $item['is_bobao'] != 9}disabled{/if} id="credit8"> 播报机
+
+								</label>
+                                <!--修改结束-->						
 							</div>
 						</div>	
 						<div id="credit-status67" {if $item['is_bobao'] == 2}style="display:block"{else}style="display:none"{/if}>
@@ -265,6 +306,75 @@
 								<div class="help-block">广告标题/广告语</div>
 							</div>
 						</div>
+                        <!--修改开始-->
+                        <div class="form-group">
+
+                            <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>班级播报语音话术</label>
+    
+							<div class="col-sm-9 col-xs-12">
+    
+                                <input type="text" class="form-control" name="voice" value="{$banner['voice']}" placeholder="变量名含义，名称：[name] 关系：[relationship]">
+    
+                                <div class="help-block">举例:小明妈妈来了,其中[name]是小明,[relationship]是妈妈</div>
+	
+                            </div>
+    
+                        </div>		
+                        <div class="form-group">
+
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>欢迎语</label>
+
+							<div class="col-sm-9 col-xs-12">
+
+								<input type="text" class="form-control" name="welcome" value="{$banner['welcome']}" placeholder="考勤机开机启动广告语">
+
+								<div class="help-block">考勤机开机启动时播放的广告话术</div>
+
+							</div>
+
+						</div>
+                        
+                        <div class="form-group">
+
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>密码</label>
+
+							<div class="col-sm-9 col-xs-12">
+
+								<input type="text" class="form-control" name="password" value="{$banner['password']}" placeholder="考勤机进入设置页面的密码">
+
+								<div class="help-block">只能是数字或字母，区分大小写，空为不启用</div>
+
+							</div>
+
+						</div>
+                        
+                        <div class="form-group">
+
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>开机时间</label>
+
+							<div class="col-sm-9 col-xs-12">
+
+								
+                                {php echo tpl_form_field_clock(starttime, $banner['starttime']?$banner['starttime']:'00:00');}
+
+							<div class="help-block">考勤机自动开机时间（在手机使用无效）</div>
+							</div>
+
+						</div>
+                        
+                        <div class="form-group">
+
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>关机时间</label>
+
+							<div class="col-sm-9 col-xs-12">
+
+								{php echo tpl_form_field_clock(shutdowntime, $banner['shutdowntime']?$banner['shutdowntime']:'00:00');}
+
+								<div class="help-block">考勤机自动关机时间（在手机使用无效）</div>
+							</div>
+
+						</div>
+						<!--修改结束-->
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">体温枪</label>
 							<div class="col-sm-9 col-xs-12">
@@ -907,7 +1017,9 @@ $(function(){
 										{/if}
 									{else}
 										<a class="btn btn-default" href="javascript::;"  data-toggle="tooltip" data-placement="top" title="执行任务" onclick="show_order({$item['id']});">执行任务</a>
-									{/if}									
+									{/if}
+                                {elseif $item['macname'] == '6'}
+                                	<a class="btn btn-default" href="javascript::;"  data-toggle="tooltip" data-placement="top" title="执行任务" onclick="show_order6({$item['id']});">执行任务</a>							
 								{else}
 									<span class="label label-danger">不支持</span>
 								{/if}
@@ -1020,6 +1132,45 @@ $(function(){
 		</div>	
 	</div>
 </div>
+<div class="modal fade" id="Modal6" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="  margin-top: 60px;">
+	<div class="modal-dialog modal-lg" role="document">		
+		<div class="modal-content">			
+		<form class="table-responsive form-inline bv-form" method="post" action="" id="form-credit" novalidate="novalidate">				
+			<div class="modal-header">					
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>					
+				<h4 class="modal-title" id="myModalLabel">执行命令</h4>	
+			</div>
+			<div class="modal-body">
+				<table class="table table-hover table-bordered">						
+					<tbody>
+						<tr>	
+							<input type="hidden" id="macidforabb6" value="">
+							<th width="150">选择命令</th>							
+							<td>								
+								<select id="order6" class="form-control" >									
+									<option value="1">更新学生卡号信息</option>									
+									<option value="2">更新学校信息图片、文字、视频</option>	
+									<option value="3">重启app,全部更新</option>	
+									<option value="4">重启硬件主板设备</option>	
+								</select>							
+							</td>						
+						</tr>
+						
+						<tr>	
+							<th width="150">执行中任务</th>							
+							<td id="loading_order6"></td>
+						</tr>
+					</tbody>
+				</table>				
+			</div>				
+			<div class="modal-footer">	
+				<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+				<button type="button" class="btn btn-primary" id="submit6">提交</button>
+			</div>			
+		</form>		
+		</div>	
+	</div>
+</div>
 <div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="  margin-top: 60px;">
 	<div class="modal-dialog modal-lg" role="document">		
 		<div class="modal-content">			
@@ -1075,6 +1226,23 @@ function show_order(id){
 			}
 		},'json');	 
 }
+//修改开始
+function show_order6(id){
+	$("#loading_order").empty();//先清空任务列表,然后在添加新获取的任务
+	 var id = id;
+	 $('#Modal6').modal('toggle');
+	 $('#macidforabb6').val(id);
+		$.post("{php echo $this->createWebUrl('indexajax', array('op' => 'getloadingorder'))}",{id:id}, function(data){
+			if(data.result){
+				var html = '<span id=\"order'+data.id+'\" class="help-block">'+data.ordername+'<a onclick="del('+data.id+')" class="custom-url"><i class="fa fa-times-circle"></i></a></span>';					
+				$('#loading_order6').append(html);	
+			}else{
+				var html =  '<span class="help">当前无执行中的任务</span>';
+				$('#loading_order6').append(html);			
+			}
+		},'json');	 
+}
+//修改结束
 function del(id){
 	 var id = id;
 		$.post("{php echo $this->createWebUrl('indexajax', array('op' => 'delorder'))}",{id:id}, function(data){
@@ -1134,6 +1302,37 @@ $(function(){
 			}
 		},'json');
 	});
+	//修改开始
+	$('#submit6').click(function(){
+		var dotime1 = $("#dotime61").val();
+		var dotime2 = $("#dotime62").val();
+		var time_type = $("#time_type").val();
+		var submitData = {
+			schoolid :"{$schoolid}",
+			weid :"{$weid}",
+			macid : $("#macidforabb6").val(),
+			order : $("#order6").val(),
+			time_type : time_type,
+			dotime1 : dotime1,
+			dotime2 : dotime2,
+		};		
+		$.post("{php echo $this->createWebUrl('indexajax', array('op' => 'createorder'))}",submitData, function(data){
+			if(data.result){
+				if(time_type == 1){
+					//checkorder(data.id);
+					alert('设置成功');
+					location.reload();
+				}else{
+					$('#Modal6').modal('toggle');
+					alert(data.msg);
+				}				
+			}else{
+				//$('#Modal6').modal('toggle');
+				alert(data.msg);
+			}
+		},'json');
+	});
+	//修改结束
 	$('#submit1').click(function(){
 		var submitData = {
 			schoolid :"{$schoolid}",

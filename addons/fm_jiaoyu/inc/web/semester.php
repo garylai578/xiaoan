@@ -171,6 +171,15 @@ if($operation == 'display'){
     }	
     pdo_delete($this->table_classify, array('sid' => $sid), 'OR');
     $this->imessage('年级删除成功！', referer(), 'success');
+}elseif($operation == 'change_over'){
+	$id    = intval($_GPC['id']);
+	$is_over = intval($_GPC['is_over']);
+	$data1 = array('is_over' => $is_over);
+	$classlist = pdo_fetchall("SELECT sid FROM " . tablename($this->table_classify) . " WHERE parentid = '{$id}' ");
+	foreach($classlist as $key_c=>$value_c){
+		pdo_update($this->table_classify, $data1, array('sid' => $value_c['sid']));	
+	}
+	pdo_update($this->table_classify, $data1, array('sid' => $id));	
 }
 include $this->template('web/semester');
 ?>

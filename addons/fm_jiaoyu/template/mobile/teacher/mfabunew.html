@@ -23,6 +23,10 @@
 .jiantou{background: url({OSSURL}public/mobile/img/partent_ico77.png) no-repeat left;background-size: 7px 10px;}
 .option_list_ul1 .jiantou2{background: url({OSSURL}public/mobile/img/fy_partent_ico.png) no-repeat left;background-size: 11px 8px;background-position-y: 15px;}
 .JobLeaderBox {height: 20px;background: #ff6665;color: white;display: -webkit-box;display: -moz-box;display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: center;-moz-box-align: center;-ms-flex-align: center;-webkit-align-items: center;align-items: center;font-size: 11px;margin-left: 5px;padding: 0 4px;border-radius: 5px;}
+.option_list_ul2 li{background:url({OSSURL}/public/mobile/img/check_icon_off.png) no-repeat right center;background-size: 20px;}
+.option_list_ul li {background:url({OSSURL}/public/mobile/img/check_icon_off.png) no-repeat right center;background-size: 20px;}
+.option_title2 {background:url({OSSURL}/public/mobile/img/check_icon_off.png) no-repeat right center;background-size: 20px;}
+.option_title {background:url({OSSURL}/public/mobile/img/check_icon_off.png) no-repeat right center;background-size: 20px;}
 </style>
 <link href="{OSSURL}public/mobile/css/wx_sdk.css" rel="stylesheet" />
 {php echo register_jssdks();}
@@ -57,6 +61,7 @@
     <div class="feedback_title_box">
         <div class="feedback_title feedback_title_teacher" id="feedback_title" select_id=''>@全体师生</div>
         <select id="master_select_box">
+			<option value="">请选择</option>
             <option value="school">@全体师生</option>
 			<option value="alltea">@全体老师</option>
 			<option value="allstu">@全体学生</option>
@@ -691,11 +696,19 @@ setTimeout(function() {
 			upload_video_url: "{php echo $this->createMobileUrl('bjqajax',array('op'=>'donwvioce'))}",   //音频的url
 			wxsdkcheckForm: function () {
 				// 1.这里先做校验文本框不能为空
+				var typessss = $("#master_select_box").find(":selected").val();	
+				if (typessss == "send_class" || typessss == "student" || typessss == "staff_jsfz" || typessss == "staff") {
+					var typedatasss = $('#feedback_title').attr('select_id');
+					if(typedatasss == '' || typedatasss == null){
+						jAlert("请选择接收对象");
+						return false;
+					}
+				}
 				var title = $.trim($("#title").val());
 				if (title.replace(/(#)[0-9a-zA-Z\u4e00-\u9fa5]{0,255}(#)/g, '$1$2').replace(/[#]/g, "") == "") {
 					jAlert("请先输入标题");
 					return false;
-				}				
+				}
 				var diary_content = $.trim($("#feedback_content").val());
 
 				if (diary_content.replace(/(#)[0-9a-zA-Z\u4e00-\u9fa5]{0,255}(#)/g, '$1$2').replace(/[#]/g, "") == "") {
@@ -857,9 +870,10 @@ setTimeout(function() {
 					var page = 1;
 					var total = result.total;
 					var noticeid = result.noticeid;
+					var groupid = result.groupid;
 					ajax_start_loading(result.msg);
 					ajax_stop_loading();					
-					upload_pro(page,noticeid,total, this);
+					upload_pro(page,noticeid,groupid,total, this);
 				} else {
 					$.wx_upload.success_img_arr = [];
 					$.wx_upload.fail_local_img_arr = [];
@@ -883,12 +897,12 @@ setTimeout(function() {
 		});
 	};
 
-	function upload_pro(page, noticeid,total, self) {
+	function upload_pro(page, noticeid,groupid,total, self) {
 		var prodata = {
 			weid:"{$weid}",
 			schoolid : "{$schoolid}",
 			tname:"{$teacher['tname']}",
-			groupid : $("#bj_id").val(),
+			groupid : groupid,
 			noticeid:noticeid,
 			schooltype:"{$schooltype}",
 			usertype:$("#master_select_box").find(":selected").val(),
@@ -907,7 +921,7 @@ setTimeout(function() {
 					var page = result.page;
 					var pro = result.pro;
 					ajax_start_loading(pro);
-					upload_pro(page, noticeid,total, this);
+					upload_pro(page, noticeid,groupid,total, this);
 				}
 				if (result.status == 2) {
 					ajax_stop_loading();

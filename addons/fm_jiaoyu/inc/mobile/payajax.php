@@ -9,7 +9,7 @@
      if ($operation == 'default') {
 	           die ( json_encode ( array (
 			         'result' => false,
-			         'msg' => '非法请求！'
+			         'msg' => '参数错误'
 	                ) ) );
               }			
 
@@ -21,7 +21,7 @@
                     'msg' => '非法请求！' 
 		               ) ) );
 	         }
-			  
+		$shareuserid = $_GPC['shareuserid'];	   
         $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
 		$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " WHERE :id = id", array(':id' => $_GPC['schoolid']));
 		$user = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " WHERE :weid = weid And :schoolid = schoolid And :id = id", array(':weid' => $_GPC['weid'], ':schoolid' => $_GPC['schoolid'], ':id' => $_GPC['user']));
@@ -34,14 +34,7 @@
 		$userinfo = iunserializer($user['userinfo']);
 		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$cose['id']."' And (status = 2 or type = 2) ");
 		$rest = $cose['minge'] - $yb;
-		//if ($cose['xq_id'] != 0) {
-		//	if ($cose['xq_id'] != $student['xq_id']) {
-		//			die ( json_encode ( array (
-		//				'result' => false,
-		//				'msg' => '本课程只限本年级学生报名！'
-		//				) ) );
-  //          }					   
-		//}
+
 		
 		if (empty($userinfo['name'])) {
             die ( json_encode ( array (
@@ -103,6 +96,13 @@
 					'createtime' => time(),
 			);
 			$temp['ksnum'] = $cose['FirstNum'];
+			if(!empty($shareuserid)){
+				$ShareUserInfo = pdo_fetch("SELECT sid FROM " . tablename($this->table_user) . " WHERE :weid = weid And :schoolid = schoolid And :id = id", array(':weid' => $_GPC['weid'], ':schoolid' => $_GPC['schoolid'], ':id' => $shareuserid));
+				if($ShareUserInfo['sid'] != $_GPC['sid']){
+					$temp['shareuserid'] = $shareuserid;
+				}
+				
+			}
 			pdo_insert($this->table_order, $temp);
    
 			$order_id = pdo_insertid();

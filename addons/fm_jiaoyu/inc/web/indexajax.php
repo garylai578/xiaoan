@@ -855,6 +855,7 @@
 							$data['not'] = "da";
 						}
 					}
+					$data['backid'] = $_GPC['bj_id'];
 				}else{
 					$bj_id = $_GPC['bj_id'];
 					$this->sendMobileBjtz($notice_id, $schoolid, $weid, $tname, $bj_id, $pindex, $psize);
@@ -913,8 +914,16 @@
 		               ) ) );
 	    }else{
 			$data = array();
-			$kclist =  pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " where schoolid = '{$_GPC['schoolid']}' And Ctype = '{$_GPC['ctypeId']}'  ORDER BY ssort DESC");
-			
+			$time = time();
+			$kclist =  pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " where schoolid = '{$_GPC['schoolid']}' And Ctype = '{$_GPC['ctypeId']}'  ORDER BY end DESC ,ssort DESC");
+			foreach($kclist as $key => $value){
+				if($value['end'] < $time){
+					$kclist[$key]['name'] .= "【已结课】";
+				}
+				
+				
+				
+			}
    			$data ['kclist'] = $kclist;
 			$data ['result'] = true;
 			$data ['msg'] = '成功获取！';

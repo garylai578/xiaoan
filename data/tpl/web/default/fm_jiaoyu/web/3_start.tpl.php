@@ -240,6 +240,35 @@ line-height: 129px;text-align: center;display: none;}
 			</div>
 		</div>
 	</div>
+	<?php  if($schooltype) { ?>
+	<div class="col-md-4 span_8">
+		<div class="activity_box">
+			<div class="panel-heading">
+                    <h4 class="panel-title">消课记录</h4>
+            </div>		
+			<div class="scrollbar" id="style-2">
+			<?php  if(is_array($lastxk)) { foreach($lastxk as $item) { ?>
+				<div class="activity-row1">
+					 <div class="col-xs-1"> <i class="fa fa-comment text-info"></i></div>
+					 <div class="col-xs-3 activity-img" style="width:auto;">
+					 <img style="width:50px;height:50px;border-radius:50%;" src="<?php  if($item['sicon']) { ?><?php  echo tomedia($item['sicon'])?><?php  } else { ?><?php  echo tomedia($logo['spic'])?><?php  } ?>" class="img-responsive" alt="">
+					 </div>
+					 <div class="col-xs-8 activity-desc">
+						<h5>
+							<a href="#"><span class="label label-success">学生</span><?php  echo $item['s_name'];?></a> 
+							<span class="label label-info"><?php  echo $item['kcname'];?></span> 
+						</h5>
+						 
+						<h6><?php  echo $item['time'];?>前</h6>
+					 </div>
+					 <div class="clearfix"> </div>
+				 </div>
+			<?php  } } ?>
+			<a href="<?php  echo $this->createWebUrl('checklog', array('op' => 'display', 'schoolid' => $schoolid))?>">点击查看更多</a>
+			</div>
+		</div>
+	</div>
+	<?php  } else { ?>
 	<div class="col-md-4 span_8">
 		<div class="activity_box">
 			<div class="panel-heading">
@@ -250,7 +279,7 @@ line-height: 129px;text-align: center;display: none;}
 				<div class="activity-row1">
 					 <div class="col-xs-1"><?php  if($item['checktype'] == 1) { ?><i class="fa fa-credit-card text-info icon_12"><?php  } else { ?><i class="fa fa-weixin text-info icon_12"><?php  } ?></i></div>
 					 <div class="col-xs-3 activity-img" style="width:auto;">
-					 <img style="width:50px;height:50px;border-radius:50%;" src="<?php  if(!empty($item['sid'])) { ?><?php  if($item['siocn']) { ?><?php  echo tomedia($item['siocn'])?><?php  } else { ?><?php  echo tomedia($logo['spic'])?><?php  } ?>
+					 <img style="width:50px;height:50px;border-radius:50%;" src="<?php  if(!empty($item['sid'])) { ?><?php  if($item['sicon']) { ?><?php  echo tomedia($item['sicon'])?><?php  } else { ?><?php  echo tomedia($logo['spic'])?><?php  } ?>
 					 <?php  } else { ?><?php  if($item['thumb']) { ?><?php  echo tomedia($item['thumb'])?><?php  } else { ?><?php  echo tomedia($logo['tpic'])?><?php  } ?><?php  } ?>" class="img-responsive" alt="">
 					 </div>
 					 <div class="col-xs-8 activity-desc">
@@ -269,6 +298,7 @@ line-height: 129px;text-align: center;display: none;}
 			</div>
 		</div>
 	</div>	
+	<?php  } ?>
 </div>	
 
 	<div class="row">
@@ -300,7 +330,11 @@ line-height: 129px;text-align: center;display: none;}
 					<div class="account-stat-btn">
 						<?php  if($logo['is_cost'] == 1 || $_W['isfounder'] || $_W['role'] == 'vice_founder') { ?><div class="col-12" style="width:8%">已付总额<span style="font-size: 24px;color: #FF8000;" id="cose1"><?php  echo $cose1;?></span></div><?php  } ?>
 						<div class="col-12" style="width:8%">报名数<span style="font-size: 24px;color: #FF8000;" id="baomzj"><?php  echo $baomzj;?>人</span></div>
+						<?php  if(!$_W['schooltype']) { ?>
 						<div class="col-12" style="width:8%">考勤数<span style="font-size: 24px;color: #FF8000;" id="checklogzj"><?php  echo $checklogzj;?>次</span></div>
+						<?php  } else { ?>
+						<div class="col-12" style="width:8%">消课数<span style="font-size: 24px;color: #FF8000;" id="checklogzj"><?php  echo $checklogzj;?>次</span></div>
+						<?php  } ?>
 						<div class="col-12" style="width:8%">班级圈<span style="font-size: 24px;color: #FF8000;" id="bjqzj"><?php  echo $bjqzj;?>条</span></div>	
 						<div class="col-12" style="width:8%">照片数<span style="font-size: 24px;color: #FF8000;" id="xczj"><?php  echo $xczj;?>张</span></div>
 						<div class="col-12" style="width:8%">已绑教师<span style="font-size: 24px;color: #FF8000;" id="ybjs"><?php  echo $ybjs;?>人</span></div>
@@ -328,9 +362,9 @@ line-height: 129px;text-align: center;display: none;}
 						</div>
 						<div class="col-sm-2 col-lg-2" style="float:left;left:120px">
 							<select style="width: 147px;" id="kc_id" class="form-control">
-							<?php  if(is_array($njchecklog)) { foreach($njchecklog as $row) { ?>
-								<option value="<?php  echo $row['sid'];?>"><?php  echo $row['sname'];?></option>
-							<?php  } } ?>	
+							
+								<option value="0">请选择课程</option>
+							
 							</select>
 						</div>
 					</div>

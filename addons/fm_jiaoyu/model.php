@@ -68,6 +68,49 @@ class Mloader
 	}
 }
 
+function get_week($time){
+	if(date('w',$time) == 0 ){
+		$day = '星期日';
+	}
+	if(date('w',$time) == 1 ){
+		$day = '星期一';
+	}
+	if(date('w',$time) == 2 ){
+		$day = '星期二';
+	}
+	if(date('w',$time) == 3 ){
+		$day = '星期三';
+	}
+	if(date('w',$time) == 4 ){
+		$day = '星期四';
+	}
+	if(date('w',$time) == 5 ){
+		$day = '星期五';
+	}
+	if(date('w',$time) == 6 ){
+		$day = '星期六';
+	}
+	return $day;
+}
+
+function array_sorts($array,$keys,$type='asc'){
+	//用法$datas = array_sorts($datas,'is_over','asc');
+	$keysvalue = $new_array = array();
+	foreach ($array as $k=>$v){
+		$keysvalue[$k] = $v[$keys];
+	}
+	if($type == 'asc'){
+		asort($keysvalue);
+	}else{
+		arsort($keysvalue);
+	}
+	reset($keysvalue);
+	foreach ($keysvalue as $k=>$v){
+		$new_array[$k] = $array[$k];
+	}
+	return $new_array;
+}
+
 function sub_day($staday)
 {
 	$value = TIMESTAMP - $staday;

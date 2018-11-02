@@ -67,7 +67,7 @@ body{padding-bottom: 0 !important;}
                 <div style="clear:both"></div>
             </dd> 	
         </dl>
-		{if GetSchoolType($schoolid,$weid) == 1}
+		{if $schooltype}
 		{if $share != 0}
 		<dl class="count_outline">
             <dt><a href="{php echo $this->createMobileUrl('mysharedetail', array('id' => $it['id'],'schoolid' => $schoolid,'kcid'=>$item['id']), true)}" >已成功邀请<span class="outline_link" style="float:unset;margin-right:3px;margin-left:3px;" >{$share}</span>人 <span class="outline_link" >查看更多</span></a></dt>
@@ -491,7 +491,7 @@ function WeixinJSHideAllNonBaseMenuItem(){
 	if (typeof wx != "undefined"){
 		wx.ready(function () {
 		//alert("{$sharetitle}");
-		{if GetSchoolType($schoolid,$weid) == 1}
+		{if $schooltype}
 			sharedata = {
 				title: "{$sharetitle}",
 				desc: "{$sharedesc}",

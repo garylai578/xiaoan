@@ -135,7 +135,11 @@
 							</div>
 							<div class="icon_text" style="height: 55px; line-height: 55px;">
 								<div class="name" style="font-size: 12px !important;">
+								{if $schooltype}
+									{$item['tname']}{if $item['kmname']}（{$item['kmname']}）{/if} 
+								{else}
 									{$item['tname']}{if $item['kmname']}（{$item['kmname']}）{/if}({loop $item['kemu'] $v} {$v['kemus']} {/loop})({$item['Ttitle']})
+								{/if}
 								</div>
 							</div>
 							{if !empty($item['userid']) && $item['is_allowmsg'] == 2}
@@ -154,44 +158,86 @@
 				</div>
 			</div>
 		</div>
-		{if !empty($student['bj_id'])}
-			<div count="{$bj1count}" name="{$bj['sname']}">
-				<div class="common_til2">
-					<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$bj['sname']}','{$bj['sname']}（{$bj1count}人）','{$bj['sname']}（{$bj1count}人）')">{$bj['sname']}（{$bj1count}人）</a>
-				</div>
-				<div class="common_box1" style="">
-					<div class="main_box2" style="padding:0 0; display:none;"  id="{$bj['sname']}">
-						<ul class="common_list_imgtext2">
-						{loop $xs1 $vue}
-							{loop $vue['sid'] $item}
-							<li style="padding-left: 70px;">
-								<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
-									<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
-								</div>
-								<div class="icon_text" style="height: 55px; line-height: 55px;">
-									<div class="name">
-										{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
+		{if $schooltype}
+			{loop $stupardlist $row_s}
+				<div count="{$row_s['bj1count']}" name="{$row_s['bj']['sname']}">
+					<div class="common_til2">
+						<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$row_s['bj']['sname']}','{$row_s['bj']['sname']}（{$row_s['bj1count']}人）','{$row_s['bj']['sname']}（{$row_s['bj1count']}人）')">{$row_s['bj']['sname']}（{$row_s['bj1count']}人）</a>
+					</div>
+					<div class="common_box1" style="">
+						<div class="main_box2" style="padding:0 0; display:none;"  id="{$row_s['bj']['sname']}">
+							<ul class="common_list_imgtext2">
+							{loop $row_s['xs1'] $vue}
+								{loop $vue['sid'] $item}
+								<li style="padding-left: 70px;">
+									<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
+										<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
 									</div>
-								</div>
-								{if $item[sid] != $it['sid']}
-								{if !empty($item['id']) && $item['is_allowmsg'] ==2}
-								<div class="btn_contact">
-									<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
-								</div>
-								{/if}
-								{/if}
-                                <!-- {if !empty($userinfo['mobile'])}
-								<div class="btn_box">
-									<a href="tel:{$userinfo['mobile']}" class="icon_btn_call"></a>
-								</div>
-								{/if} -->
-							</li> 
+									<div class="icon_text" style="height: 55px; line-height: 55px;">
+										<div class="name">
+											{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
+										</div>
+									</div>
+									{if $item[sid] != $it['sid']}
+									{if !empty($item['id']) && $item['is_allowmsg'] ==2}
+									<div class="btn_contact">
+										<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
+									</div>
+									{/if}
+									{/if}
+									<!-- {if !empty($userinfo['mobile'])}
+									<div class="btn_box">
+										<a href="tel:{$userinfo['mobile']}" class="icon_btn_call"></a>
+									</div>
+									{/if} -->
+								</li> 
+								{/loop}	
 							{/loop}	
-						{/loop}	
-						</ul>
+							</ul>
+						</div>
 					</div>
 				</div>
-			</div>
+			{/loop}
+		{elseif !$schooltype}
+			{if !empty($student['bj_id'])}
+				<div count="{$bj1count}" name="{$bj['sname']}">
+					<div class="common_til2">
+						<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$bj['sname']}','{$bj['sname']}（{$bj1count}人）','{$bj['sname']}（{$bj1count}人）')">{$bj['sname']}（{$bj1count}人）</a>
+					</div>
+					<div class="common_box1" style="">
+						<div class="main_box2" style="padding:0 0; display:none;"  id="{$bj['sname']}">
+							<ul class="common_list_imgtext2">
+							{loop $xs1 $vue}
+								{loop $vue['sid'] $item}
+								<li style="padding-left: 70px;">
+									<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
+										<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
+									</div>
+									<div class="icon_text" style="height: 55px; line-height: 55px;">
+										<div class="name">
+											{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
+										</div>
+									</div>
+									{if $item[sid] != $it['sid']}
+									{if !empty($item['id']) && $item['is_allowmsg'] ==2}
+									<div class="btn_contact">
+										<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
+									</div>
+									{/if}
+									{/if}
+									<!-- {if !empty($userinfo['mobile'])}
+									<div class="btn_box">
+										<a href="tel:{$userinfo['mobile']}" class="icon_btn_call"></a>
+									</div>
+									{/if} -->
+								</li> 
+								{/loop}	
+							{/loop}	
+							</ul>
+						</div>
+					</div>
+				</div>
+			{/if}
 		{/if}
 	</div>
 </div>

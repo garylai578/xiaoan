@@ -44,7 +44,7 @@
 							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
 								<i class="fa fa-user"></i>
 								<span class="username">
-									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
+									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'owner') { ?>副创始人<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
 								</span>
 								<b class="caret"></b>
 							</a>
@@ -89,7 +89,7 @@
 							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
 								<i class="fa fa-user"></i>
 								<span class="username">
-									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
+									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'owner') { ?>副创始人<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
 								</span>
 								<b class="caret"></b>
 							</a>

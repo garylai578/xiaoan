@@ -12,28 +12,29 @@
 	$type = $_GPC['type'];
 	$pindex = max(1, intval($_GPC['page']));
 	$psize = 2;
+	$schooltype  =GetSchoolType($schoolid,$weid);
 	//班级通知
 	if($type == 1){
-		$bj_id = $_GPC['bj_id'];
-		$pindex = max(1, intval($_GPC['page']));
+
+			$bj_id = $_GPC['bj_id'];
+			$pindex = max(1, intval($_GPC['page']));
+			if (is_array($bj_id)) {
+				$mutiBj_id = 1 ;
+				$from = $_GPC['from'];
+				foreach( $bj_id as $key => $value )
+				{
+					$temp_bj .= $value.",";
+				}
+				$bj_id_fin = trim($temp_bj,",");
+				//var_dump($bj_id_fin);
+				$total = pdo_fetchcolumn("SELECT count(distinct id ) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And FIND_IN_SET(bj_id,:bj_id)",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id_fin));
+				$bj_id = json_encode($bj_id);
+			}else{
+				$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));
+			}
+			$tp = ceil($total/$psize);
 		
-	if (is_array($bj_id)) {
-		
-		$mutiBj_id = 1 ;
-		
-		$from = $_GPC['from'];
-		foreach( $bj_id as $key => $value )
-		{
-			$temp_bj .= $value.",";
-		}
-		$bj_id_fin = trim($temp_bj,",");
-		//var_dump($bj_id_fin);
-		$total = pdo_fetchcolumn("SELECT count(distinct id ) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And FIND_IN_SET(bj_id,:bj_id)",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id_fin));
-		$bj_id = json_encode($bj_id);
-	}else{
-		$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));
-	}
-		$tp = ceil($total/$psize);
+	
 	//校园通知
 	}elseif($type == 2){
 		$groupid = $_GPC['groupid'];
@@ -53,12 +54,12 @@
 		$tp = ceil($total/$psize);
 		//作业群发
 	}elseif($type == 3){
-		$bj_id = $_GPC['bj_id'];
-		$pindex = max(1, intval($_GPC['page']));
+	
+			$bj_id = $_GPC['bj_id'];
+			$pindex = max(1, intval($_GPC['page']));
+			$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));
+			$tp = ceil($total/$psize);
 		
-		$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));
-
-		$tp = ceil($total/$psize);
 	}
 	
 	

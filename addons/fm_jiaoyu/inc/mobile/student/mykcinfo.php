@@ -9,19 +9,24 @@
 		$openid = $_W['openid'];
         $id = intval($_GPC['id']);
 		$schoolid = intval($_GPC['schoolid']);
-
+		$schooltype = $_W['schooltype'];
 		//获取基本信息
 		if(empty($_GPC['userid'])){
 			$it = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where id = :id ", array(':id' => $_SESSION['user']));
 		}elseif(!empty($_GPC['userid'])){
 			$it = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where id = :id ", array(':id' => $_GPC['userid']));
+			$_SESSION['user'] = $_GPC['userid'];
 		}
-				
+		$category = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = :weid AND schoolid = :schoolid ORDER BY sid ASC, ssort DESC", array(':weid' => $weid, ':schoolid' => $schoolid), 'sid');
+		//var_dump($category);
 		$student = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where weid = :weid AND schoolid=:schoolid AND id=:id", array(':weid' => $weid, ':schoolid' => $schoolid, ':id' => $it['sid']));
+		$share = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_order) . " where weid = '{$weid}' AND schoolid='{$schoolid}' AND shareuserid='{$it['id']}' and kcid = '{$id}' and type=1 and status = 2 ");
+		//var_dump($share);
 		$stup=$student['points']?$student['points']:0;
-		$school = pdo_fetch("SELECT style2,title,tpic,logo,Is_point FROM " . tablename($this->table_index) . " where weid = :weid AND id = :id ", array(':weid' => $weid, ':id' => $schoolid));
+		$school = pdo_fetch("SELECT style2,title,tpic,logo,Is_point,thumb FROM " . tablename($this->table_index) . " where weid = :weid AND id = :id ", array(':weid' => $weid, ':id' => $schoolid));
 
 		$item = pdo_fetch("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE id = :id ", array(':id' => $id));
+		//var_dump($item);
         $t_array = explode(',',$item['tid']);
 		$tname_array = ' ';
 		foreach( $t_array as $key_t => $value_t )
@@ -66,8 +71,12 @@
 			 $teacher = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " where weid = :weid AND schoolid=:schoolid AND id=:id", array(':weid' => $weid, ':schoolid' => $schoolid, ':id' => $item['tid']));
 		}
 
-		$title = $item['title'];
-        $category = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = :weid AND schoolid = :schoolid ", array(':weid' => $weid, ':schoolid' => $schoolid), 'sid');
-
+		$title = $item['name'];
+       
+		$title1 .= "我分享了一个课程，快来看看吧";  
+		$sharetitle = $title1;
+		$sharedesc = $title."【课程分享】";
+		$shareimgUrl = tomedia($item['thumb']);
+		$links = $_W['siteroot'] .'app/'.$this->createMobileUrl('kcinfo', array('schoolid' => $schoolid,'id' => $id,'shareuserid'=>$it['id'],'fenxiang'=> 'fenxiang'));
         include $this->template(''.$school['style2'].'/mykcinfo');
 ?>

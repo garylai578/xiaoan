@@ -605,7 +605,7 @@ $(function(){
 					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">是否显示：</label>
                     <div class="col-sm-2 col-lg-2">
                         <label class="radio-inline">
-                            <input type="radio" name="is_show" value="1" {if $item['is_show']==1}checked{/if}>是
+                            <input type="radio" name="is_show" value="1" {if $item['is_show']==1 || empty($item['is_show'])}checked{/if}>是
                         </label>
                         <label class="radio-inline">
                             <input type="radio" name="is_show" value="2" {if $item['is_show']==2}checked{/if}>否

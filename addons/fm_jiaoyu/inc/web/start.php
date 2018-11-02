@@ -53,9 +53,19 @@ if ($operation == 'display') {
     $cose = $cost[0]['SUM(cose)'];
     $ybjs = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_user) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sid = 0 $condition1");
     $ybxs = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_user) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND tid = 0 $condition1");
-    $baomzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_signup) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition1");
+	if (!$_W['schooltype']){
+		$baomzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_signup) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition1");
+	}else{
+		$baomzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_order) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' and type = 1 and status = 2 AND paytime > '{$starttime}' AND paytime < '{$endtime}'");
+	} 
+    
     $bjqzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition1");
-    $checklogzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition1");
+	if (!$_W['schooltype']){
+		 $checklogzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition1");
+	}else{
+		 $checklogzj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_kcsign) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' and status = 2 and tid = 0 and sid != 0 and kcid != 0  $condition1");
+	} 
+   
     $xczj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition1");
     $jszj = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_teachers) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition7");
 	$allstu  = pdo_fetchall("select id,keyid FROM ".tablename($this->table_students)." WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition6 AND (stheendtime >='{$endtime}' or stheendtime = 0) ");
@@ -144,24 +154,36 @@ if ($operation == 'display') {
         $lasttz[$key]['thumb'] = $ls['thumb'];
         $lasttz[$key]['time'] = sub_day($row['createtime']);
     }
-    $lastkq = pdo_fetchall("SELECT * FROM " . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ORDER BY createtime DESC LIMIT 0,10");
-    foreach($lastkq as $index =>$row){
-        $student = pdo_fetch("SELECT s_name,icon FROM " . tablename($this->table_students) . " WHERE id = '{$row['sid']}' ");
-        $teacher = pdo_fetch("SELECT tname FROM " . tablename($this->table_teachers) . " WHERE id = '{$row['tid']}' ");
-        $qdtid = pdo_fetch("SELECT tname,thumb FROM " . tablename($this->table_teachers) . " WHERE id = '{$row['qdtid']}' ");
-        $idcard = pdo_fetch("SELECT pname FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$row['cardid']}' ");
-        $mac = pdo_fetch("SELECT name FROM " . tablename($this->table_checkmac) . " WHERE schoolid = '{$row['schoolid']}' And id = '{$row['macid']}' ");
-        $banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = '{$row['bj_id']}' ");
-        $lastkq[$index]['s_name'] = $student['s_name'];
-        $lastkq[$index]['sicon'] = $student['icon'];
-        $lastkq[$index]['tname'] = $teacher['tname'];
-        $lastkq[$index]['thumb'] = $teacher['thumb'];
-        $lastkq[$index]['qdtname'] = $qdtid['tname'];
-        $lastkq[$index]['mac'] = $mac['name'];
-        $lastkq[$index]['pname'] = $idcard['pname'];
-        $lastkq[$index]['bj_name'] = $banji['sname'];
-        $lastkq[$index]['time'] = sub_day($row['createtime']);
-    }
+	if($schooltype){
+		$lastxk = pdo_fetchall("SELECT * FROM " . tablename($this->table_kcsign) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' and sid != 0 and tid = 0 ORDER BY createtime DESC LIMIT 0,10");
+		foreach($lastxk as $index => $row){
+			$student = pdo_fetch("SELECT s_name,icon FROM " . tablename($this->table_students) . " WHERE id = '{$row['sid']}' ");
+			$kcinfo = pdo_fetch("SELECT name FROM " . tablename($this->table_tcourse) . " WHERE id = '{$row['kcid']}' ");
+			$lastxk[$index]['s_name'] = $student['s_name'];
+			$lastxk[$index]['sicon'] = $student['icon'];
+			$lastxk[$index]['kcname'] = $kcinfo['name'];
+			$lastxk[$index]['time'] = sub_day($row['createtime']);
+		}
+	}else{ 
+		$lastkq = pdo_fetchall("SELECT * FROM " . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ORDER BY createtime DESC LIMIT 0,10");
+		foreach($lastkq as $index =>$row){
+			$student = pdo_fetch("SELECT s_name,icon FROM " . tablename($this->table_students) . " WHERE id = '{$row['sid']}' ");
+			$teacher = pdo_fetch("SELECT tname FROM " . tablename($this->table_teachers) . " WHERE id = '{$row['tid']}' ");
+			$qdtid = pdo_fetch("SELECT tname,thumb FROM " . tablename($this->table_teachers) . " WHERE id = '{$row['qdtid']}' ");
+			$idcard = pdo_fetch("SELECT pname FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$row['cardid']}' ");
+			$mac = pdo_fetch("SELECT name FROM " . tablename($this->table_checkmac) . " WHERE schoolid = '{$row['schoolid']}' And id = '{$row['macid']}' ");
+			$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = '{$row['bj_id']}' ");
+			$lastkq[$index]['s_name'] = $student['s_name'];
+			$lastkq[$index]['sicon'] = $student['icon'];
+			$lastkq[$index]['tname'] = $teacher['tname'];
+			$lastkq[$index]['thumb'] = $teacher['thumb'];
+			$lastkq[$index]['qdtname'] = $qdtid['tname'];
+			$lastkq[$index]['mac'] = $mac['name'];
+			$lastkq[$index]['pname'] = $idcard['pname'];
+			$lastkq[$index]['bj_name'] = $banji['sname'];
+			$lastkq[$index]['time'] = sub_day($row['createtime']);
+		}
+	}
 	if(!empty($_GPC['addtime'])) {
 		$starttime1 = strtotime($_GPC['addtime']['start']);
 		$endtime1 = strtotime($_GPC['addtime']['end']) + 86399;

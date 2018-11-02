@@ -10,7 +10,7 @@
      if ($operation == 'default') {
 	           die ( json_encode ( array (
 			         'result' => false,
-			         'msg' => '对不起，你的请求不存在！'
+			         'msg' => '参数错误'
 	                ) ) );
      }			
      if ($operation == 'useredit') {
@@ -304,129 +304,60 @@
 				$data ['msg'] = '非法请求！';
 				die ( json_encode ( $data ) ); 
 		}else{
-			if($item['keyid'] != 0 ){
-				$allstu = pdo_fetchall("SELECT * FROM " . tablename($this->table_students) . " where :schoolid = schoolid And weid = :weid AND keyid=:keyid ", array(
-				':weid' => $_GPC ['weid'],
-				':schoolid' => $_GPC ['schoolid'],				 
-				':keyid' => $item['keyid']
-				));
-
-				foreach( $allstu as $key => $value )
-				{
-					$userdata = array(
-						'sid' => $value['id'],
-						'weid' =>  $_GPC ['weid'],
-						'schoolid' => $_GPC ['schoolid'],
-						'openid' => $_W ['openid'],
-						'pard' => $subjectId,
-						'uid' => $_GPC['uid'],
-						'createtime' => time()
+			$userdata = array(
+				'sid' => trim($stuid),
+				'weid' =>  $_GPC ['weid'],
+				'schoolid' => $_GPC ['schoolid'],
+				'openid' => $_W ['openid'],
+				'pard' => $subjectId,
+				'uid' => $_GPC['uid'],
+				'createtime' => time()
+			);
+			if(!empty($_GPC['mobile']) || !empty($_GPC['mymobile'])){
+				if(!$_GPC['mymobile']){
+					$userinfo = array(
+						'name' => $_GPC['s_name'].get_guanxi($subjectId),
+						'mobile' => trim($_GPC['mobile'])
+					);								
+				}else{
+					$userinfo = array(
+						'name' => $_GPC['realname'],
+						'mobile' => trim($_GPC['mymobile'])
+					);								
+				}
+				$userdata['userinfo'] = iserializer($userinfo);
+			}					
+			pdo_insert($this->table_user, $userdata);			
+			$userid = pdo_insertid();
+			if($subjectId == 2){
+				$temp = array( 
+					'mom' => $_GPC['openid'],
+					'muserid' => $userid,
+					'muid'=> $_GPC['uid']
 					);
-					
-					if(!empty($_GPC['mobile']) || !empty($_GPC['mymobile'])){
-						if(!$_GPC['mymobile']){
-							$userinfo = array(
-								'name' => $_GPC['s_name'].get_guanxi($subjectId),
-								'mobile' => trim($_GPC['mobile'])
-							);								
-						}else{
-							$userinfo = array(
-								'name' => $_GPC['realname'],
-								'mobile' => trim($_GPC['mymobile'])
-							);								
-						}
-						$userdata['userinfo'] = iserializer($userinfo);
-					}	
-					pdo_insert($this->table_user, $userdata);
-					$userid = pdo_insertid();
-
-					if($subjectId == 2){
-						$temp = array( 
-							'mom' => $_GPC['openid'],
-							'muserid' => $userid,
-							'muid'=> $_GPC['uid']
-							);
-					}
-					if($subjectId == 3){
-						$temp = array(
-							'dad' => $_GPC['openid'],
-							'duserid' => $userid,
-							'duid'=> $_GPC['uid']
-							);
-					}
-					if($subjectId == 4){
-						$temp = array(
-							'own' => $_GPC['openid'],
-							'ouserid' => $userid,
-							'ouid'=> $_GPC['uid']
-							);
-					}
-					if($subjectId == 5){
-						$temp = array(
-							'other' => $_GPC['openid'],
-							'otheruserid' => $userid,
-							'otheruid'=> $_GPC['uid']
-							);
-					}			
-					pdo_update($this->table_students, $temp, array('id' => $value['id']));  
-				}
-				
-			}else{
-				$userdata = array(
-					'sid' => trim($stuid),
-					'weid' =>  $_GPC ['weid'],
-					'schoolid' => $_GPC ['schoolid'],
-					'openid' => $_W ['openid'],
-					'pard' => $subjectId,
-					'uid' => $_GPC['uid'],
-					'createtime' => time()
-				);
-				if(!empty($_GPC['mobile']) || !empty($_GPC['mymobile'])){
-					if(!$_GPC['mymobile']){
-						$userinfo = array(
-							'name' => $_GPC['s_name'].get_guanxi($subjectId),
-							'mobile' => trim($_GPC['mobile'])
-						);								
-					}else{
-						$userinfo = array(
-							'name' => $_GPC['realname'],
-							'mobile' => trim($_GPC['mymobile'])
-						);								
-					}
-					$userdata['userinfo'] = iserializer($userinfo);
-				}					
-				pdo_insert($this->table_user, $userdata);			
-				$userid = pdo_insertid();
-				if($subjectId == 2){
-					$temp = array( 
-						'mom' => $_GPC['openid'],
-						'muserid' => $userid,
-						'muid'=> $_GPC['uid']
-						);
-				}
-				if($subjectId == 3){
-					$temp = array(
-						'dad' => $_GPC['openid'],
-						'duserid' => $userid,
-						'duid'=> $_GPC['uid']
-						);
-				}
-				if($subjectId == 4){
-					$temp = array(
-						'own' => $_GPC['openid'],
-						'ouserid' => $userid,
-						'ouid'=> $_GPC['uid']
-						);
-				}
-				if($subjectId == 5){
-					$temp = array(
-						'other' => $_GPC['openid'],
-						'otheruserid' => $userid,
-						'otheruid'=> $_GPC['uid']
-						);
-				}			
-				pdo_update($this->table_students, $temp, array('id' => $stuid));   
 			}
+			if($subjectId == 3){
+				$temp = array(
+					'dad' => $_GPC['openid'],
+					'duserid' => $userid,
+					'duid'=> $_GPC['uid']
+					);
+			}
+			if($subjectId == 4){
+				$temp = array(
+					'own' => $_GPC['openid'],
+					'ouserid' => $userid,
+					'ouid'=> $_GPC['uid']
+					);
+			}
+			if($subjectId == 5){
+				$temp = array(
+					'other' => $_GPC['openid'],
+					'otheruserid' => $userid,
+					'otheruid'=> $_GPC['uid']
+					);
+			}			
+			pdo_update($this->table_students, $temp, array('id' => $stuid));   
 			$data ['result'] = true;			
 			$data ['msg'] = '恭喜您,绑定成功!点击确定立刻跳转至个人中心';
 			die ( json_encode ( $data ) );
@@ -931,7 +862,7 @@
 		               ) ) );
 	    }else{
 			$data = array();
-			$bjlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$_GPC['schoolid']}' And weid = '{$_W['uniacid']}' And parentid = '{$_GPC['gradeId']}' And type = 'theclass' ORDER BY ssort DESC");
+			$bjlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$_GPC['schoolid']}' And weid = '{$_W['uniacid']}' And parentid = '{$_GPC['gradeId']}' And type = 'theclass' and is_over != 2 ORDER BY ssort DESC");
    			$data ['bjlist'] = $bjlist;
 			$data ['result'] = true;
 			$data ['msg'] = '成功获取！';

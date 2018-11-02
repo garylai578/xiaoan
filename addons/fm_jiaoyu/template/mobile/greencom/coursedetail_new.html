@@ -165,7 +165,7 @@
 	<div id="BlackBg" class="BlackBg"></div>
 	<div class="header mainColor">
 		<div id="titlebar" class="l">
-			<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
+			<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="{php echo $this->createMobileUrl('kc', array('schoolid' => $schoolid), true)}"></a>
 		</div>
 		<div class="m"><a><span style="font-size: 18px">课程详情</span></a></div>
 	</div>
@@ -252,7 +252,7 @@
 				<a href="{php echo $this->createMobileUrl('jianjie', array('schoolid' => $schoolid), true)}"></a>
 			</div>
 		</div>
-		<div class="relateds"><strong>学校其他课程</strong>
+		<div class="relateds" style="margin-bottom: 5rem;"><strong>学校其他课程</strong>
 			<ol>
 				{loop $others $rowO}
 				<li>
@@ -659,6 +659,7 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					nj 		 :nj,
 					bj 		 :bj,
 					pard	 :pard,
+					shareuserid : "{$_GPC['shareuserid']}"
 					};
 				$.post("{php echo $this->createMobileUrl('kcajax',array('op'=>'newstu'))}",submitData,function(data){
 
@@ -705,9 +706,10 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					uid      : "{$fan['uid']}",
 					kcid     : "{$id}",
 					sid      : sid,
-					user     : id
+					user     : id,
+					shareuserid : "{$_GPC['shareuserid']}"
 					};
-				$.post("{php echo $this->createMobileUrl('payajax',array('op'=>'sigeup'))}",submitData,function(data){
+				$.post("{php echo $this->createMobileUrl('payajax',array('op'=>'sigeup','shareuserid'=>$_GPC['shareuserid']))}",submitData,function(data){
 
 					if(data.result){
 						jTips(data.msg);
@@ -766,7 +768,8 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					sid      : jfdy_sid,
 					user     : jfdy_id,
 					point	 : count,
-					is_point : is_point
+					is_point : is_point, 
+					shareuserid : "{$_GPC['shareuserid']}"
 				};
 				$.post("{php echo $this->createMobileUrl('kcajax',array('op'=>'signup'))}",submitData,function(data){
 
@@ -805,6 +808,8 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 				checkSigeup(id,sid);
 			}
 		}
+		
+		
 		function closed(){
 			$("#yyst").hide();
 			$("body").removeAttr("style");

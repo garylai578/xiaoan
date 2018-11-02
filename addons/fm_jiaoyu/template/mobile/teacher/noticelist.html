@@ -61,7 +61,7 @@ position: relative;}
 position: relative;}
 .hederRightBox {width: 21px;height: 100%;display: inline-block;position: absolute;right: 20px;}
 .hederRightBox a {width: 100%;height: 21px;display: inline-block;position: absolute;top: 50%;transform: translateY(-50%);-webkit-transform: translateY(-50%);-moz-transform: translateY(-50%);-ms-transform: translateY(-50%);-o-transform: translateY(-50%);}
-
+.Tip_usertype {height: 20px;background: #30c6e1;color: white;display: -webkit-box;display: -moz-box;display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: center;-moz-box-align: center;-ms-flex-align: center;-webkit-align-items: center;align-items: center;font-size: 11px;margin-left: 5px;padding: 0 4px;border-radius: 5px;}
 .audit_statusNew, .audit_statusPass, .audit_statusPassReject {width: 50px;height: 20px;position: absolute;top: 0;right: 0;font-size: 11px;display: -webkit-box;display: -moz-box;
 display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: center;-moz-box-align: center;-ms-flex-align: center;-webkit-align-items: center;align-items: center;
 -webkit-box-pack: center;-moz-box-pack: center;-ms-flex-pack: center;-webkit-justify-content: center;justify-content: center;border-top-right-radius: 10px;border-bottom-left-radius: 10px;}
@@ -113,12 +113,13 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 					<img src="{php echo tomedia($v['thumb'])}" class="teacherImgError" />
 				</div>
 				<div class="notifyTopRight">
-					
 					<div class="notifyTopRightTopBox">
 						<span class="teacherInfo">{$v['name']}</span>
 							{if $v['shenfen'] == '校长'}<div class="JobLeaderBox">{$v['shenfen']}</div>{/if}
 							{if $v['shenfen'] == '主任'}<div class="JobTeacherBox">{$v['shenfen']}</div>{/if}
 							{if $v['shenfen'] == '老师'}<div class="JobTeacherBox">{$v['shenfen']}</div>{/if}
+							{if $v['usertype'] == 'send_class'}<div class="Tip_usertype">指定班级</div>{/if}
+							{if $v['usertype'] == 'student'}<div class="Tip_usertype">指定学生</div>{/if}
 					</div>
 					<p class="notifyCreateTime">{$v['banji']}&nbsp;{$v['time']}</p>
 				</div>
@@ -134,42 +135,13 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 		<div class="slide_left_menu">
 			<div class="slide_left_menu_til">班级列表</div>
 			<ul class="slide_left_menu_ul">
-			{if is_njzr($teachers['id'])}
-				{if $bjlists}
-					{loop $bjlists $row}
-						{if !in_array($row['bj_id'], $bjlists)}
-						<?php $bjlists[] = $row['bj_id'];?>
-							<li onclick="isSelect({$row['bj_id']});" {if $bj_id == $row['bj_id']}class="act"{/if}><div>{$row['bjname']}</div></li>
-						{/if}
-					{/loop}		
-				{/if}	
-					{loop $mynjlist $row}
-					{if $bjlists}
-						{loop $row['bjlist'] $item}
-						{if !in_array($item['sid'], $bjlists)}
-							<li onclick="isSelect({$item['sid']});" {if $bj_id == $item['sid']}class="act"{/if}><div>{$item['sname']}</div></li>
-						{/if}
-						{/loop}
-					{else}
-						{loop $row['bjlist'] $item}
-							<li onclick="isSelect({$item['sid']});" {if $bj_id == $item['sid']}class="act"{/if}><div>{$item['sname']}</div></li>
-						{/loop}					
-					{/if}	
-					{/loop}		
-			{else}
-				{if $teachers['status'] == 2}
-					{loop $bjlist $row}
-						<li onclick="isSelect({$row['sid']});" {if $bj_id == $row['sid']}class="act"{/if}><div>{$row['sname']}</div></li>
-					{/loop}
-				{else}
-					{loop $bjlists $row}
-						{if !in_array($row['bj_id'], $bjlists)}
-						<?php $bjlists[] = $row['bj_id'];?>
-							<li onclick="isSelect({$row['bj_id']});" {if $bj_id == $row['bj_id']}class="act"{/if}><div>{$row['bjname']}</div></li>
-						{/if}
-					{/loop}					
-				{/if}
-			{/if}
+			<?php $bjlistsss = array();?>
+				{loop $bjlists $row}
+					{if !in_array($row['sid'], $bjlistsss)}
+					<?php $bjlistsss[] = $row['bj_id'];?>
+						<li onclick="isSelect({$row['sid']});" {if $bj_id == $row['sid']}class="act"{/if}><div style="margin-left: -47px;font-size: 13px;">{$row['sname']}{if $row['info']}<span style="color:red;">{$row['info']}</span>{/if}</div></li>
+					{/if}
+				{/loop}
 			</ul>
 		</div>
 	</div>	

@@ -34,7 +34,29 @@
 			header("location:$stopurl");
 			exit;
 		}
-		$bjlists = get_mylist($schoolid,$it['tid'],'teacher');		
+		if (!$_W['schooltype']){
+			$bjlists = get_mylist($schoolid,$it['tid'],'teacher');		
+		}else{
+			$tid = $it['tid'];
+			$time = time();
+			$kclists_str = '';
+			$kclist = pdo_fetchall("select id ,name  FROM ".tablename($this->table_tcourse)." WHERE schoolid = '{$schoolid}'  and (tid like '%,{$tid},%'  or tid like '%,{$tid}' or tid like '{$tid},%' or tid ='{$tid}') and start<='{$time}' and end >= '{$time}' ORDER BY end DESC , ssort DESC   limit 3");
+			$kclist_count = pdo_fetchcolumn("select count(id)  FROM ".tablename($this->table_tcourse)." WHERE schoolid = '{$schoolid}'  and (tid like '%,{$tid},%'  or tid like '%,{$tid}' or tid like '{$tid},%' or tid ='{$tid}') and start<='{$time}' and end >= '{$time}' ORDER BY end DESC , ssort DESC  ");
+			if(!empty($kclist)){
+				$muti = 1;
+				foreach($kclist as $value){
+					$kclists_str .= $value['name'].' </br> ';	
+				}
+				$kclists_str =  substr($kclists_str,0,strlen($kclists_str)-6); 
+				if($kclist_count > 3 ){
+					$kclists_str .= '&nbsp;<span style="color:#17b056">等'.$kclist_count.'门课程</span>';
+				}
+			}else{
+				$muti = 0;
+				$kclists_str = "暂无授课信息";
+			}
+		}
+		
 		if(!empty($schoollist)){
 			// 获取该微信绑定的老师的学校信息（Lee 0721）
 			$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where weid = :weid AND id=:id ORDER BY ssort DESC", array(':weid' => $weid, ':id' => $schoolid));
@@ -51,8 +73,7 @@
 			$bjlist = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And tid = '{$it['tid']}' And type = 'theclass' ORDER BY sid ASC, ssort DESC");
 			//格式化userinfo  （Lee 0721） 
 		    $userinfo = iunserializer($it['userinfo']); 
-		    //按键值删除数组制定元素
-		
+		 
 	     	$iconsF = pdo_fetchall("SELECT * FROM " . tablename($this->table_icon) . " where weid = :weid And schoolid = :schoolid And place = :place ORDER by ssort ASC", array(':weid' => $weid, ':schoolid' => $schoolid, ':place' => 13));
 			$ss = count($iconsF,0);
 			for($i=$ss;$i>=0;$i--){

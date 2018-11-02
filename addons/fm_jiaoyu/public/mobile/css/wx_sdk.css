@@ -205,7 +205,7 @@ h1{ font-size: 20px; font-weight: bold; }
 .option_li_box2 .option_title2{border-bottom:1px solid #ddd; height:40px; line-height:40px; font-size:16px; margin:0 10px; box-sizing:border-box;}
 
 .option_li_box2 .option_list_ul1{ width:100%; display:block; padding:0 10px; box-sizing: border-box;}
-.option_li_box2 .option_list_ul1 li{ min-height:40px; line-height:40px; font-size:14px; overflow:auto; zoom:1; display:none; }
+.option_li_box2 .option_list_ul1 li{ min-height:40px; line-height:40px; font-size:14px; overflow:hidden; zoom:1; display:none; }
 .option_li_box2 > .option_list_ul1 > li > .name{ font-size:14px; padding-left: 15px;line-height:40px; border-bottom:1px solid #ddd; box-sizing:border-box; width:100%;}
 .option_li_box2 .option_list_ul1 li.show{ display:block;}
 .sec_ul_box{ display:none;}

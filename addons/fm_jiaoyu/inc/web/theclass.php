@@ -97,6 +97,7 @@ if($operation == 'display'){
 					'erwei'      => trim($_GPC['erwei']),
 					'qun'        => trim($_GPC['qun']),
 					'cost'       => trim($_GPC['cost']),
+					'class_device'       => trim($_GPC['class_device']),
 					'video'      => trim($_GPC['video']),
 					'video1'     => trim($_GPC['video1']),
 					'videostart' => trim($_GPC['videostart']),
@@ -129,6 +130,7 @@ if($operation == 'display'){
 						'tid'      => trim($_GPC['tid_new'][$key]),
 						'ssort'    => intval($_GPC['ssort_new'][$key]),
 						'cost'     => trim($_GPC['cost_new'][$key]),
+						'class_device'       => trim($_GPC['class_device']),
 						'parentid' => intval($_GPC['parentid_new'][$key]),
 						'type'     => 'theclass',
 					);				
@@ -163,6 +165,7 @@ if($operation == 'display'){
 						'tid'      => trim($_GPC['tid_new'][$key]),
 						'ssort'    => intval($_GPC['ssort_new'][$key]),
 						'cost'     => trim($_GPC['cost_new'][$key]),
+						'class_device'       => trim($_GPC['class_device']),
 						'parentid' => intval($_GPC['parentid_new'][$key]),
 						'type'     => 'theclass',
 					);				
@@ -179,7 +182,13 @@ if($operation == 'display'){
 	$is_on = intval($_GPC['is_on']);
 	$data = array('is_bjzx' => $is_on);
 	pdo_update($this->table_classify, $data, array('sid' => $id));	
-}elseif($operation == 'delete'){
+}elseif($operation == 'change_over'){
+	$id    = intval($_GPC['id']);
+	$is_over = intval($_GPC['is_over']);
+	$data1 = array('is_over' => $is_over);
+	pdo_update($this->table_classify, $data1, array('sid' => $id));	
+}
+elseif($operation == 'delete'){
     $sid      = intval($_GPC['sid']);
     $theclass = pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " WHERE sid = '{$sid}'");
 	$checkstud = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " WHERE bj_id = '{$sid}'");

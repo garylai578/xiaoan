@@ -186,7 +186,7 @@ function changeGrade(cityId, type, __result) {
 	.template .item-build-div2{text-align:center; line-height:30px; padding-top:150px;}
 	@media screen and (min-width:992px){#ListStyle{width:890px; margin:100px auto;}}
 </style>
-<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="  margin-top: 60px;">
+<div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -230,10 +230,9 @@ function changeGrade(cityId, type, __result) {
 				<!--<input type="submit" name="tijiao" id="tijiao" class="btn btn-success" value="开始上传">-->
 				<button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
 			</div>
-			
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->			
+		</div>
+	</div>
+</div>
 <script type="text/javascript">				
 function sj(schoolid,user_ysh,user_wsh,user_tprc,user_cyrs){
 	 $('#Modal1').modal('toggle');

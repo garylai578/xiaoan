@@ -44,15 +44,23 @@
 				$data ['result'] = false;
 				$message = "请输入粉丝昵称！";
 			}
-			$fans = pdo_fetchall("SELECT * FROM " . tablename('mc_mapping_fans') . " WHERE openid = '{$email}' And uniacid = '{$weid}' ");
+			$member = pdo_fetchall("SELECT * FROM " . tablename('mc_members') . " WHERE nickname like '{$email}' And uniacid = '{$weid}' ");
 			if($member){
-				$f = 0;
-				foreach($fans as $row){
-					pdo_delete("mc_mapping_fans", array('fanid' => $row['fanid']));
-					$f++;
+				$m = 0;
+				foreach($member as $vel){
+					pdo_delete("mc_members", array('uid' => $vel['uid']));
+					$m++;
+				}
+				$fans = pdo_fetchall("SELECT * FROM " . tablename('mc_mapping_fans') . " WHERE nickname like '{$email}' And uniacid = '{$weid}' ");
+				if($fans){
+					$f = 0;
+					foreach($fans as $row){
+						pdo_delete("mc_mapping_fans", array('fanid' => $row['fanid']));
+						$f++;
+					}
 				}
 				$data ['result'] = true;
-				$message = "清理粉丝垃圾信息{$f}条!";
+				$message = "清理垃圾会员信息{$m}条，清理粉丝垃圾信息{$f}条!";
 			}else{
 				$data ['result'] = false;
 				$message = "未查到相关数据";

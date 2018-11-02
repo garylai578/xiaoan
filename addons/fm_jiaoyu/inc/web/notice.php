@@ -6,13 +6,10 @@
  */
 global $_GPC, $_W;
 mload()->model('que');
-
-
-
+$schooltype  = $_W['schooltype'];
 //lee 0725
-	$lastid = pdo_fetch("SELECT id FROM " . tablename($this->table_class) . " ORDER by id DESC LIMIT 0,1");
-	$lastids = empty($lastid['id']) ? 1000 :$lastid['id'];
-
+$lastid = pdo_fetch("SELECT id FROM " . tablename($this->table_class) . " ORDER by id DESC LIMIT 0,1");
+$lastids = empty($lastid['id']) ? 1000 :$lastid['id'];
 
 
 $weid              = $_W['uniacid'];
@@ -48,15 +45,18 @@ foreach($nj as $key_n=>$value_n){
 	$nj_str_temp .=$value_n['sid'].",";
 }
 $nj_str = trim($nj_str_temp,",");
-$kclist = pdo_fetchall("SELECT id,name FROM " . tablename($this->table_tcourse) . " WHERE weid = :weid AND schoolid = :schoolid  and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str) ORDER BY id ASC", array(
+$kclist = pdo_fetchall("SELECT id as sid,name as sname FROM " . tablename($this->table_tcourse) . " WHERE weid = :weid AND schoolid = :schoolid  and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str) ORDER BY id ASC", array(
     ':weid'     => $weid,
     ':schoolid' => $schoolid,
 	':bj_str'   => $bj_str,
 	':nj_str'	=> $nj_str
 ));
-$schooltype  =GetSchoolType($schoolid,$weid);
 $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
 $tid_global = $_W['tid'];
+if(is_numeric($tid_global)){
+	mload()->model('tea');
+	$kclist = GetAllClassInfoByTid($schoolid,2,$schooltype,$tid_global);
+}
 if($operation =='display' && !(IsHasQx($tid_global,1001201,1,$schoolid))){
 	$operation = 'display1';
 	$stopurl = $_W['siteroot'] .'web/'.$this->createWebUrl('notice', array('schoolid' => $schoolid,'op'=>$operation));
@@ -97,7 +97,11 @@ if($operation == 'display'){
         $params[':keyword'] = "%{$_GPC['keyword']}%";
     }
     if(!empty($_GPC['bj_id'])){
-        $condition .= " AND bj_id = '{$_GPC['bj_id']}'";
+		if($schooltype){
+			$condition .= " AND kc_id = '{$_GPC['bj_id']}'";
+		}else{
+			$condition .= " AND bj_id = '{$_GPC['bj_id']}'";
+		}
     }
 	//获取内容
     $list = pdo_fetchall("SELECT * FROM " . tablename($this->table_notice) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' And type = 1 $condition ORDER BY createtime DESC, id DESC LIMIT " . ($pindex - 1) * $psize . ',' . $psize, $params);
@@ -105,6 +109,10 @@ if($operation == 'display'){
 	    //获取班级名称
         $bj                   = pdo_fetch("SELECT * FROM " . tablename($this->table_classify) . " WHERE sid = :sid", array(':sid' => $row['bj_id']));
         $list[$key]['bjname'] = $bj['sname'];
+		if($row['kc_id']){
+			$kcinfo = pdo_fetch("SELECT name FROM " . tablename($this->table_tcourse) . " WHERE id = :id", array(':id' => $row['kc_id']));
+			$list[$key]['bjname'] = $kcinfo['name'];
+		}
     }
     //获取总个数
     $total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_notice) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' And type = 1 $condition");
@@ -138,7 +146,11 @@ if($operation == 'display'){
         $params[':keyword'] = "%{$_GPC['keyword']}%";
     }
     if(!empty($_GPC['bj_id'])){
-        $condition .= " AND bj_id = '{$_GPC['bj_id']}'";
+		if($schooltype){
+			$condition .= " AND kc_id = '{$_GPC['bj_id']}'";
+		}else{
+			$condition .= " AND bj_id = '{$_GPC['bj_id']}'";
+		}
     }
     if(!empty($_GPC['km_id'])){
         $condition .= " AND km_id = '{$_GPC['km_id']}'";
@@ -149,6 +161,10 @@ if($operation == 'display'){
         $bj                   = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = :sid", array(':sid' => $row['bj_id']));
         $km                   = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = :sid", array(':sid' => $row['km_id']));
         $list[$key]['bjname'] = $bj['sname'];
+		if($row['kc_id']){
+			$kcinfo = pdo_fetch("SELECT name FROM " . tablename($this->table_tcourse) . " WHERE id = :id", array(':id' => $row['kc_id']));
+			$list[$key]['bjname'] = $kcinfo['name'];
+		}
         $list[$key]['kmname'] = $km['sname'];
     }
 
@@ -523,6 +539,11 @@ if($out_excel == "Yes"){
         }else{
             $bj_id = 0;
         }
+        if(!empty($_GPC['kc_id'])){
+            $kc_id = intval($_GPC['kc_id']);
+        }else{
+            $kc_id = 0;
+        }
         if(!empty($_GPC['km_id'])){
             $km_id = intval($_GPC['km_id']);
         }else{
@@ -544,6 +565,7 @@ if($out_excel == "Yes"){
             'createtime' => time(),
             'bj_id'      => $bj_id,
             'km_id'      => $km_id,
+			'kc_id'      => $kc_id,
             'type'       => $_GPC['type'],
             'groupid'    => $groupid,
             'ismobile'   => 1,

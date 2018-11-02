@@ -10,7 +10,6 @@ $this1             = 'no1';
 $action            = 'schoolset';
 $GLOBALS['frames'] = $this->getNaveMenu($_GPC['schoolid'], $action);
 $schoolid          = intval($_GPC['schoolid']);
-
 $logo              = pdo_fetch("SELECT logo,title,is_openht FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
 $city              = pdo_fetchall("SELECT * FROM " . tablename($this->table_area) . " where weid = '{$weid}' And type = 'city' ORDER BY ssort DESC");
 $area              = pdo_fetchall("SELECT * FROM " . tablename($this->table_area) . " where weid = '{$weid}' And type = '' ORDER BY ssort DESC");
@@ -76,7 +75,7 @@ if($operation == 'post'){
     $mallset = unserialize($reply['mallsetinfo']);
 	$picarrSet_out = unserialize($reply['picarrset']);
 	$textarrSet_out = unserialize($reply['textarrset']);
-
+	$shareset_from =  unserialize($reply['shareset']);
     $reply['is_shangcheng'] = $mallset['isShow'];
     $reply['mall_is_Auto'] = $mallset['isAuto'];
     $reply['mallpayweid'] = $mallset['payweid'];
@@ -89,6 +88,20 @@ if($operation == 'post'){
     $sign    = unserialize($reply['signset']);
     $card    = unserialize($reply['cardset']);
 	$sms_set = get_school_sms_set($schoolid);
+	
+	$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
+	$nj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
+	$bj_str_temp = '0,';
+	foreach($bj as $key_b=>$value_b){
+		$bj_str_temp .=$value_b['sid'].",";
+	}
+	$bj_str = trim($bj_str_temp,",");
+	$nj_str_temp = '0,';
+	foreach($nj as $key_n=>$value_n){
+		$nj_str_temp .=$value_n['sid'].",";
+	}
+	$nj_str = trim($nj_str_temp,",");
+	$kclist = pdo_fetchall("SELECT id,name FROM " . tablename($this->table_tcourse) . " WHERE weid = :weid AND schoolid =:schoolid AND is_show = :is_show and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str)   ORDER BY end DESC", array(':weid' => $_W['uniacid'], ':schoolid' => $schoolid, ':is_show' => 1,':bj_str'=>$bj_str,':nj_str'=>$nj_str));
     if(checksubmit('submit')){
     if(is_showgkk())
     {
@@ -127,7 +140,22 @@ if($operation == 'post'){
     }elseif($_GPC['is_fbnew'] == null ){
 	    $is_fbnew = 2;
     }
-
+	$kcshare = $_GPC['kcshare'];
+	$shareset = array();
+	if($kcshare == 0){
+		$shareset['is_share'] = 0;
+	}elseif($kcshare == 1){
+		$shareset['is_share'] = 1;
+		$shareset['addJF'] = $_GPC['shareAddJF'];
+	}elseif($kcshare == 2){
+		$shareset['is_share'] = 2;
+		$shareset['addYE'] = $_GPC['shareAddYE'];
+	}elseif($kcshare == 3){
+		$shareset['is_share'] = 3;
+		$shareset['addKC'] = 0;
+		$shareset['addKS'] = $_GPC['shareAddKS'];
+	}
+	$shareset_str = serialize($shareset);
 	$picarrset = array();
 	$textarrset = array();
     $piclen = 0;
@@ -415,7 +443,8 @@ if($operation == 'post'){
         'picarrset'			  => $out_p,
         'is_picarr' 		  => $piclen,
         'is_textarr' 		  => $textlen,
-        'textarrset'  		  => $out_t
+        'textarrset'  		  => $out_t,
+		'shareset'			  => $shareset_str
     );
 	if(is_showgkk())
 	{

@@ -4,8 +4,7 @@
  *
  * @author 高贵血迹
  */global $_W, $_GPC;
-   $operation = in_array ( $_GPC ['op'], array ('default','fabu','mfabu','zfabu','fangxue','sxcfb','xcfb','dellimg','savely','hfavely','UpdateTypeByActiveId','SavePlanWeek','GetDetailByWeekDay','SendPlanWeek','DeleteWeekPlanByPlanUid','updatabypic','savedatabypicforplan','GetAttendData','GetAttendDataforTeacher','CheckSign','DoSign','fzqd','fzqdqr','checklogbyid','qingjialog','videodz','videopl','delmypl','getcook','zhuida','CheckSignForTeacher','DoSignForTeacher','delnotice','send_mail','mnotpro','notpro','znotpro','t_piyue','GetHolidayData','get_noticeuser') ) ? $_GPC ['op'] : 'default';
-
+   $operation = in_array ( $_GPC ['op'], array ('default','fabu','mfabu','zfabu','fangxue','sxcfb','xcfb','dellimg','savely','hfavely','UpdateTypeByActiveId','SavePlanWeek','GetDetailByWeekDay','SendPlanWeek','DeleteWeekPlanByPlanUid','updatabypic','savedatabypicforplan','GetAttendData','GetAttendDataforTeacher','CheckSign','DoSign','fzqd','fzqdqr','checklogbyid','qingjialog','videodz','videopl','delmypl','getcook','zhuida','CheckSignForTeacher','DoSignForTeacher','delnotice','send_mail','mnotpro','notpro','znotpro','t_piyue','GetHolidayData','get_noticeuser','get_noticebjtz') ) ? $_GPC ['op'] : 'default';
     if ($operation == 'default') {
 	           die ( json_encode ( array (
 			         'result' => false,
@@ -27,7 +26,6 @@
 		$endtime = $starttime + 86399;
 		$condition = " AND createtime > '{$starttime}' AND createtime < '{$endtime}'";
 		$checkyy = pdo_fetch("SELECT id FROM " . tablename($this->table_courseorder) . " where weid = '{$_GPC ['weid']}' And schoolid = '{$_GPC ['schoolid']}' And  fromuserid ='{$_GPC['fromuserid']}'  $condition ");
-
 		if(empty($_GPC['beizhu'])){
 		   	 die ( json_encode ( array (
                     'result' => false,
@@ -69,9 +67,7 @@
                     'msg' => '非法请求！'
 		            ) ) );
 	    }
-
         $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
 		$user = pdo_fetch("SELECT status FROM " . tablename($this->table_user) . " WHERE :id = id", array(':id' => $_GPC['userid']));
 		if ($user['status'] == 1) {
                die ( json_encode ( array (
@@ -80,13 +76,9 @@
 		               ) ) );
 		}else{
 			$schoolid = $_GPC['schoolid'];
-
 			$userid = $_GPC['userid'];
-
 			$touserid = $_GPC['touserid'];
-
 			$weid = $_GPC['weid'];
-
 			$data = array(
 					'weid' =>  $weid,
 					'schoolid' => $schoolid,
@@ -104,7 +96,6 @@
 			$data ['result'] = true;
 			$data ['msg'] = '成功发送留言信息，请勿重复发送！';
           die ( json_encode ( $data ) );
-
 		}
     }
 	if ($operation == 'hfavely') {
@@ -207,9 +198,7 @@
 			$this->sendMobileLyhf($leave_id, $schoolid, $weid);
 			$datas ['result'] = true;
 			$datas ['msg'] = '成功发送留言信息，请勿重复发送！';
-
           die ( json_encode ( $datas ) );
-
 		}
     }
 	if ($operation == 'fabu') {
@@ -297,156 +286,231 @@
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
-
 				$schoolid = $_GPC['schoolid'];
-
+				$schooltype = $_GPC['schooltype'];
 				$title = $_GPC['title'];
-
 				$weid = $_GPC['weid'];
-
 				$content = $_GPC['content'];
-
 				$tid = $_GPC['tid'];
-				
 				$uid = $_GPC['uid'];
-				
 				$openid = $_GPC['openid'];
-
-				$bj_id = $_GPC['bj_id']; //用户组
-				
+				$usertype = $_GPC['type'];
+				$userdatas = $_GPC['datas'];
 				$audios = $_GPC ['audioServerid'];
-				
 				$audio = $audios[0];
-				
 				$audiotimes = $_GPC['audioTime'];
-				
 				$audiotime = $audiotimes[0];
-				
 				$tname = $_GPC['tname'];
-				
 				$shername = $tname;
-				
 				$is_private = trim($_GPC['is_private']);
-				
-				if($is_private == 'Y'){
-					$bjqdata = array(
-						'weid' =>  $weid,
-						'schoolid' => $schoolid,
-						'uid' => $uid,
-						'shername' => $shername,
-						'audio' => $audio,
-						'audiotime' => $audiotime,
-						'content' => $content,
-						'video' => $video,
-						'bj_id1' => $bj_id,
-						'openid'=>$openid,
-						'isopen'=>0,
-						'is_private'=>'N',
-						'createtime' => time(),
-						'msgtype'=>7,
-						'type'=>0,
-					);
-													
-					pdo_insert($this->table_bjq, $bjqdata);
-				
-					$bjq_id = pdo_insertid();
-					
-					$data1 = array(
-						'sherid'=>$bjq_id,
-					);
-					
-					pdo_update($this->table_bjq, $data1, array ('id' => $bjq_id) );
-					
-					if($_GPC ['photoUrls']){
-						 $photoUrl = $_GPC ['photoUrls'];
-						 $order = 1;
-						 foreach($photoUrl as $key => $v){
-							if(!empty($v)) {
-							   $data = array(
+				if($usertype == 'send_class'){
+					$userdatas = explode(',',$_GPC['datas']);
+				}
+				if($usertype == 'student'){
+					$datass = str_replace('&quot;','"',$_GPC['datas']);
+					$userdatas = json_decode($datass,true);
+					$stuarr = array();
+				}
+				$notice_idarr = array();
+				$bjarr = array();
+				$totals = 0;
+				foreach($userdatas as $key => $row){
+					if($row != ''){
+						if($usertype == 'send_class'){
+							$bj_id = $row;
+							if($schooltype){
+								$total = pdo_fetchcolumn("SELECT COUNT( distinct sid ) FROM ".tablename($this->table_order)." where schoolid = '{$schoolid}' and kcid = '{$bj_id}' and type = 1 and status = 2 And sid != 0  ");	
+							}else{
+								$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));		
+							}
+							$totals = $totals + $total;
+						}
+						if($usertype == 'student'){
+							$bj_id = $key;
+							$vals = explode(',',$row);
+							foreach($vals as $v){
+								if($v != ''){
+									$stuarr[] = $v;
+									$totals++;
+								}
+							}
+						}
+						if($is_private == 'Y'){
+							$bjqdata = array(
 								'weid' =>  $weid,
 								'schoolid' => $schoolid,
 								'uid' => $uid,
-								'picurl' => $v,	
-								'bj_id1' => $bj_id,
-								'order'=>$order,
-								'sherid'=>$bjq_id,
+								'shername' => $shername,
+								'audio' => $audio,
+								'audiotime' => $audiotime,
+								'content' => $content,
+								'video' => $video,
+								'openid'=>$openid,
+								'isopen'=>0,
+								'is_private'=>'N',
 								'createtime' => time(),
-							   );
-							   pdo_insert($this->table_media, $data);							
+								'msgtype'=>7,
+								'type'=>0,
+							);
+							if($schooltype){
+								$bjqdata['kc_id']	= $bj_id;
+							}else{
+								$bjqdata['bj_id1']	= $bj_id;
+							}							
+							pdo_insert($this->table_bjq, $bjqdata);
+							$bjq_id = pdo_insertid();					
+							$data1 = array(
+								'sherid'=>$bjq_id,
+							);					
+							pdo_update($this->table_bjq, $data1, array ('id' => $bjq_id) );					
+							if($_GPC ['photoUrls']){
+								 $photoUrl = $_GPC ['photoUrls'];
+								 $order = 1;
+								 foreach($photoUrl as $key => $v){
+									if(!empty($v)) {
+									   $data = array(
+										'weid' =>  $weid,
+										'schoolid' => $schoolid,
+										'uid' => $uid,
+										'picurl' => $v,	
+										'order'=>$order,
+										'sherid'=>$bjq_id,
+										'createtime' => time(),
+									   );
+										if($schooltype){
+											$data['kc_id']	= $bj_id;
+										}else{
+											$data['bj_id1']	= $bj_id;
+										}
+									   pdo_insert($this->table_media, $data);							
+									}
+									$order++;
+								 }
 							}
-							$order++;
-						 }
+						}				
+						$temp = array(
+							'weid' =>  $weid,
+							'schoolid' => $schoolid,
+							'tid' => $tid,
+							'tname' => $tname,
+							'title' => $title,
+							'video' => $video,
+							'videopic' => $videoimg,
+							'audio' => $audio,
+							'audiotime' => $audiotime,					
+							'content' => $content,
+							'userdatas' => $_GPC['datas'],
+							'usertype' => $usertype,
+							'createtime' => time(),
+							'type'=>1
+						);
+						if($schooltype){
+							$temp['kc_id']	= $bj_id;
+						}else{
+							$temp['bj_id']	= $bj_id;
+						}
+						$temp['picarr'] = iserializer($picstr);				
+						pdo_insert($this->table_notice, $temp);
+						$notice_id = pdo_insertid();
+						$notice_idarr[] = $notice_id;
+						$bjarr[] = $bj_id;
 					}
 				}
-				
-				$temp = array(
-					'weid' =>  $weid,
-					'schoolid' => $schoolid,
-					'tid' => $tid,
-					'tname' => $tname,
-					'title' => $title,
-					'video' => $video,
-					'videopic' => $videoimg,
-					'audio' => $audio,
-					'audiotime' => $audiotime,					
-					'content' => $content,
-					'createtime' => time(),
-					'type'=>1,
-					'bj_id'=>$bj_id,
-				);
-				$temp['picarr'] = iserializer($picstr);				
-			    pdo_insert($this->table_notice, $temp);
-			    $notice_id = pdo_insertid();
-				$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));				
-				$data ['status'] = 1;
-				$data ['total'] = $total;
-				$data ['noticeid'] = $notice_id;
-		        $data ['result'] = true;
-			    $data ['msg'] = '开始群发,请勿执行任何操作';
+				$result ['status'] = 1;				
+				$result ['total'] = $totals;
+				$result ['dats'] = $userdatas;
+				$result ['bjarr'] = $bjarr;
+				$result ['stuarr'] = $stuarr;
+				$result ['noticeidarr'] = $notice_idarr;
+		        $result ['result'] = true;
+			    $result ['msg'] = '开始群发,请勿执行任何操作';
 			    $actop = 'bjtz';
 				$userid = $_GPC['userid'];
 				$point = PointAct($weid,$schoolid,$userid,$actop);
-				$point1 = PointMission($weid,$schoolid,$userid,$actop);
-				
+				$point1 = PointMission($weid,$schoolid,$userid,$actop);				
 				if(!empty($point)){
-					$data ['msg'] = '群发成功，请勿重复操作!积分+'.$point;
+					$result ['msg'] = '群发成功，请勿重复操作!积分+'.$point;
 				}		
 			}
-          die ( json_encode ( $data ) );
+          die ( json_encode ( $result ) );
 		}
     }
+	
 	if($operation == 'notpro'){
-		$notice_id = $_GPC['noticeid'];
 		$schoolid = $_GPC['schoolid'];
 		$weid = $_GPC['weid'];
 		$tname = $_GPC['tname'];
-		$bj_id = $_GPC['bj_id'];
+		$schooltype = $_GPC['schooltype'];
+		$usertype = $_GPC['usertype'];
+		$bjarr = $_GPC['bjarr'];
+		$stuarr = $_GPC['stuarr'];
+		$noticeidarr = $_GPC['noticeidarr'];
 		$total = $_GPC['total'];
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 2;
 		$tp = ceil($total/$psize);
 			//echo '第' . $pindex . '次,总共'.$tp.'次';
 		if($pindex <= $tp){
-			$this->sendMobileBjtz($notice_id, $schoolid, $weid, $tname, $bj_id, $pindex, $psize);
+			session_start();
+			if($usertype == 'send_class'){
+				if($_SESSION['arr'] || $_SESSION['arr'] != ""){
+					$arr = $_SESSION['arr'];
+				}else{
+					mload()->model('stu');
+					$arr = StuInfoByclassArr($bjarr,$schoolid,$schooltype);
+					$_SESSION['arr'] = $arr;
+				}
+				$this->sendMobileBjtzToUserArr($schoolid,$schooltype, $weid, $tname, $arr,$noticeidarr,'tostu', $pindex, $psize);
+			}
+			if($usertype == 'student'){
+				if($_SESSION['arr'] || $_SESSION['arr'] != ""){
+					$arr = $_SESSION['arr'];
+				}else{
+					$arr = $stuarr;
+					$_SESSION['arr'] = $arr;
+				}
+				$this->sendMobileBjtzToUserArr($schoolid,$schooltype, $weid, $tname, $arr,$noticeidarr, 'tostu', $pindex, $psize);
+			}
 			$mq = round(($pindex / $tp) * 100);
 			$msg = '已发送' . $mq . ' %';
 			$page = $pindex + 1;
 			$data ['pro'] = $msg;
+			$data ['arr'] = $arr;
+			$data ['bjarr'] = $bjarr;
+			$data ['stuarr'] = $stuarr;
+			$data ['noticeidarr'] = $noticeidarr;
 			$data ['page'] = $page;
+			$data ['count'] = count($arr);
 			$data ['status'] = 1;			
 		}else{
-			$data ['status'] = 2;			
+			$data ['status'] = 2;
+			$_SESSION['arr'] = "";
+			$arr = $_SESSION['arr'];
+			$data ['userdatas'] = $arr;
 		}
 		die ( json_encode ( $data ) );
 	}
+	if($operation == 'get_noticebjtz'){
+		$schooltype = $_GPC['schooltype'];
+		$schoolid = $_GPC['schoolid'];
+		$tid = $_GPC['tid'];
+		$usertype = $_GPC['type'];
+		if($usertype == "student"){
+			mload()->model('tea');
+			$list = GetAllClassStuInfoByTid($schoolid,2,$schooltype,$tid);
+		}
+		if($usertype == "send_class"){
+			mload()->model('tea');
+			$list = GetAllClassInfoByTid($schoolid,2,$schooltype,$tid);
+		}
+		include $this->template('comtool/notice_bjtz');
+	}	
 	if ($operation == 'mfabu') {
 		 load()->func('communication');
 		 load()->func('file');
@@ -528,28 +592,21 @@
 			delvioce($mp3,FM_JIAOYU_HOST);
 		}		
 		$setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
 		if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
                die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
-
 				$schoolid = $_GPC['schoolid'];
-
 				$title = $_GPC['title'];
-
 				$weid = $_GPC['weid'];
-
 				$content = $_GPC['content'];
 				
 				$schooltype = $_GPC['schooltype'];
@@ -586,7 +643,6 @@
 				$tname = $_GPC['tname'];
 				
 				$is_private = trim($_GPC['is_private']);
-
 				$temp = array(
 					'weid' =>  $weid,
 					'schoolid' => $schoolid,
@@ -650,7 +706,7 @@
 						foreach($userdatas as $row){
 							if($row == 0 || $row != ""){
 								if($schooltype){
-									$nowtotal = pdo_fetchcolumn("SELECT COUNT( distinct sid ) FROM ".tablename($this->table_order)." where schoolid = '{$schoolid}' and kcid = '{$row}' and type = 1 and status = 2 sid != 0  ");
+									$nowtotal = pdo_fetchcolumn("SELECT COUNT( distinct sid ) FROM ".tablename($this->table_order)." where schoolid = '{$schoolid}' and kcid = '{$row}' and type = 1 and status = 2 and sid != 0  ");
 									$total = $total + $nowtotal;		
 								}else{
 									$nowtotal = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where bj_id = :bj_id And schoolid = :schoolid",array(':bj_id'=>$row, ':schoolid'=>$schoolid));
@@ -687,6 +743,7 @@
 				}
 				$data ['status'] = 1;
 				$data ['total'] = $total;
+				$data ['groupid'] = $groupid;
 				$data ['usertype'] = $_GPC['type'];
 				$data ['userdatas'] = $userdatas;
 				$data ['noticeid'] = $notice_id;
@@ -796,24 +853,25 @@
 			$data ['status'] = 2;
 			$_SESSION['arr'] = "";
 			$arr = $_SESSION['arr'];
-			$data ['userdatas'] = $arr;			
+			$data ['userdatas'] = $arr;
 		}
 		die ( json_encode ( $data ) );
 	}
+	
 	if($operation == 'get_noticeuser'){
 		$schooltype = $_GPC['schooltype'];
 		$schoolid = $_GPC['schoolid'];
 		$usertype = $_GPC['type'];
 		if($usertype == "student"){
 			mload()->model('stu');
-			$list = getallclassstuinfo($schoolid,1,$schooltype);
+			$list = getallclassstuinfo($schoolid,2,$schooltype);
 			if($schooltype != 1){
 				$list2 = getallclassstuinfo_nobj($schoolid,$schooltype);
 			}
 		}
 		if($usertype == "send_class"){
 			mload()->model('stu');
-			$list = getallclassinfo($schoolid,1,$schooltype);
+			$list = getallclassinfo($schoolid,2,$schooltype);
 		}
 		if($usertype == "staff"){
 			mload()->model('tea');
@@ -827,6 +885,7 @@
 		//die ( json_encode ( $list ) );
 		include $this->template('comtool/notice_user');
 	}
+	
 	if ($operation == 'zfabu') {
 		load()->func('communication');
 		load()->func('file');
@@ -911,146 +970,195 @@
 			delvioce($mp3,FM_JIAOYU_HOST);
 		}		
 		$setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
 		if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
                die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
-
 				$schoolid = $_GPC['schoolid'];
-
+				$schooltype = $_GPC['schooltype'];
 				$title = $_GPC['title'];
-
 				$weid = $_GPC['weid'];
-
 				$content = $_GPC['content'];
-
 				$tid = $_GPC['tid'];
-				
 				$uid = $_GPC['uid'];
-				
 				$openid = $_GPC['openid'];
-
-				$bj_id = $_GPC['bj_id']; 
-				
 				$km_id = $_GPC['km_id'];
-				
 				$audios = $_GPC ['audioServerid'];
-				
 				$audio = $audios[0];
 				$is_personal = $_GPC['is_private'];
 				$audiotimes = $_GPC['audioTime'];
-				
 				$audiotime = $audiotimes[0];
-				
 				$tname = $_GPC['tname'];
-				
 				$shername = $tname.'老师';
-				
+				$usertype = $_GPC['type'];
+				$userdatas = $_GPC['datas'];
 				$is_private = trim($_GPC['is_private']);
-				
 				$temp_ans = array(
 					'is_txt' => $is_txt,
 					'is_img' => $is_img,
 					'is_audio' => $is_audio,
 					'is_video' => $is_video
 				);
-
-				$ansType = iserializer($temp_ans);				
-				$temp = array(
-					'weid' =>  $weid,
-					'schoolid' => $schoolid,
-					'tid' => $tid,
-					'tname' => $tname,
-					'title' => $title,
-					'video' => $video,
-					'videopic' => $videoimg,
-					'audio' => $audio,
-					'audiotime' => $audiotime,					
-					'content' => $content,
-					'createtime' => time(),
-					'type'=>3,
-					'bj_id'=>$bj_id,
-					'km_id'=>$km_id,
-				);
-				if( $is_personal == 'Y' )
-				{
-					$temp['anstype'] = $ansType;
+				$ansType = iserializer($temp_ans);
+				if($usertype == 'send_class'){
+					$userdatas = explode(',',$_GPC['datas']);
 				}
-				$temp['picarr'] = iserializer($picstr);
- 				pdo_insert($this->table_notice, $temp);
-			    $notice_id = pdo_insertid();
-				$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));				
-				$data ['status'] = 1;
-				$data ['total'] = $total;
-				$data ['noticeid'] = $notice_id;
-		        $data ['result'] = true;
-			    $data ['msg'] = '开始群发,请勿执行任何操作';
+				if($usertype == 'student'){
+					$datass = str_replace('&quot;','"',$_GPC['datas']);
+					$userdatas = json_decode($datass,true);
+					$stuarr = array();
+				}
+				$notice_idarr = array();
+				$bjarr = array();
+				$totals = 0;
+				foreach($userdatas as $key => $row){
+					if($row != ''){
+						if($usertype == 'send_class'){
+							$bj_id = $row;
+							if($schooltype){
+								$total = pdo_fetchcolumn("SELECT COUNT( distinct sid ) FROM ".tablename($this->table_order)." where schoolid = '{$schoolid}' and kcid = '{$bj_id}' and type = 1 and status = 2 And sid != 0  ");	
+							}else{
+								$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));		
+							}
+							$totals = $totals + $total;
+						}
+						if($usertype == 'student'){
+							$bj_id = $key;
+							$vals = explode(',',$row);
+							foreach($vals as $v){
+								if($v != ''){
+									$stuarr[] = $v;
+									$totals++;
+								}
+							}
+						}
+						$temp = array(
+							'weid' =>  $weid,
+							'schoolid' => $schoolid,
+							'tid' => $tid,
+							'tname' => $tname,
+							'title' => $title,
+							'video' => $video,
+							'videopic' => $videoimg,
+							'audio' => $audio,
+							'audiotime' => $audiotime,
+							'userdatas' => $_GPC['datas'],
+							'usertype' => $usertype,
+							'content' => $content,
+							'createtime' => time(),
+							'type'=>3,
+							'km_id'=>$km_id,
+						);
+						if($schooltype){
+							$temp['kc_id']	= $bj_id;
+						}else{
+							$temp['bj_id']	= $bj_id;
+						}
+						if( $is_personal == 'Y' ){
+							$temp['anstype'] = $ansType;
+						}
+						$temp['picarr'] = iserializer($picstr);
+						pdo_insert($this->table_notice, $temp);
+						$notice_id = pdo_insertid();
+						$notice_idarr[] = $notice_id;
+						$bjarr[] = $bj_id;
+					}
+				}				
+				$result ['status'] = 1;
+				$result ['total'] = $totals;
+				$result ['dats'] = $userdatas;
+				$result ['bjarr'] = $bjarr;
+				$result ['stuarr'] = $stuarr;
+				$result ['noticeidarr'] = $notice_idarr;
+		        $result ['result'] = true;
+			    $result ['msg'] = '开始群发,请勿执行任何操作';
 			    $actop = 'fbzy';
 				$userid = $_GPC['userid'];
 				$point = PointAct($weid,$schoolid,$userid,$actop);
 				$point1 = PointMission($weid,$schoolid,$userid,$actop);
 				if(!empty($point)){
-					$data ['msg'] = '群发成功，请勿重复操作!积分+'.$point;
+					$result ['msg'] = '群发成功，请勿重复操作!积分+'.$point;
 				}
-			
 			}
-          die ( json_encode ( $data ) );
+          die ( json_encode ( $result ) );
 		}
     }
 	if($operation == 'znotpro'){
-		$notice_id = $_GPC['noticeid'];
 		$schoolid = $_GPC['schoolid'];
 		$weid = $_GPC['weid'];
 		$tname = $_GPC['tname'];
-		$bj_id = $_GPC['bj_id'];
+		$schooltype = $_GPC['schooltype'];
+		$usertype = $_GPC['usertype'];
+		$bjarr = $_GPC['bjarr'];
+		$stuarr = $_GPC['stuarr'];
+		$noticeidarr = $_GPC['noticeidarr'];
 		$total = $_GPC['total'];
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 2;
 		$tp = ceil($total/$psize);
 			//echo '第' . $pindex . '次,总共'.$tp.'次';
 		if($pindex <= $tp){
-			$this->sendMobileZuoye($notice_id, $schoolid, $weid, $tname, $bj_id, $pindex, $psize);
+			session_start();
+			if($usertype == 'send_class'){
+				if($_SESSION['arr'] || $_SESSION['arr'] != ""){
+					$arr = $_SESSION['arr'];
+				}else{
+					mload()->model('stu');
+					$arr = StuInfoByclassArr($bjarr,$schoolid,$schooltype);
+					$_SESSION['arr'] = $arr;
+				}
+				$this->sendMobileZytzToUserArr($schoolid,$schooltype, $weid, $tname, $arr,$noticeidarr,'tostu', $pindex, $psize);
+			}
+			if($usertype == 'student'){
+				if($_SESSION['arr'] || $_SESSION['arr'] != ""){
+					$arr = $_SESSION['arr'];
+				}else{
+					$arr = $stuarr;
+					$_SESSION['arr'] = $arr;
+				}
+				$this->sendMobileZytzToUserArr($schoolid,$schooltype, $weid, $tname, $arr,$noticeidarr, 'tostu', $pindex, $psize);
+			}
 			$mq = round(($pindex / $tp) * 100);
 			$msg = '已发送' . $mq . ' %';
 			$page = $pindex + 1;
 			$data ['pro'] = $msg;
+			$data ['arr'] = $arr;
+			$data ['bjarr'] = $bjarr;
+			$data ['stuarr'] = $stuarr;
+			$data ['noticeidarr'] = $noticeidarr;
 			$data ['page'] = $page;
+			$data ['count'] = count($arr);
 			$data ['status'] = 1;			
 		}else{
-			$data ['status'] = 2;			
+			$data ['status'] = 2;
+			$_SESSION['arr'] = "";
+			$arr = $_SESSION['arr'];
+			$data ['userdatas'] = $arr;
 		}
 		die ( json_encode ( $data ) );
 	}	
 	if ($operation == 'fangxue') {
-
 		 $data = explode ( '|', $_GPC ['json'] );
-
 		 $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
 		if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
                die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
 				$schoolid = $_GPC['schoolid'];
 				$weid = $_GPC['weid'];
@@ -1074,7 +1182,6 @@
           die ( json_encode ( $data ) );
 		}
     }
-
 	if ($operation == 'sxcfb') {
 		 load()->func('communication');
 		 load()->func('file');
@@ -1100,37 +1207,25 @@
 					}
 				 }
 			}
-
 		 $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
-
 		if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
                die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
-
 				$schoolid = $_GPC['schoolid'];
-
 				$weid = $_GPC['weid'];
-
 				$content = $_GPC['content'];
-
 				$uid = $_GPC['uid'];
-
 				$sid = $_GPC['sid'];
-
 				$bj_id = $_GPC['bj_id'];
-
 				$isfmpic = pdo_fetch("SELECT * FROM " . tablename($this->table_media) . " WHERE :weid = weid And :schoolid = schoolid And :sid = sid And :type = type And :bj_id1 = bj_id1 ORDER BY id ASC LIMIT 0,1 ", array(
 						 ':weid' => $weid,
 						 ':schoolid' => $schoolid,
@@ -1138,7 +1233,6 @@
 						 ':bj_id1' => $bj_id,
 						 ':type' => 1
 						 ));
-
 				if (!empty($isfmpic['fmpicurl'])){
 					if(!empty($photoUrls[0])) {
 					   $data = array(
@@ -1172,7 +1266,6 @@
 					   pdo_insert($this->table_media, $data);
 					}
 				}
-
 				if(!empty($photoUrls[1])) {
                    $data = array(
 					'weid' =>  $weid,
@@ -1285,17 +1378,13 @@
 			       );
                    pdo_insert($this->table_media, $data);
 				}
-
 		        $data ['result'] = true;
-
 			    $data ['msg'] = '发布成功，请勿重复发布！';
-
 			}
           die ( json_encode ( $data ) );
 		}
     }
 	if ($operation == 'xcfb') {
-
 		 load()->func('communication');
 		 load()->func('file');
 	     $token2 = $this->getAccessToken2();
@@ -1316,7 +1405,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[1])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[1];
 				$pic_data = ihttp_request($url);
@@ -1330,7 +1418,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[2])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[2];
 				$pic_data = ihttp_request($url);
@@ -1344,7 +1431,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[3])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[3];
 				$pic_data = ihttp_request($url);
@@ -1358,7 +1444,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[4])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[4];
 				$pic_data = ihttp_request($url);
@@ -1372,7 +1457,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[5])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[5];
 				$pic_data = ihttp_request($url);
@@ -1386,7 +1470,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[6])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[6];
 				$pic_data = ihttp_request($url);
@@ -1400,7 +1483,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[7])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[7];
 				$pic_data = ihttp_request($url);
@@ -1414,7 +1496,6 @@
 							}
 						}
 				}
-
 				if(!empty($photoUrls[8])) {
 				$url = 'https://file.api.weixin.qq.com/cgi-bin/media/get?access_token='.$token2.'&media_id='.$photoUrls[8];
 				$pic_data = ihttp_request($url);
@@ -1428,42 +1509,27 @@
 							}
 						}
 				}
-
 		 $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
-
 		if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
                die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
-
 				$schoolid = $_GPC['schoolid'];
-
 				$weid = $_GPC['weid'];
-
 				$content = $_GPC['content'];
-
 				$uid = $_GPC['uid'];
-
 				$sid = $_GPC['sid'];
-
 				$bj_id1 = $bjids[0];
-
 				$bj_id2 = $bjids[1];
-
 				$bj_id3 = $bjids[2];
-
-
 				if(!empty($photoUrls[0])) {
 				   $data = array(
 					'weid' =>  $weid,
@@ -1480,7 +1546,6 @@
 				   );
 				   pdo_insert($this->table_media, $data);
 				}
-
 				if(!empty($photoUrls[1])) {
                    $data = array(
 					'weid' =>  $weid,
@@ -1609,9 +1674,7 @@
 			       );
                    pdo_insert($this->table_media, $data);
 				}
-
 		        $data ['result'] = true;
-
 			    $data ['msg'] = '发布成功，请勿重复发布！';
 			     $actop = 'scxc';
 			$userid = $_GPC['userid'];
@@ -1623,14 +1686,12 @@
 				$data ['msg'] = '发布成功，请勿重复发布!积分+'.$point;
 			}
 			
-
 			}
           die ( json_encode ( $data ) );
 		}
     }
 	if ($operation == 'dellimg') {
 		$dataid = explode ( ',', $_GPC ['fileids'] );
-
 			if (empty($dataid)){
 				   die ( json_encode ( array (
 						'result' => false,
@@ -1650,7 +1711,6 @@
 						$data ['msg'] = '删除成功！';
 					}
 				}
-
 			}
 		die ( json_encode ( $data ) );
 	}
@@ -1661,7 +1721,6 @@
 			$data = str_replace('JSON=','',$data);
 		}
 		$data = json_decode($data,true);
-
 		$starttime = strtotime($data['StartDate']);
 		$endtime = strtotime($data['EndDate']);
 		$checktime = pdo_fetch("SELECT * FROM " . tablename($this->table_zjh) . " where weid = :weid And schoolid = :schoolid And bj_id = :bj_id And type = :type And start < :start And end > :end", array(
@@ -1678,9 +1737,7 @@
 			die ( json_encode ( $msg ) );
 		}else{
 		$temp = array('weid' => $_GPC['weid'],'schoolid' => $_GPC['schoolid'],'bj_id' => $_GPC['bj_id'],'start' => $starttime,'end' => $endtime,'type' => 1,'is_on' => 2,'createtime' => time(),'tid' => $_GPC['tid']);
-
 		pdo_update($this->table_zjh, $temp, array('planuid' => $data['PlanUid']));
-
 		$msg ['Status'] = 1;
 		$msg ['Result'] = '保存周计划成功';
 		$actop = 'sczjh';
@@ -1735,7 +1792,6 @@
 		$msg ['data'] = $urls.$picurl;
 		die ( json_encode ( $msg ) );
     }
-
 	if ($operation == 'DeleteWeekPlanByPlanUid') {
 			if (empty($_GPC['sPlanUid'])){
 			   die ( json_encode ( array (
@@ -1975,8 +2031,6 @@
 		}
 		die ( json_encode ( $msg ) );
 	}
-
-
 if ($operation == 'GetDetailByWeekDay') {
     $data = file_get_contents('php://input');
     if ($data) {
@@ -2030,7 +2084,6 @@ if ($operation == 'GetDetailByWeekDay') {
     }
     die (json_encode($msg));
 }
-
 if ($operation == 'GetAttendDataforTeacher') {
 	if($_GPC['sDate']){
 		$thistime = strtotime($_GPC['sDate']);
@@ -2098,7 +2151,6 @@ if ($operation == 'GetAttendDataforTeacher') {
 	$result['AttendanceCount'] = $days;
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'GetAttendData') {
 	if($_GPC['sDate']){
 		$thistime = strtotime($_GPC['sDate']);
@@ -2166,7 +2218,6 @@ if ($operation == 'GetAttendData') {
 	$result['AttendanceCount'] = $days;
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'CheckSignForTeacher') {
 	//if($_GPC['lat'] && $_GPC['lon']){
 		$result['status'] = 2;
@@ -2176,7 +2227,6 @@ if ($operation == 'CheckSignForTeacher') {
 	//}
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'DoSignForTeacher') {
 	$school = pdo_fetch("SELECT is_wxsign FROM " . tablename($this->table_index) . " where id = :id ", array(':id' => $_GPC['schoolid']));
 	if($school['is_wxsign'] ==1){
@@ -2211,10 +2261,8 @@ if ($operation == 'DoSignForTeacher') {
 		$result['status'] = 2;
 		$result['info'] = "抱歉,本校未启用微信辅助签到功能";
 	}
-
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'CheckSign') {
 	$starttime = mktime(0,0,0,date("m"),date("d"),date("Y"));
 	$endtime = $starttime + 86399;
@@ -2234,7 +2282,6 @@ if ($operation == 'CheckSign') {
 	}
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'DoSign') {
 	$school = pdo_fetch("SELECT is_signneedcomfim,is_wxsign FROM " . tablename($this->table_index) . " where id = :id ", array(':id' => $_GPC['schoolid']));
 	if($school['is_wxsign'] ==1){
@@ -2297,10 +2344,8 @@ if ($operation == 'DoSign') {
 		$result['status'] = 2;
 		$result['info'] = "抱歉,本校未启用微信辅助签到功能";
 	}
-
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'fzqdqr') {
 	$logids = explode ( ',', $_GPC ['logids'] );
 	if($logids){
@@ -2327,7 +2372,6 @@ if ($operation == 'fzqdqr') {
 	}
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'fzqd') {
 	$sids = explode ( ',', $_GPC['sids'] );
 	if($sids){
@@ -2382,7 +2426,6 @@ if ($operation == 'fzqd') {
 	}
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'checklogbyid') {
 	$date = explode ( '-', $_GPC['time'] );
 	$starttime = mktime(0,0,0,$date[1],$date[2],$date[0]);
@@ -2531,7 +2574,6 @@ if ($operation == 'checklogbyid') {
 	}
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'qingjialog') {
 	$date = explode ( '-', $_GPC['time'] );
 	$starttime = mktime(0,0,0,$date[1],$date[2],$date[0]);
@@ -2568,7 +2610,6 @@ if ($operation == 'qingjialog') {
 	}
 	die ( json_encode ( $log ) );
 }
-
 if ($operation == 'videodz') {
 	if($_GPC['thisop'] == 'mybj'){
 		$dianz = pdo_fetch("SELECT id FROM " . tablename($this->table_camerapl) . " where schoolid = :schoolid AND bj_id = :bj_id AND userid = :userid AND type = :type", array(
@@ -2661,7 +2702,6 @@ if ($operation == 'delmypl') {
 	}
 	die ( json_encode ( $result ) );
 }
-
 if ($operation == 'delnotice') {
 	$notie = pdo_fetch("SELECT id FROM " . tablename($this->table_notice) . " where id = :id ", array(':id' => trim($_GPC['sNotifyUid'])));
 	if($notie['id']){
@@ -2795,8 +2835,6 @@ if ($operation == 'getcook') {
 	}
 	die ( json_encode ( $result ) );
 }
-
-
 	if ($operation == 'zhuida') {
 		load()->func('communication');
 		load()->func('file');
@@ -2878,22 +2916,18 @@ if ($operation == 'getcook') {
 			delvioce($mp3,FM_JIAOYU_HOST);
 		}		
 		$setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
 		if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
                die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求！'
 		               ) ) );
 	    }else{
-
 			if (empty($_GPC['openid'])) {
                   die ( json_encode ( array (
                     'result' => false,
                     'msg' => '非法请求,请刷新页面！'
 		               ) ) );
-
 		    }else{
-
 				$schoolid   = $_GPC['schoolid'];
 				$title      = $_GPC['title'];
 				$weid       = $_GPC['weid'];
@@ -2918,8 +2952,6 @@ if ($operation == 'getcook') {
 					'audio' => $audio,
 					'audiotime' => $audiotime,	
 					'picarr'  => $picstr
-
-
 				);
 				$MyAnswer = iserializer($yasuo_temp);
 				$temp = array(
@@ -2952,7 +2984,6 @@ if ($operation == 'getcook') {
 		}
     }
     
-
 if ($operation == 't_piyue') {
 	load()->func('communication');
 	load()->func('file');
@@ -3034,22 +3065,18 @@ if ($operation == 't_piyue') {
 		delvioce($mp3,FM_JIAOYU_HOST);
 	}		
 	$setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $_GPC['weid']));
-
 	if (! $_GPC ['schoolid'] || ! $_GPC ['weid']) {
 		   die ( json_encode ( array (
 				'result' => false,
 				'msg' => '非法请求！'
 				   ) ) );
 	}else{
-
 		if (empty($_GPC['openid'])) {
 			  die ( json_encode ( array (
 				'result' => false,
 				'msg' => '非法请求,请刷新页面！'
 				   ) ) );
-
 		}else{
-
 			$schoolid   = $_GPC['schoolid'];
 			$title      = $_GPC['title'];
 			$weid       = $_GPC['weid'];
@@ -3074,8 +3101,6 @@ if ($operation == 't_piyue') {
 				'audio' => $audio,
 				'audiotime' => $audiotime,	
 				'picarr'  => $picstr
-
-
 			);
 			$MyAnswer = iserializer($yasuo_temp);
 			$temp = array(
@@ -3111,15 +3136,13 @@ if ($operation == 't_piyue') {
 	  die ( json_encode ( $data ) );
 	}
 }
-
 if ($operation == 'GetHolidayData') {
 	if($_GPC['sDate']){
 		$thistime = strtotime($_GPC['sDate']);
 		$start_time = strtotime(date('Y-m-01',$thistime));
 		$nowstart = strtotime(date('Y-m-01'));
-
-			$j = date('t',$thistime);
-		
+		$j = date('t',$thistime);
+		$nowyear = date('Y',$thistime);
 	}
 	$array = array();
 	for($i=0;$i<$j;$i++){
@@ -3129,12 +3152,46 @@ if ($operation == 'GetHolidayData') {
 		);
 	}
 	$result = array();
-	foreach($array as $row){
-		if(date('w',strtotime($row['date'])) == 6 || date('w',strtotime($row['date'])) == 0){
-			$result[] = $row['day'];
+	$datesetid =  pdo_fetchcolumn("SELECT datesetid FROM " . tablename($this->table_classify) . " WHERE schoolid = '{$_GPC['schoolid']}' and sid = '{$_GPC['bj_id']}' ");
+	if(!empty($datesetid)){
+		$checkdateset      =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdateset) . " WHERE schoolid = {$_GPC['schoolid']} and  id = '{$datesetid}'");
+		$checkdateset_holi =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdatedetail) . " WHERE schoolid = {$_GPC['schoolid']} and  checkdatesetid = '{$datesetid}' and year = '{$nowyear}' ");
+		foreach($array as $row){
+			//特殊日子
+			$checktime  =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE  schoolid = {$_GPC['schoolid']} and  checkdatesetid = '{$datesetid}' and date = '{$row['date']}' ");
+			//是特殊日子
+			if(!empty($checktime)){
+				if($checktime['type'] == 6 ){
+					$result[] = $row['day'];
+				}
+			//不是特殊日子
+			}else{
+				//寒暑假
+				if(($row['date'] >= $checkdateset_holi['win_start'] && $row['date'] <=$checkdateset_holi['win_end']) || ($row['date'] >= $checkdateset_holi['sum_start'] && $row['date'] <=$checkdateset_holi['sum_end'])){
+					$result[] = $row['day'];
+				//不是寒暑假
+				}else{
+					//周六
+					if(date('w',strtotime($row['date'])) == 6){
+						if($checkdateset['saturday'] != 1){
+							$result[] = $row['day'];
+						}
+					//周日
+					}elseif(date('w',strtotime($row['date'])) == 0){
+						if($checkdateset['sunday'] != 1){
+							$result[] = $row['day'];
+						}
+					}
+				}
+			}	
 		}
-			
+	}else{
+		foreach($array as $row){
+			 if(date('w',strtotime($row['date'])) == 6 || date('w',strtotime($row['date'])) == 0){
+				$result[] = $row['day'];
+			} 
+		}
 	}
 	die ( json_encode ( $result ) );
-}   
+}  
 ?>

@@ -154,95 +154,57 @@
 				</div>
 			</div>
 		</div>
-	{if $techers['status'] ==3}
-		{loop $list $row}
-			{loop $row['bj_id'] $r}
-			<div count="{$bj3count[$r['sid']]}" name="{$r['sname']}">
-				<div class="common_til2">
-					<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$r['sname']}','{$r['sname']}（{$bj3count[$r['sid']]}人）','{$r['sname']}（{$bj3count[$r['sid']]}人）')">{$r['sname']}（{$bj3count[$r['sid']]}人）</a>
-				</div>
-				<div class="common_box1" style="">
-					<div class="main_box2" style="padding:0 0; display:none;"  id="{$r['sname']}">
-						<ul class="common_list_imgtext2">
-						{loop $r['sd'] $vue}
-							{loop $vue['sid'] $item}
-							<li style="padding-left: 70px;">
-								<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
-									<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
-								</div>
-								<div class="icon_text" style="height: 55px; line-height: 55px;">
-									<div class="name">
-										{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
+
+		{if $techers['status'] ==3}
+			{loop $list $row}
+				{loop $row['bj_id'] $r}
+				<div count="{$bj3count[$r['sid']]}" name="{$r['sname']}">
+					<div class="common_til2">
+						<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$r['sname']}','{$r['sname']}（{$bj3count[$r['sid']]}人）','{$r['sname']}（{$bj3count[$r['sid']]}人）')">{$r['sname']}（{$bj3count[$r['sid']]}人）</a>
+					</div>
+					<div class="common_box1" style="">
+						<div class="main_box2" style="padding:0 0; display:none;"  id="{$r['sname']}">
+							<ul class="common_list_imgtext2">
+							{loop $r['sd'] $vue}
+								{loop $vue['sid'] $item}
+								<li style="padding-left: 70px;">
+									<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
+										<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
 									</div>
-								</div>
-								{if !empty($item['id'])}
-								<div class="btn_contact">
-									<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
-								</div>
-								{/if}
-								{if !empty($item['mobile'])}
-								<div class="btn_box">
-									<a href="tel:{$item['mobile']}" class="icon_btn_call"></a>
-								</div>
-								{/if}
-							</li>
-							{/loop}	
-						{/loop}			
-						</ul>
+									<div class="icon_text" style="height: 55px; line-height: 55px;">
+										<div class="name">
+											{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
+										</div>
+									</div>
+									{if !empty($item['id'])}
+									<div class="btn_contact">
+										<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
+									</div>
+									{/if}
+									{if !empty($item['mobile'])}
+									<div class="btn_box">
+										<a href="tel:{$item['mobile']}" class="icon_btn_call"></a>
+									</div>
+									{/if}
+								</li>
+								{/loop}	
+							{/loop}			
+							</ul>
+						</div>
 					</div>
 				</div>
-			</div>
+				{/loop}
 			{/loop}
-		{/loop}
-	{/if}		
-	{if $techers['status'] ==2}
-		{loop $list $row}
-		<div count="{$row['rs']}" name="{$row['sname']}">
-			<div class="common_til2">
-				<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$row['sname']}','{$row['sname']}（{$row['rs']}人）','{$row['sname']}（{$row['rs']}人）')">{$row['sname']}（{$row['rs']}人）</a>
-			</div>
-			<div class="common_box1" style="">
-				<div class="main_box2" style="padding:0 0; display:none;"  id="{$row['sname']}">
-					<ul class="common_list_imgtext2">
-					{loop $row['sid'] $vue}
-						{loop $vue['sid'] $item}
-						<li style="padding-left: 70px;">
-							<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
-								<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
-							</div>
-							<div class="icon_text" style="height: 55px; line-height: 55px;">
-								<div class="name">
-									{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
-								</div>
-							</div>
-								{if !empty($item['id'])}
-								<div class="btn_contact">
-									<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
-								</div>
-								{/if}
-								{if !empty($item['mobile'])}
-								<div class="btn_box">
-									<a href="tel:{$item['mobile']}" class="icon_btn_call"></a>
-								</div>
-								{/if}
-						</li>
-						{/loop}	
-					{/loop}			
-					</ul>
-				</div>
-			</div>
-		</div>
-		{/loop}
-	{/if}
-	{if $techers['status'] ==1}
-		{loop $bjlists $row}
-			{if !empty($row['bjname'])}
-			<div count="{$row['rs']}" name="{$row['bjname']}">
+		{/if}
+		
+		{if $techers['status'] ==2}
+			{loop $list $row}
+			<div count="{$row['rs']}" name="{$row['sname']}">
 				<div class="common_til2">
-					<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$row['bjname']}','{$row['bjname']}（{$row['rs']}人）','{$row['bjname']}（{$row['rs']}人）')">{$row['bjname']}（{$row['rs']}人）</a>
+					<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$row['sname']}','{$row['sname']}（{$row['rs']}人）','{$row['sname']}（{$row['rs']}人）')">{$row['sname']}（{$row['rs']}人）</a>
 				</div>
 				<div class="common_box1" style="">
-					<div class="main_box2" style="padding:0 0; display:none;"  id="{$row['bjname']}">
+					<div class="main_box2" style="padding:0 0; display:none;"  id="{$row['sname']}">
 						<ul class="common_list_imgtext2">
 						{loop $row['sid'] $vue}
 							{loop $vue['sid'] $item}
@@ -272,9 +234,50 @@
 					</div>
 				</div>
 			</div>
-			{/if}
-		{/loop}		
-	{/if}	
+			{/loop}
+		{/if}
+		{if $techers['status'] ==1}
+			{loop $bjlists $row}
+				{if !empty($row['bjname'])}
+				<div count="{$row['rs']}" name="{$row['bjname']}">
+					<div class="common_til2">
+						<a href="###" class="joeBoxA" onclick="openShutManager(this,'{$row['bjname']}','{$row['bjname']}（{$row['rs']}人）','{$row['bjname']}（{$row['rs']}人）')">{$row['bjname']}（{$row['rs']}人）</a>
+					</div>
+					<div class="common_box1" style="">
+						<div class="main_box2" style="padding:0 0; display:none;"  id="{$row['bjname']}">
+							<ul class="common_list_imgtext2">
+							{loop $row['sid'] $vue}
+								{loop $vue['sid'] $item}
+								<li style="padding-left: 70px;">
+									<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
+										<img src="{if $item['pard'] !=4}{if !empty($item['avatar'])}{php echo tomedia($item['avatar'])}{else}{php echo tomedia($school['spic'])}{/if}{else}{if !empty($vue['icon'])}{php echo tomedia($vue['icon'])}{else}{php echo tomedia($school['spic'])}{/if}{/if}" />
+									</div>
+									<div class="icon_text" style="height: 55px; line-height: 55px;">
+										<div class="name">
+											{$vue['s_name']}{if $item['pard'] ==2}（妈妈&nbsp;{$item['name']}）{/if}{if $item['pard'] ==3}（爸爸&nbsp;{$item['name']}）{/if}{if $item['pard'] ==5}（家长&nbsp;{$item['name']}）{/if}
+										</div>
+									</div>
+										{if !empty($item['id'])}
+										<div class="btn_contact">
+											<a onclick="showReplyBox({$item['id']});" class="icon_btn_contact"></a>
+										</div>
+										{/if}
+										{if !empty($item['mobile'])}
+										<div class="btn_box">
+											<a href="tel:{$item['mobile']}" class="icon_btn_call"></a>
+										</div>
+										{/if}
+								</li>
+								{/loop}	
+							{/loop}			
+							</ul>
+						</div>
+					</div>
+				</div>
+				{/if}
+			{/loop}		
+		{/if}
+
 	</div>
 </div>
 <div class="top_height_blank50"></div>    

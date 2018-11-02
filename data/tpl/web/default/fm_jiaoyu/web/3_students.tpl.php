@@ -67,13 +67,21 @@ require(['bootstrap'],function($){
 								<option value="1" <?php  if($_GPC['bd_type'] == 1) { ?> selected="selected"<?php  } ?>>已绑定</option>
 								<option value="2" <?php  if($_GPC['bd_type'] == 2) { ?> selected="selected"<?php  } ?>>未绑定</option>
                         </select>
-                    </div>					
+                    </div>
+					<?php  if(!$schooltype) { ?>
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">按类型</label>
+                    <div class="col-sm-2 col-lg-2">
+                        <select style="margin-right:15px;" name="s_type" class="form-control">
+								<option value="">按学生类型</option>
+								<option value="1" <?php  if($_GPC['s_type'] == 1) { ?> selected="selected"<?php  } ?>>走读生</option>
+								<option value="2" <?php  if($_GPC['s_type'] == 2) { ?> selected="selected"<?php  } ?>>住校生</option>
+                        </select>
+                    </div>
+					<?php  } ?>
                     <div class="col-sm-2 col-lg-2">
                         <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
-                    </div>
-					<div class="col-sm-2 col-lg-2">
 						<button class="btn btn-success qx_704" name="out_putcode" value="out_putcode"><i class="fa fa-download"></i>导出绑定信息</button>
-					</div>					
+                    </div>		
                 </div>
             </form>
              <form style="padding-top: 20px;" action="./index.php" method="get" class="form-horizontal" target="_blank" id="qrFrom" role="form">
@@ -105,7 +113,7 @@ require(['bootstrap'],function($){
             
 			<div class="alert we7-page-alert">
 				<?php  if(empty($_GPC['bj_id']) && empty($_GPC['bd_type']) && empty($_GPC['nj_id'])) { ?>
-				<p><i class="wi wi-info-sign"></i> 本校学生人数:<strong class="text-danger"><?php  echo $totalsss;?>个</strong>。</p>
+				<p><i class="wi wi-info-sign"></i> 本校学生人数:<strong class="text-danger"><?php  echo $totalsss;?>个</strong></p>
 				<?php  } else { ?>
 				<p><i class="wi wi-info-sign"></i> 检索到学生人数:<strong class="text-danger"><?php  echo $total;?>个</strong></p>				
 				<?php  } ?>
@@ -191,7 +199,7 @@ require(['bootstrap'],function($){
 					<th style="width:6%;"></br>父亲</th>
 					<th style="width:6%;"></br>其他家长</th>
                     <th style="width:7%;">报名时间</th>
-                    <?php  if($school['issale'] == 1) { ?>		
+                    <?php  if($_W['schooltype']) { ?>		
                  	<th >报名课程</th>
                  	<?php  } ?>	
                     <th class="qx_706" style="width:5%;">录入成绩</th>	
@@ -210,6 +218,12 @@ require(['bootstrap'],function($){
                     </td>
 					<td>
                         <img style="width:50px;height:50px;border-radius:50%;" src="<?php  if(!empty($item['icon'])) { ?><?php  echo tomedia($item['icon'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?>" width="50" style="border-radius: 3px;" /></br></br><?php  echo $item['s_name'];?>
+						</br>
+						<?php  if($item['s_type'] == 1) { ?>
+						<span class="label label-success">走读</span>
+						<?php  } else if($item['s_type'] == 2) { ?>
+						<span class="label label-primary">住校</span>
+						<?php  } ?>
                     </td>	
 					<td>
 					<?php  if($item['sex'] == 1) { ?><span class="label label-success">男</span><?php  } else { ?><span class="label label-success">女</span><?php  } ?><?php  if($item['birthdate']) { ?></br>
@@ -246,31 +260,38 @@ require(['bootstrap'],function($){
 						<?php  echo $item['area_addr'];?>
                     </td>
                     <td>
-					<?php  if(!empty($item['oavatar'])) { ?>
+					<?php  if(!empty($item['oavatar']) || !empty($item['ouserid'])) { ?>
 					
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['oavatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['onickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['own'], 'op' => 'own', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 					</td>
                     <td>
-					<?php  if(!empty($item['mavatar'])) { ?>
+					<?php  if(!empty($item['mavatar']) || !empty($item['muserid'])) { ?>
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['mavatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['mnickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['mom'], 'op' => 'mom', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 				    </td>
                     <td>
-					<?php  if(!empty($item['davatar'])) { ?>
+					<?php  if(!empty($item['davatar']) || !empty($item['duserid'])) { ?>
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['davatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['dnickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['dad'], 'op' => 'dad', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 				    </td>
                     <td>
-					<?php  if(!empty($item['otheravatar'])) { ?>
+					<?php  if(!empty($item['otheravatar']) || !empty($item['otheruserid'])) { ?>
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['otheravatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['othernickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['other'], 'op' => 'other', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 				    </td>					
-					<td><?php  echo date('Y-m-d',$item['seffectivetime'])?></td>  					
+					<td><?php  echo date('Y-m-d',$item['seffectivetime'])?></td>  
+					<?php  if($_W['schooltype']) { ?>		
+					<td>
+					<?php  if(is_array($item['bmkc'])) { foreach($item['bmkc'] as $row) { ?>
+						<?php  echo $row;?></br>
+					<?php  } } ?>
+					</td>	
+					<?php  } ?>						
                     <td class="qx_706"><a class="btn btn-default btn-sm" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'op' => 'add', 'schoolid' => $schoolid))?>" title="录入成绩"><i class="fa fa-qrcode">&nbsp;&nbsp;录入成绩</i></a></td>
 					<td><?php  echo $item['code'];?></td>	
 					<td class="qx_e_d" style="text-align:right;">
@@ -286,6 +307,11 @@ require(['bootstrap'],function($){
                     </td>
 					<td>
                         <img style="width:50px;height:50px;border-radius:50%;" src="<?php  if(!empty($item['icon'])) { ?><?php  echo tomedia($item['icon'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?>" width="50" style="border-radius: 3px;" /></br></br><?php  echo $item['s_name'];?>
+						<?php  if($item['s_type'] == 1) { ?>
+						<span class="label label-success">走读</span>
+						<?php  } else if($item['s_type'] == 2) { ?>
+						<span class="label label-primary">住校</span>
+						<?php  } ?>
                     </td>	
 					<td>
 					<?php  if($item['sex'] == 1) { ?><span class="label label-success">男</span><?php  } else { ?><span class="label label-success">女</span><?php  } ?><?php  if($item['birthdate']) { ?></br>
@@ -322,32 +348,32 @@ require(['bootstrap'],function($){
 						<?php  echo $item['area_addr'];?>
                     </td>
                     <td>
-					<?php  if(!empty($item['oavatar'])) { ?>
+					<?php  if(!empty($item['oavatar']) || !empty($item['ouserid'])) { ?>
 					
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['oavatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['onickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['own'], 'op' => 'own', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 					</td>
                     <td>
-					<?php  if(!empty($item['mavatar'])) { ?>
+					<?php  if(!empty($item['mavatar']) || !empty($item['muserid'])) { ?>
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['mavatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['mnickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['mom'], 'op' => 'mom', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 				    </td>
                     <td>
-					<?php  if(!empty($item['davatar'])) { ?>
+					<?php  if(!empty($item['davatar']) || !empty($item['duserid'])) { ?>
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['davatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['dnickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['dad'], 'op' => 'dad', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 				    </td>
                     <td>
-					<?php  if(!empty($item['otheravatar'])) { ?>
+					<?php  if(!empty($item['otheravatar']) || !empty($item['otheruserid'])) { ?>
                      <img style="width:50px;height:50px;border-radius:50%;" src="<?php  echo tomedia($item['otheravatar'])?>" width="50"  onerror="this.src='./resource/images/nopic.jpg';" style="border-radius: 3px;" /></br><?php  echo $item['othernickname'];?></br>
 					 <a class="btn btn-default btn-sm qx_707" href="<?php  echo $this->createWebUrl('students', array('id' => $item['id'], 'openid' => $item['other'], 'op' => 'other', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认解绑？');return false;" title="解绑"><i class="fa fa-times"></i>&nbsp;解绑</a>
                     <?php  } ?>
 				    </td>					
 					<td><?php  echo date('Y-m-d',$item['seffectivetime'])?></td>  	
-					<?php  if($school['issale'] == 1) { ?>		
+					<?php  if($_W['schooltype']) { ?>		
 					<td>
 					<?php  if(is_array($item['bmkc'])) { foreach($item['bmkc'] as $row) { ?>
 						<?php  echo $row;?></br>
@@ -626,6 +652,17 @@ $(function(){
                         <span class="help-block"></span>
                     </div>
                 </div>
+                <!--修改开始-->
+                <div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
+                    <div class="col-sm-9">
+                        <label class="radio-inline"><input type="radio" name="s_type" value="1" <?php  if(empty($item) || $item['s_type'] == 1) { ?>checked="true"<?php  } ?> /> 走读</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <label class="radio-inline"><input type="radio" name="s_type" value="2" <?php  if(!empty($item) && $item['s_type'] == 2) { ?>checked="true"<?php  } ?> /> 住校</label>
+                        <span class="help-block"></span>
+                    </div>
+                </div>
+                <!--修改结束-->
                 <div id="custom-url">     
                 <?php  if(!empty($id)) { ?>
 					<input type="hidden" name="old" value="111" />

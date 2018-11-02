@@ -22,20 +22,36 @@ function getallclassinfo($schoolid,$is_over,$schooltype){
 		foreach($datas as $key =>$row){
 			if($row['end'] < $nowtime){
 				$datas[$key]['info'] = '--(已结课)';
+				$datas[$key]['is_over'] = 2; 
+			}else{
+				$datas[$key]['is_over'] = 1; 
 			}
+			$total =  pdo_fetchall("SELECT distinct sid as id  FROM " . tablename('wx_school_order') . " WHERE schoolid='{$schoolid}' And kcid = '{$row['sid']}' And type = 1 And status = 2 And sid != 0  ");
+			$datas[$key]['sname'] = $row['sname'].'('.count($total).'人)';			
 		} 
 	}else{//公立
 		$condition = '';
 		if($is_over){
-			$condition .= " AND is_over = '{$is_over}' ";
+			//$condition .= " AND is_over = '{$is_over}' ";
 		}
-		$datas = pdo_fetchall("SELECT sid,sname FROM ".tablename('wx_school_classify')." WHERE  type ='theclass' And schoolid='{$schoolid}' $condition ORDER BY parentid ASC ");
+		$datas = pdo_fetchall("SELECT sid,sname,is_over FROM ".tablename('wx_school_classify')." WHERE  type ='theclass' And schoolid='{$schoolid}' $condition ORDER BY parentid ASC ");
+		foreach($datas as $key => $row){
+			$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_students')." WHERE bj_id = '{$row['sid']}' ");
+			$datas[$key]['sname'] = $row['sname'].'('.$total.'人)';
+			if($row['is_over'] == 2){
+				$datas[$key]['info'] = '--(已毕业)';
+				if($is_over == 1){
+					unset($datas[$key]);
+				}
+			}			
+		}
 	}
+	$datas = array_sorts($datas,'is_over','asc');
 	return $datas;
 }
 
 
-//获取所有班级(课程)的学生信息
+//获取所有班级(课程)数组的学生信息
 function getallclassstuinfo($schoolid,$is_over,$schooltype){
 	$nowtime = time();
 	if($schooltype){//培训
@@ -49,8 +65,12 @@ function getallclassstuinfo($schoolid,$is_over,$schooltype){
 		foreach($bjlist as $key => $item){
 			if($item['end'] < $nowtime){
 				$bjlist[$key]['info'] = '--(已结课)';
+				$bjlist[$key]['is_over'] = 2; 
+			}else{
+				$bjlist[$key]['is_over'] = 1; 
 			}
 			$stulist =  pdo_fetchall("SELECT distinct sid as id  FROM " . tablename('wx_school_order') . " WHERE schoolid='{$schoolid}'  and kcid = '{$item['sid']}' and type = 1 and status = 2 and sid != 0  ");
+			$bjlist[$key]['sname'] = $item['sname'].'('.count($stulist).'人)';
 			foreach($stulist as $keys => $values){
 				$stuinfo =  pdo_fetch("SELECT s_name,icon FROM ".tablename('wx_school_students')." WHERE id = '{$values['id']}' ");
 				if($stuinfo['icon']){
@@ -65,12 +85,13 @@ function getallclassstuinfo($schoolid,$is_over,$schooltype){
 	}else{//公立
 		$condition = '';
 		if($is_over){
-			$condition .= " AND is_over = '{$is_over}' ";
+			//$condition .= " AND is_over = '{$is_over}' ";
 		}
 		$school = pdo_fetch("SELECT spic FROM ".tablename('wx_school_index')." WHERE id = '{$schoolid}' ");
-		$bjlist = pdo_fetchall("SELECT sid,sname FROM ".tablename('wx_school_classify')." WHERE  type ='theclass' And schoolid='{$schoolid}' $condition ORDER BY parentid ASC ");
+		$bjlist = pdo_fetchall("SELECT sid,sname,is_over FROM ".tablename('wx_school_classify')." WHERE  type ='theclass' And schoolid='{$schoolid}' $condition ORDER BY parentid ASC ");
 		foreach($bjlist as $key => $item){
 			$allstu = pdo_fetchall("SELECT id,s_name,icon FROM ".tablename('wx_school_students')." WHERE schoolid = '{$schoolid}' And bj_id ='{$item['sid']}' ORDER BY id ASC ");
+			$bjlist[$key]['sname'] = $item['sname'].'('.count($allstu).'人)';
 			foreach($allstu as $k =>$i){
 				if($i['icon']){
 					$allstu[$k]['icon'] = tomedia($i['icon']);
@@ -78,13 +99,20 @@ function getallclassstuinfo($schoolid,$is_over,$schooltype){
 					$allstu[$k]['icon'] = tomedia($school['spic']);
 				}
 			}
-			$bjlist[$key]['allstu'] = $allstu;
+			if($item['is_over'] == 2){
+				$bjlist[$key]['info'] = '--(已毕业)';
+				if($is_over == 1){
+					unset($bjlist[$key]);
+				}
+			}			
+			$bjlist[$key]['allstu'] = $allstu;			
 		}
 	}
+	$bjlist = array_sorts($bjlist,'is_over','asc');
 	return $bjlist;
 }
 
-//根据班级（课程）获取学生id
+//根据班级（课程）ID获取学生id //暂时未用
 function StuInfoByclassArr($send_class,$schoolid,$schooltype){
 	if($schooltype){//培训
 		if(is_array($send_class)){
@@ -110,6 +138,27 @@ function StuInfoByclassArr($send_class,$schoolid,$schooltype){
 				}
 			}
 		}
+	}
+	return $stuarr;	 
+}
+//根据班级（课程）获取学生id
+function StuInfoByclassId($bj_id,$schoolid,$schooltype){
+	if($schooltype){//培训
+		$stuarr = array();
+		$stulist =  pdo_fetchall("SELECT distinct sid as id  FROM " . tablename('wx_school_order') . " WHERE schoolid='{$schoolid}'  and kcid = '{$bj_id}' and type = 1 and status = 2 and sid != 0  ");
+		if($stulist){
+			foreach($stulist as $r){
+				$stuarr[] = intval($r['id']);
+			}
+		}	
+	}else{//公立
+		$stuarr = array();
+		$allstu = pdo_fetchall("SELECT id FROM ".tablename('wx_school_students')." WHERE  bj_id = '{$bj_id}' And schoolid = '{$schoolid}' ORDER BY id ASC ");
+		if($allstu){
+			foreach($allstu as $r){
+				$stuarr[] = intval($r['id']);
+			}
+		}		
 	}
 	return $stuarr;	 
 }

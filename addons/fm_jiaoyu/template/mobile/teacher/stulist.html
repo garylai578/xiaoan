@@ -9,6 +9,7 @@
 <script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.10.1.min.js?v=4.9"></script>
 {php echo register_jssdks();}
 <style type="text/css">
+
 .header { width: 100%; height: 50px; line-height: 50px; position: fixed; z-index: 1000; top: 0; left: 0; box-shadow: 0 0 2px 0px rgba(0,0,0,0.3),0 0 6px 2px rgba(0,0,0,0.15); } .header .l { width: 50px; height: 50px; line-height: 50px; color: white; position: absolute; left: 0; top: 0; } .header .m { width: 100%; height: 50px; line-height: 50px; text-align: center; color: white; font-size: 18px; } .header .r { width: 50px; height: 50px; line-height: 50px; position: absolute; right: 0; top: 0; } .mainColor { background: #06c1ae !important; } .header .l a { font-size: 18px; color: white; display: block; width: 100%; height: 100%; text-align: center; }
 .add_link_box{
 width:100%;position: absolute;left:0;top:60px;bottom:0;z-index: 9999;background-color:rgba(0,0,0,0.5);display: none}
@@ -116,13 +117,14 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 .manual_student_list_search .search_text {border: none;height: 22px;line-height: 22px;font-size: 14px;box-sizing: border-box;width: 100%;padding-right: 30px;}
 .manual_student_list_search .search_btn {width: 22px;height: 22px;background: url({OSSURL}public/mobile/img/manual_search_icon.png) no-repeat center;background-size: 22px;position: absolute;right: 10px;
 top: 10px;}
+
 </style>
 {php include $this->template('port');}
 <title>{$school['title']}</title>
 <div id="BlackBg" class="BlackBg"></div>
 <div class="header mainColor">
 	<div id="titlebar" class="l"><a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
-	<div class="m"><a><span style="font-size: 18px">{$nowbj['sname']}</span></a></div>
+	<div class="m"><a><span style="font-size: 18px">{$title_name}</span></a></div>
 	<div class="r">
         <a href="javascript:;" class="choice_baby">
             <img style="height: 30px;margin-top:10px" src="{OSSURL}public/mobile/img/selectMean.png" class="img-responsive">
@@ -133,6 +135,7 @@ top: 10px;}
 	<input type="text" id="search" value="" placeholder="请输入学生姓名、手机号、学号" class="search_text">
 	<div class="search_btn" onclick="search();"></div>
 </div>
+
 <div id="attendance">
 	<div class="r1">
 		<div class="t">
@@ -205,40 +208,55 @@ top: 10px;}
 		<div class="slide_left_menu">
 			<div class="slide_left_menu_til">班级列表</div>
 			<ul class="slide_left_menu_ul">
-			{if is_njzr($teachers['id'])}
-				{if $bjlists}
-					{loop $bjlists $row}
-						{if !in_array($row['bj_id'], $bjlists)}
-						<?php $bjlists[] = $row['bj_id'];?>
-							<li onclick="isSelect({$row['bj_id']});" {if $bj_id == $row['bj_id']}class="act"{/if}><div>{$row['bjname']}</div></li>
+			{if $_W['schooltype']}
+				{loop $MyKcList $row}
+							
+				<li onclick="SelectByKc({$row['id']});" {if $kc_id == $row['id']}class="act"{/if}>
+					<div>
+						{$row['name']}
+						{if $row['end'] < $nowtime}
+						【已结课】
 						{/if}
-					{/loop}	
-				{/if}		
-					{loop $mynjlist $row}
-						{if $bjlists}
-							{loop $row['bjlist'] $item}
-								{if !in_array($item['sid'], $bjlists)}
-									<li onclick="isSelect({$item['sid']});" {if $bj_id == $item['sid']}class="act"{/if}><div>{$item['sname']}</div></li>
-								{/if}
-							{/loop}
-						{else}
-							{loop $row['bjlist'] $item}
-								<li onclick="isSelect({$item['sid']});" {if $bj_id == $item['sid']}class="act"{/if}><div>{$item['sname']}</div></li>
-							{/loop}				
-						{/if}
-					{/loop}			
+					</div>
+				</li>
+							
+				{/loop}	
 			{else}
-				{if $teachers['status'] == 2}
-					{loop $bjlist $row}
-						<li onclick="isSelect({$row['sid']});" {if $bj_id == $row['sid']}class="act"{/if}><div>{$row['sname']}</div></li>
-					{/loop}
+				{if is_njzr($teachers['id'])}
+					{if $bjlists}
+						{loop $bjlists $row}
+							{if !in_array($row['bj_id'], $bjlists)}
+							<?php $bjlists[] = $row['bj_id'];?>
+								<li onclick="isSelect({$row['bj_id']});" {if $bj_id == $row['bj_id']}class="act"{/if}><div>{$row['bjname']}</div></li>
+							{/if}
+						{/loop}	
+					{/if}		
+						{loop $mynjlist $row}
+							{if $bjlists}
+								{loop $row['bjlist'] $item}
+									{if !in_array($item['sid'], $bjlists)}
+										<li onclick="isSelect({$item['sid']});" {if $bj_id == $item['sid']}class="act"{/if}><div>{$item['sname']}</div></li>
+									{/if}
+								{/loop}
+							{else}
+								{loop $row['bjlist'] $item}
+									<li onclick="isSelect({$item['sid']});" {if $bj_id == $item['sid']}class="act"{/if}><div>{$item['sname']}</div></li>
+								{/loop}				
+							{/if}
+						{/loop}			
 				{else}
-					{loop $bjlists $row}
-						{if !in_array($row['bj_id'], $bjlists)}
-						<?php $bjlists[] = $row['bj_id'];?>
-							<li onclick="isSelect({$row['bj_id']});" {if $bj_id == $row['bj_id']}class="act"{/if}><div>{$row['bjname']}</div></li>
-						{/if}
-					{/loop}					
+					{if $teachers['status'] == 2}
+						{loop $bjlist $row}
+							<li onclick="isSelect({$row['sid']});" {if $bj_id == $row['sid']}class="act"{/if}><div>{$row['sname']}</div></li>
+						{/loop}
+					{else}
+						{loop $bjlists $row}
+							{if !in_array($row['bj_id'], $bjlists)}
+							<?php $bjlists[] = $row['bj_id'];?>
+								<li onclick="isSelect({$row['bj_id']});" {if $bj_id == $row['bj_id']}class="act"{/if}><div>{$row['bjname']}</div></li>
+							{/if}
+						{/loop}					
+					{/if}
 				{/if}
 			{/if}
 			</ul>
@@ -350,7 +368,13 @@ function search() {
 		dataType: "html",
 		data: {
 			search: search,
+			{if $_W['schooltype']}
+			kc_id:"{$kc_id}",
+			schoolType:'1',
+			{else}
 			bj_id:"{$bj_id}",
+			schoolType:'2',
+			{/if}
 			schoolid:"{$schoolid}"
 		},
 		success: function(datas) {
@@ -507,7 +531,13 @@ $("#tijiao").click(function(e) {
 			s_name: s_name,
 			area_addr: area_addr,
 			numberid: numberid,
+			{if $_W['schooltype']}
+			kc_id:"{$kc_id}",
+			schoolType:'1',
+			{else}
 			bj_id:"{$bj_id}",
+			schoolType:'2',
+			{/if}
 			schoolid:"{$schoolid}"
 		},
 		success: function(datas) {
@@ -572,7 +602,12 @@ new Scroll_load({
 	"ajax_switch": true,
 	"ul_box": ".listContent",
 	"li_item": ".listContent .main",
+	{if $_W['schooltype']}
+	"ajax_url": "{php echo $this->createMobileUrl('stulist', array('schoolid' => $schoolid, 'kc_id' => $kc_id), true)}",
+	schoolType:'1',
+	{else}
 	"ajax_url": "{php echo $this->createMobileUrl('stulist', array('schoolid' => $schoolid, 'bj_id' => $bj_id), true)}",
+	{/if}
 	"page_name": "teacher_notify",
 	"after_ajax": function () {
 		{if !(IsHasQx($tid_global,2000502,2,$schoolid))}
@@ -636,6 +671,11 @@ $(function ($) {
 function isSelect(bjid){
 	jTips("数据加载中！···");
 	location.href = "{php echo $this->createMobileUrl('stulist', array('schoolid' => $schoolid), true)}"+ '&bj_id=' + bjid;
+}
+
+function SelectByKc(id){
+	jTips("数据加载中！···");
+	location.href = "{php echo $this->createMobileUrl('stulist', array('schoolid' => $schoolid), true)}"+ '&kc_id=' + id;
 }
 
 $(".F_divs").click(function(e) {

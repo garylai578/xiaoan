@@ -15,12 +15,14 @@
 					<img src="{php echo tomedia($v['kmicon'])}" class="teacherImgError" />
 				</div>
 				<div class="notifyTopRight">
-					
 					<div class="notifyTopRightTopBox">
 						<span class="teacherInfo">{$v['name']}</span>
-						<div class="JobLeaderBox">{$v['kmname']}</div>
+						{if !$schooltype}<div class="JobLeaderBox">{$v['kmname']}</div>{/if}
 					</div>
-					<p class="notifyCreateTime">{$v['banji']}&nbsp;{$v['time']}</p>
+					<div class="notifyTopRightTopBox">
+						<p class="notifyCreateTime">{$v['banji']}</p>
+					</div>
+					<p class="notifyCreateTime">{$v['time']}</p>
 				</div>
 			</div>
 			<div class="main_text" style="max-height: 60px; line-height: 20px; overflow: hidden;">{$v['content']}</div>

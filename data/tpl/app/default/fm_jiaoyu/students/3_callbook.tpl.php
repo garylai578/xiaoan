@@ -135,7 +135,11 @@
 							</div>
 							<div class="icon_text" style="height: 55px; line-height: 55px;">
 								<div class="name" style="font-size: 12px !important;">
+								<?php  if($schooltype) { ?>
+									<?php  echo $item['tname'];?><?php  if($item['kmname']) { ?>（<?php  echo $item['kmname'];?>）<?php  } ?> 
+								<?php  } else { ?>
 									<?php  echo $item['tname'];?><?php  if($item['kmname']) { ?>（<?php  echo $item['kmname'];?>）<?php  } ?>(<?php  if(is_array($item['kemu'])) { foreach($item['kemu'] as $v) { ?> <?php  echo $v['kemus'];?> <?php  } } ?>)(<?php  echo $item['Ttitle'];?>)
+								<?php  } ?>
 								</div>
 							</div>
 							<?php  if(!empty($item['userid']) && $item['is_allowmsg'] == 2) { ?>
@@ -154,44 +158,86 @@
 				</div>
 			</div>
 		</div>
-		<?php  if(!empty($student['bj_id'])) { ?>
-			<div count="<?php  echo $bj1count;?>" name="<?php  echo $bj['sname'];?>">
-				<div class="common_til2">
-					<a href="###" class="joeBoxA" onclick="openShutManager(this,'<?php  echo $bj['sname'];?>','<?php  echo $bj['sname'];?>（<?php  echo $bj1count;?>人）','<?php  echo $bj['sname'];?>（<?php  echo $bj1count;?>人）')"><?php  echo $bj['sname'];?>（<?php  echo $bj1count;?>人）</a>
-				</div>
-				<div class="common_box1" style="">
-					<div class="main_box2" style="padding:0 0; display:none;"  id="<?php  echo $bj['sname'];?>">
-						<ul class="common_list_imgtext2">
-						<?php  if(is_array($xs1)) { foreach($xs1 as $vue) { ?>
-							<?php  if(is_array($vue['sid'])) { foreach($vue['sid'] as $item) { ?>
-							<li style="padding-left: 70px;">
-								<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
-									<img src="<?php  if($item['pard'] !=4) { ?><?php  if(!empty($item['avatar'])) { ?><?php  echo tomedia($item['avatar'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?><?php  } else { ?><?php  if(!empty($vue['icon'])) { ?><?php  echo tomedia($vue['icon'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?><?php  } ?>" />
-								</div>
-								<div class="icon_text" style="height: 55px; line-height: 55px;">
-									<div class="name">
-										<?php  echo $vue['s_name'];?><?php  if($item['pard'] ==2) { ?>（妈妈&nbsp;<?php  echo $item['name'];?>）<?php  } ?><?php  if($item['pard'] ==3) { ?>（爸爸&nbsp;<?php  echo $item['name'];?>）<?php  } ?><?php  if($item['pard'] ==5) { ?>（家长&nbsp;<?php  echo $item['name'];?>）<?php  } ?>
+		<?php  if($schooltype) { ?>
+			<?php  if(is_array($stupardlist)) { foreach($stupardlist as $row_s) { ?>
+				<div count="<?php  echo $row_s['bj1count'];?>" name="<?php  echo $row_s['bj']['sname'];?>">
+					<div class="common_til2">
+						<a href="###" class="joeBoxA" onclick="openShutManager(this,'<?php  echo $row_s['bj']['sname'];?>','<?php  echo $row_s['bj']['sname'];?>（<?php  echo $row_s['bj1count'];?>人）','<?php  echo $row_s['bj']['sname'];?>（<?php  echo $row_s['bj1count'];?>人）')"><?php  echo $row_s['bj']['sname'];?>（<?php  echo $row_s['bj1count'];?>人）</a>
+					</div>
+					<div class="common_box1" style="">
+						<div class="main_box2" style="padding:0 0; display:none;"  id="<?php  echo $row_s['bj']['sname'];?>">
+							<ul class="common_list_imgtext2">
+							<?php  if(is_array($row_s['xs1'])) { foreach($row_s['xs1'] as $vue) { ?>
+								<?php  if(is_array($vue['sid'])) { foreach($vue['sid'] as $item) { ?>
+								<li style="padding-left: 70px;">
+									<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
+										<img src="<?php  if($item['pard'] !=4) { ?><?php  if(!empty($item['avatar'])) { ?><?php  echo tomedia($item['avatar'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?><?php  } else { ?><?php  if(!empty($vue['icon'])) { ?><?php  echo tomedia($vue['icon'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?><?php  } ?>" />
 									</div>
-								</div>
-								<?php  if($item['sid'] != $it['sid']) { ?>
-								<?php  if(!empty($item['id']) && $item['is_allowmsg'] ==2) { ?>
-								<div class="btn_contact">
-									<a onclick="showReplyBox(<?php  echo $item['id'];?>);" class="icon_btn_contact"></a>
-								</div>
-								<?php  } ?>
-								<?php  } ?>
-                                <!-- <?php  if(!empty($userinfo['mobile'])) { ?>
-								<div class="btn_box">
-									<a href="tel:<?php  echo $userinfo['mobile'];?>" class="icon_btn_call"></a>
-								</div>
-								<?php  } ?> -->
-							</li> 
+									<div class="icon_text" style="height: 55px; line-height: 55px;">
+										<div class="name">
+											<?php  echo $vue['s_name'];?><?php  if($item['pard'] ==2) { ?>（妈妈&nbsp;<?php  echo $item['name'];?>）<?php  } ?><?php  if($item['pard'] ==3) { ?>（爸爸&nbsp;<?php  echo $item['name'];?>）<?php  } ?><?php  if($item['pard'] ==5) { ?>（家长&nbsp;<?php  echo $item['name'];?>）<?php  } ?>
+										</div>
+									</div>
+									<?php  if($item['sid'] != $it['sid']) { ?>
+									<?php  if(!empty($item['id']) && $item['is_allowmsg'] ==2) { ?>
+									<div class="btn_contact">
+										<a onclick="showReplyBox(<?php  echo $item['id'];?>);" class="icon_btn_contact"></a>
+									</div>
+									<?php  } ?>
+									<?php  } ?>
+									<!-- <?php  if(!empty($userinfo['mobile'])) { ?>
+									<div class="btn_box">
+										<a href="tel:<?php  echo $userinfo['mobile'];?>" class="icon_btn_call"></a>
+									</div>
+									<?php  } ?> -->
+								</li> 
+								<?php  } } ?>	
 							<?php  } } ?>	
-						<?php  } } ?>	
-						</ul>
+							</ul>
+						</div>
 					</div>
 				</div>
-			</div>
+			<?php  } } ?>
+		<?php  } else if(!$schooltype) { ?>
+			<?php  if(!empty($student['bj_id'])) { ?>
+				<div count="<?php  echo $bj1count;?>" name="<?php  echo $bj['sname'];?>">
+					<div class="common_til2">
+						<a href="###" class="joeBoxA" onclick="openShutManager(this,'<?php  echo $bj['sname'];?>','<?php  echo $bj['sname'];?>（<?php  echo $bj1count;?>人）','<?php  echo $bj['sname'];?>（<?php  echo $bj1count;?>人）')"><?php  echo $bj['sname'];?>（<?php  echo $bj1count;?>人）</a>
+					</div>
+					<div class="common_box1" style="">
+						<div class="main_box2" style="padding:0 0; display:none;"  id="<?php  echo $bj['sname'];?>">
+							<ul class="common_list_imgtext2">
+							<?php  if(is_array($xs1)) { foreach($xs1 as $vue) { ?>
+								<?php  if(is_array($vue['sid'])) { foreach($vue['sid'] as $item) { ?>
+								<li style="padding-left: 70px;">
+									<div class="icon" style="height: 55px; padding: 10px 0 10px 15px;">
+										<img src="<?php  if($item['pard'] !=4) { ?><?php  if(!empty($item['avatar'])) { ?><?php  echo tomedia($item['avatar'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?><?php  } else { ?><?php  if(!empty($vue['icon'])) { ?><?php  echo tomedia($vue['icon'])?><?php  } else { ?><?php  echo tomedia($school['spic'])?><?php  } ?><?php  } ?>" />
+									</div>
+									<div class="icon_text" style="height: 55px; line-height: 55px;">
+										<div class="name">
+											<?php  echo $vue['s_name'];?><?php  if($item['pard'] ==2) { ?>（妈妈&nbsp;<?php  echo $item['name'];?>）<?php  } ?><?php  if($item['pard'] ==3) { ?>（爸爸&nbsp;<?php  echo $item['name'];?>）<?php  } ?><?php  if($item['pard'] ==5) { ?>（家长&nbsp;<?php  echo $item['name'];?>）<?php  } ?>
+										</div>
+									</div>
+									<?php  if($item['sid'] != $it['sid']) { ?>
+									<?php  if(!empty($item['id']) && $item['is_allowmsg'] ==2) { ?>
+									<div class="btn_contact">
+										<a onclick="showReplyBox(<?php  echo $item['id'];?>);" class="icon_btn_contact"></a>
+									</div>
+									<?php  } ?>
+									<?php  } ?>
+									<!-- <?php  if(!empty($userinfo['mobile'])) { ?>
+									<div class="btn_box">
+										<a href="tel:<?php  echo $userinfo['mobile'];?>" class="icon_btn_call"></a>
+									</div>
+									<?php  } ?> -->
+								</li> 
+								<?php  } } ?>	
+							<?php  } } ?>	
+							</ul>
+						</div>
+					</div>
+				</div>
+			<?php  } ?>
 		<?php  } ?>
 	</div>
 </div>
