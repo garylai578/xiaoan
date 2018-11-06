@@ -101,6 +101,17 @@
 			$result['code'] = 1000;
 			$result['msg'] = "success";
 			$result['ServerTime'] = date('Y-m-d H:i:s',time());
+
+			//查询该学校的时间设置，在“考勤管理->时间设置”，如果设置了时间段但是没有分配到具体班级，则默认是对所有班级生效，返回这个时间段。
+            $checkdatesetid = pdo_fetch("SELECT id  FROM " . tablename($this->table_checkdateset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} AND bj_id=''");
+            if(!empty($checkdatesetid['id']) && $checkdatesetid != ""){
+                $kqtimes = pdo_fetchall("SELECT start, end  FROM " . tablename($this->table_checktimeset) . " WHERE  checkdatesetid=".$checkdatesetid['id'] . " ORDER BY start");
+                /*foreach($kqtimes as $key =>$row) {
+                    $timeset[$key][]
+                }*/
+                $result['data']['todaytimeset'] = $kqtimes;
+            }
+
 			echo json_encode($result);
 		}
     }
@@ -179,7 +190,7 @@
 				$result['data']['todaytimeset'] = $todaytimeset;
 					
 				
-				$class = pdo_fetchall("SELECT id as childId, bj_id as classId, icon as headIcon, s_name as name,s_type FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And bj_id = '{$classid}' ORDER BY id DESC");
+				$class = pdo_fetchall("SELECT id as childId, bj_id as classId, icon as headIcon, s_name as name,s_type, createdate as updatetime FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And bj_id = '{$classid}' ORDER BY id DESC");
 				foreach($class as $key =>$row) {
 					if(!empty($row['headIcon'])){
 						$class[$key]['headIcon'] = $urls.$row['headIcon'];
@@ -206,6 +217,12 @@
 					$class[$key]['fingerid5'] = "-1";
 				}
 				$result['data']['childs'] = $class;
+
+				// 增加该班级所有的请假学生列表
+                $nowUTime = time();
+                $leaves = pdo_fetchall("SELECT sid as childid,startime1 as starttime,endtime1 as endtime FROM " . tablename($this->table_leave) . " WHERE weid = '{$weid}'  And schoolid = '{$schoolid}' and startime1 <= '{$nowUTime}' and endtime1 >= '{$nowUTime}' and bj_id ='{$classid}' and `status`=1 ");
+
+				$result['data']['leave'] = $leaves;
 				$result['code'] = 1000;
 				$result['msg'] = "success";
 				$result['ServerTime'] = date('Y-m-d H:i:s',time());
@@ -614,6 +631,22 @@
 		echo json_encode($result);
 		exit;
     }
-	
+/**
+    if ($operation == 'qrcode') {
+        $time = $_GPC['signtime'];
+        $ckuser        = pdo_fetch("SELECT sid FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$_GPC['iccode']}' And weid = '{$weid}' And schoolid = '{$schoolid}' ");
+        $leave        =  pdo_fetch("SELECT sid,startime1,endtime1 FROM " . tablename($this->table_leave) . " WHERE weid = '{$weid}'  And schoolid = '{$schoolid}' and isliuyan = 0 and status = 1 and startime1 <= '{$time}' and endtime1 >= '{$time}' and sid = '{$ckuser['sid']}' ");
+        $result['code'] = 1000;
+        $result['msg']    = "success";
+        if(!empty($leave)){
+            $result['data']['openDoor']   = 0;
+        }else{
+            $result['data']['openDoor']   = 1;
+        }
+
+        echo json_encode($result);
+        exit;
+    }
+  **/
 
 ?>

@@ -88,6 +88,7 @@
 					'stheendtime'    => strtotime($_GPC['stheendtime']),
 					'note'           => trim($_GPC['note']),
 					'code'           => $rand,
+                    'createdate'     => time(), //如果修改了与考勤相关的字段，则更新createdate
 				);
 				
 				$check = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " WHERE s_name = :s_name And mobile = :mobile And schoolid = :schoolid", array(':s_name' => $_GPC['s_name'], ':mobile' => $_GPC['mobile'], ':schoolid' => $schoolid));
@@ -190,6 +191,7 @@
 								'stheendtime'    => strtotime($_GPC['stheendtime']),
 								'note'           => trim($_GPC['note']),
 								'code'           => $rand,
+                                'createdate'     => time(), //如果修改了与考勤相关的字段，则更新createdate
 							);
 							pdo_insert($this->table_students, $datas);
 						};
@@ -262,6 +264,7 @@
 							$primaryThis['stheendtime'] = strtotime($_GPC['stheendtime']);
 							$primaryThis['note'] = trim($_GPC['note']);
 							$primaryThis['code'] = $rand;
+							$primaryThis['createdate'] = time();    //当修改了与考勤相关的字段时，更新一下createdate
 							array_splice($primaryThis,0,1);
 							//echo "修改的sid:".$value['id']."\n";
 							
@@ -294,6 +297,7 @@
 						{
 							$primary['bj_id'] = $_GPC['bj_new'][$key];
 							$primary['xq_id'] = $_GPC['xueqi_new'][$key];
+							$primary['createdate'] = time(); //如果修改了与考勤相关的字段，则更新createdate
 							pdo_insert($this->table_students, $primary);
 							$newsid = pdo_insertid();
 							//echo "新增的bjid:".$_GPC['bj_new'][$key]."\n";
@@ -1086,6 +1090,7 @@
 						array_splice($stuOld,0,1);
 						$stuOld['bj_id'] = $bj_id;
 						$stuOld['xq_id'] = $xueqi['parentid'];
+						$stuOld['createdate'] = time(); //如果修改了与考勤相关的字段，则更新createdate
 						pdo_insert($this->table_students,$stuOld);
 						$newsid = pdo_insertid();
 						foreach( $userOld as $key => $value )
@@ -1125,7 +1130,7 @@
 							$notrowcount++;
 							continue;
 						}
-						pdo_update($this->table_students, array('bj_id' => $bj_id,'xq_id' => $xueqi['parentid']), array('id' => $id));
+						pdo_update($this->table_students, array('bj_id' => $bj_id,'xq_id' => $xueqi['parentid'], 'createdate'=>time()), array('id' => $id));    //  如果修改了与考勤相关的字段，则更新createdate
 						$rowcount++;
 					}
 				}

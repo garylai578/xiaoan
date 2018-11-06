@@ -1656,11 +1656,11 @@
 				$allstu = pdo_fetchall("SELECT id FROM " . tablename($this->table_students) . " WHERE :keyid = keyid", array(':keyid' =>$student['keyid']));	
 				foreach( $allstu as $key => $value )
 				{
-					pdo_update($this->table_students, array('icon' => $picurl), array('id' => $value['id']));
+					pdo_update($this->table_students, array('icon' => $picurl, 'createdate'=>time()), array('id' => $value['id']));
 				}
 			}
 			else{
-				pdo_update($this->table_students, array('icon' => $picurl), array('id' => $student['id']));
+				pdo_update($this->table_students, array('icon' => $picurl,  'createdate'=>time()), array('id' => $student['id']));
 			}
 			
 			$data ['result'] = true;
