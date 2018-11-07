@@ -5,7 +5,7 @@
 
 	global $_GPC, $_W;
 	
-	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','getleave') ) ? $_GPC ['op'] : 'default';
+	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','getleave', 'qrcode') ) ? $_GPC ['op'] : 'default';
 	$weid = $_GPC['i'];
 	$schoolid = $_GPC['schoolid'];
 	$macid = $_GPC['macid'];
@@ -101,16 +101,6 @@
 			$result['code'] = 1000;
 			$result['msg'] = "success";
 			$result['ServerTime'] = date('Y-m-d H:i:s',time());
-
-			//查询该学校的时间设置，在“考勤管理->时间设置”，如果设置了时间段但是没有分配到具体班级，则默认是对所有班级生效，返回这个时间段。
-            $checkdatesetid = pdo_fetch("SELECT id  FROM " . tablename($this->table_checkdateset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} AND bj_id=''");
-            if(!empty($checkdatesetid['id']) && $checkdatesetid != ""){
-                $kqtimes = pdo_fetchall("SELECT start, end  FROM " . tablename($this->table_checktimeset) . " WHERE  checkdatesetid=".$checkdatesetid['id'] . " ORDER BY start");
-                /*foreach($kqtimes as $key =>$row) {
-                    $timeset[$key][]
-                }*/
-                $result['data']['todaytimeset'] = $kqtimes;
-            }
 
 			echo json_encode($result);
 		}
@@ -631,22 +621,210 @@
 		echo json_encode($result);
 		exit;
     }
-/**
+
     if ($operation == 'qrcode') {
-        $time = $_GPC['signtime'];
-        $ckuser        = pdo_fetch("SELECT sid FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$_GPC['iccode']}' And weid = '{$weid}' And schoolid = '{$schoolid}' ");
-        $leave        =  pdo_fetch("SELECT sid,startime1,endtime1 FROM " . tablename($this->table_leave) . " WHERE weid = '{$weid}'  And schoolid = '{$schoolid}' and isliuyan = 0 and status = 1 and startime1 <= '{$time}' and endtime1 >= '{$time}' and sid = '{$ckuser['sid']}' ");
-        $result['code'] = 1000;
-        $result['msg']    = "success";
-        if(!empty($leave)){
-            $result['data']['openDoor']   = 0;
-        }else{
-            $result['data']['openDoor']   = 1;
+        $singId = $_GPC['signId']; //18位（前8位是学生的id，后10位是unix时间戳）
+
+        if(strlen($singId) != 18){
+            $result['code'] = 2001;
+            $result['msg'] = 'signId必须是18位，前8位是学生的id，后10位是unix时间戳';
+            echo json_encode($result);
+            exit;
         }
 
+        $childId = substr($singId, 0, 8);
+        $expire = substr($singId, 8, 10);
+        $qrcode =  pdo_fetch("SELECT ticket, expire FROM " . tablename($this->table_qrinfo) . " WHERE qrcid = '{$childId}' And expire = '{$expire}' And weid = '{$weid}' And schoolid = '{$schoolid}' And model=3");
+        if(!empty($qrcode)){
+            if($qrcode['expire'] < time()){
+                $result['code'] = 2002;
+                $result['msg'] = '该二维码已过期，禁止通行';
+            }else{
+                //二维码正确，写入考勤数据(与上面check的逻辑是一样的)
+                $fstype = false;
+                $ckuser = pdo_fetch("SELECT * FROM " . tablename($this->table_idcard) . " WHERE idcard = :idcard And schoolid = :schoolid ", array(':idcard' =>$_GPC['signId'],':schoolid' =>$schoolid));
+                if($_GPC['mactype'] == 'other'){
+                    $signTime = strtotime($_GPC['signTime']);
+                }else{
+                    $signTime = trim($_GPC['signTime']);
+                }
+                $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid And createtime = :createtime ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid,':createtime' =>$signTime));
+                if(empty($checkthisdata)){
+                    if(!empty($ckuser)){
+                        $times = TIMESTAMP;
+                        $nowtime = date('H:i',$signTime);
+                        if($_GPC['picurl']) {
+                            load()->func('file');
+                            $urls = "http://www.daren007.com/attachment/";
+                            $path = "images/fm_jiaoyu/check/". date('Y/m/d/');
+                            if (!is_dir(IA_ROOT."/attachment/". $path)) {
+                                mkdirs(IA_ROOT."/attachment/". $path, "0777");
+                            }
+                            $rand = random(30);
+                            if(!empty($_GPC['picurl'])) {
+                                $picurl = $path.$rand."_1.jpg";
+                                if($_GPC['mactype'] == 'other'){
+                                    $pic_url = base64_decode(str_replace(" ","+",$_GPC['picurl']));
+                                }else{
+                                    $pic_url = file_get_contents($urls.$_GPC['picurl']);
+                                }
+                                file_write($picurl,$pic_url);
+                                if (!empty($_W['setting']['remote']['type'])){
+                                    $remotestatus = file_remote_upload($picurl);
+                                }
+                                $pic = $picurl;
+                            }
+                            if(!empty($_GPC['picurl2'])) {
+                                $picurl2 = $path.$rand."_2.jpg";
+                                if($_GPC['mactype'] == 'other'){
+                                    $pic_url2 = base64_decode(str_replace(" ","+",$_GPC['picurl2']));
+                                }else{
+                                    $pic_url2 = file_get_contents($urls.$_GPC['picurl2']);
+                                }
+                                file_write($picurl2,$pic_url2);
+                                if (!empty($_W['setting']['remote']['type'])){
+                                    $remotestatus = file_remote_upload($picurl2);
+                                }
+                                $pic2 = $picurl2;
+                            }
+                        }
+                        $signMode = $_GPC['signMode'];
+                        if($ckmac['type'] !=0){
+                            include 'checktime2.php';
+                        }else{
+                            include 'checktime.php';
+                        }
+                        if($_GPC['signId'] == '999999999'){
+                            $data = array(
+                                'weid' => $weid,
+                                'schoolid' => $schoolid,
+                                'macid' => $ckmac['id'],
+                                'lon' => $_GPC['lon'],
+                                'lat' => $_GPC['lat'],
+                                'cardid' => $_GPC ['signId'],
+                                'type' => "无卡进出",
+                                'pic' => $pic,
+                                'pic2' => $pic2,
+                                'leixing' => $leixing,
+                                'createtime' => $signTime
+                            );
+                            pdo_insert($this->table_checklog, $data);
+                            $fstype = true;
+                        }
+                        if(!empty($ckuser['sid'])){
+                            $bj = pdo_fetch("SELECT bj_id FROM " . tablename($this->table_students) . " WHERE id = :id ", array(':id' =>$ckuser['sid']));
+                            if($school['is_cardpay'] == 1){
+                                if($ckuser['severend'] > $times){
+                                    $data = array(
+                                        'weid' => $weid,
+                                        'schoolid' => $schoolid,
+                                        'macid' => $ckmac['id'],
+                                        'cardid' => $_GPC ['signId'],
+                                        'sid' => $ckuser['sid'],
+                                        'bj_id' => $bj['bj_id'],
+                                        'type' => $type,
+                                        'pic' => $pic,
+                                        'pic2' => $pic2,
+                                        'lon' => $_GPC['lon'],
+                                        'lat' => $_GPC['lat'],
+                                        'temperature' => $_GPC ['signTemp'],
+                                        'leixing' => $leixing,
+                                        'pard' => $ckuser['pard'],
+                                        'createtime' => $signTime
+                                    );
+                                    pdo_insert($this->table_checklog, $data);
+                                    $checkid = pdo_insertid();
+                                    if($school['send_overtime'] >= 1){
+                                        $overtime = $school['send_overtime']*60;
+                                        $timecha = $times - $signTime;
+                                        if($overtime >= $timecha){
+                                            $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                                        }else{
+                                            $result['info'] = "延迟发送之数据将不推送刷卡提示";
+                                        }
+                                    }else{
+                                        $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                                    }
+                                }else{
+                                    $result['info'] = "本卡已失效,请联系学校管理员";
+                                }
+                                $fstype = true;
+                            }else{
+                                $data = array(
+                                    'weid' => $weid,
+                                    'schoolid' => $schoolid,
+                                    'macid' => $ckmac['id'],
+                                    'cardid' => $_GPC ['signId'],
+                                    'sid' => $ckuser['sid'],
+                                    'bj_id' => $bj['bj_id'],
+                                    'type' => $type,
+                                    'pic' => $pic,
+                                    'pic2' => $pic2,
+                                    'lon' => $_GPC['lon'],
+                                    'lat' => $_GPC['lat'],
+                                    'temperature' => $_GPC ['signTemp'],
+                                    'leixing' => $leixing,
+                                    'pard' => $ckuser['pard'],
+                                    'createtime' => $signTime
+                                );
+                                pdo_insert($this->table_checklog, $data);
+                                $checkid = pdo_insertid();
+                                if($school['send_overtime'] >= 1){
+                                    $overtime = $school['send_overtime']*60;
+                                    $timecha = $times - $signTime;
+                                    if($overtime >= $timecha){
+                                        $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                                    }else{
+                                        $result['info'] = "延迟发送之数据将不推送刷卡提示";
+                                    }
+                                }else{
+                                    $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                                }
+                                $fstype = true;
+                            }
+                        }
+                        if(!empty($ckuser['tid'])){
+                            $data = array(
+                                'weid' => $weid,
+                                'schoolid' => $schoolid,
+                                'macid' => $ckmac['id'],
+                                'cardid' => $_GPC ['signId'],
+                                'tid' => $ckuser['tid'],
+                                'type' => $type,
+                                'leixing' => $leixing,
+                                'pic' => $pic,
+                                'pic2' => $pic2,
+                                'pard' => 1,
+                                'createtime' => $signTime
+                            );
+                            pdo_insert($this->table_checklog, $data);
+                            $fstype = true;
+                        }
+                    }else{
+                        $result['info'] = "本卡未绑定任何学生或老师";
+                    }
+                }else{
+                    $fstype = true;
+                    $result['info'] = "不可重复相同刷卡数据";
+                }
+                if ($fstype ==true){
+                    $result['data'] = "";
+                    $result['code'] = 1000;
+                    $result['msg'] = "success";
+                    $result['ServerTime'] = date('Y-m-d H:i:s',time());
+                }else{
+                    $result['data'] = "";
+                    $result['code'] = 300;
+                    $result['msg'] = "lose";
+                    $result['ServerTime'] = date('Y-m-d H:i:s',time());
+                }
+            }
+        }else{
+            $result['code'] = 2003;
+            $result['msg'] = '非法二维码，禁止通行';
+            $result['data'] = $sql."  000   ".$qrcode;
+        }
         echo json_encode($result);
         exit;
     }
-  **/
-
 ?>
