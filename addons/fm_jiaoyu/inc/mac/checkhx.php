@@ -212,6 +212,35 @@
                 $nowUTime = time();
                 $leaves = pdo_fetchall("SELECT sid as childid,startime1 as starttime,endtime1 as endtime FROM " . tablename($this->table_leave) . " WHERE weid = '{$weid}'  And schoolid = '{$schoolid}' and startime1 <= '{$nowUTime}' and endtime1 >= '{$nowUTime}' and bj_id ='{$classid}' and `status`=1 ");
 
+                // 增加每周允许的出校门时间段
+                $time1 = array('startTime'=>"00:00", 'endTime'=>"00:00");
+                $time2 = array('startTime'=>"00:00", 'endTime'=>"24:00");
+                $time3 = array('startTime'=>"06:00", 'endTime'=>"08:00");
+                $time4 = array('startTime'=>"11:50", 'endTime'=>"14:00");
+                $time5 = array('startTime'=>"17:00", 'endTime'=>"24:00");
+                $time6 = array('startTime'=>"21:25", 'endTime'=>"24:00");
+                $time7 = array($time3, $time4, $time6);
+                $time8 = array($time3, $time4, $time5);
+                $time9 = array($time3, $time6);
+                $time10 = array($time3, $time5);
+
+                $weeks0['id'] = 0;
+                $weeks0['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>array($time1)), array('weekno'=>2,  'groups'=>array($time1)), array('weekno'=>3,  'groups'=>array($time1)), array('weekno'=>4,  'groups'=>array($time1)), array('weekno'=>5,  'groups'=>array($time5)), array('weekno'=>6,  'groups'=>array($time2)));
+                $timeset[0] = $weeks0;
+
+                $weeks1['id'] = 1;
+                $weeks1['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>$time7), array('weekno'=>2,  'groups'=>$time7), array('weekno'=>3,  'groups'=>$time7), array('weekno'=>4,  'groups'=>$time7), array('weekno'=>5,  'groups'=>$time8), array('weekno'=>6,  'groups'=>array($time2)));
+                $timeset[1] = $weeks1;
+
+                $weeks2['id'] = 2;
+                $weeks2['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>array($time1)), array('weekno'=>2,  'groups'=>array($time1)), array('weekno'=>3,  'groups'=>array($time1)), array('weekno'=>4,  'groups'=>array($time1)), array('weekno'=>5,  'groups'=>array($time5)), array('weekno'=>6,  'groups'=>array($time2)));
+                $timeset[2] = $weeks2;
+
+                $weeks3['id'] = 3;
+                $weeks3['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>$time9), array('weekno'=>2,  'groups'=>$time9), array('weekno'=>3,  'groups'=>$time9), array('weekno'=>4,  'groups'=>$time9), array('weekno'=>5,  'groups'=>$time10), array('weekno'=>6,  'groups'=>array($time2)));
+                $timeset[3] = $weeks3;
+
+                $result['data']['timeset'] = $timeset;
 				$result['data']['leave'] = $leaves;
 				$result['code'] = 1000;
 				$result['msg'] = "success";
