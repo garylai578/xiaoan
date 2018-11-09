@@ -1640,6 +1640,10 @@ class Fm_jiaoyuModuleSite extends Core {
 		$insert['pname'] = empty($strs[7]) ? 0 : trim($strs[7]);
         
 		if (empty($card)) {
+		    if($insert['sid'] != 0)
+		        pdo_update('wx_school_students', array("createdate"=>time()), array('id'=>$insert['sid']));
+            if($insert['tid'] != 0)
+                pdo_update('wx_school_teachers', array("updatedate"=>time()), array('id'=>$insert['tid']));
             return pdo_insert('wx_school_idcard', $insert);
         }else{
 			 message('有重复卡号【'.$strs[1].'】，请检查');
