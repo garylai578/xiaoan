@@ -249,7 +249,7 @@
 			}
 		}else{
 			if(!empty($ckmac)){
-				$class = pdo_fetchall("SELECT id as TID, fz_id as classId, thumb as headIcon, tname as name FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And fz_id = '{$classid}' ORDER BY id DESC");
+				$class = pdo_fetchall("SELECT id as TID, fz_id as classId, thumb as headIcon, tname as name, updatetime FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And fz_id = '{$classid}' ORDER BY id DESC");
 				foreach($class as $key =>$row) {
 					if(!empty($row['headIcon'])){
 						$class[$key]['headIcon'] = $urls.$row['headIcon'];
