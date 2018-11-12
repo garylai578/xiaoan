@@ -1584,6 +1584,11 @@
 			
 			$data ['result'] = true;
 			$data ['msg'] = '绑定成功！';
+
+            if(!empty($_GPC['sid']))
+                pdo_update($this->table_students, array('createdate'=>time()), array('id'=>$_GPC['sid'])); // 绑定考勤卡后,更新用户的时间戳
+            if(!empty($_GPC['tid']))
+                pdo_update($this->table_teachers, array('updatetime'=>time()), array('id'=>$_GPC['tid'])); // 绑定考勤卡后,更新用户的时间戳
 			
           die ( json_encode ( $data ) );
 		  
@@ -1610,7 +1615,11 @@
 					'spic'=> '',
 					'tpic'=> '',
 			       );
-			pdo_update($this->table_idcard, $temp, array('id' => $_GPC['id']));						
+			pdo_update($this->table_idcard, $temp, array('id' => $_GPC['id']));
+			if(!empty($item['sid']) && $item['sid'] != 0)
+		    	pdo_update($this->table_students, array('createdate'=>time()), array('id'=>$item['sid'])); // 解绑考勤卡后,更新用户的时间戳
+            elseif(!empty($item['tid']) && $item['tid'] != 0)
+                pdo_update($this->table_teachers, array('updatetime'=>time()), array('id'=>$item['tid'])); // 解绑考勤卡后,更新用户的时间戳
 			$data ['result'] = true;
 			$data ['msg'] = '解绑成功！';
 			
