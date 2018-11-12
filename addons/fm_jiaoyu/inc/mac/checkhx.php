@@ -837,7 +837,13 @@
                     $result['info'] = "不可重复相同刷卡数据";
                 }
                 if ($fstype ==true){
-                    $result['data'] = "";
+                    $result['data']['name'] = $ckuser['pname'];
+                    if(!empty($ckuser['sid']) && $ckuser['sid'] != 0){
+                        $std = pdo_fetch("SELECT bj_id FROM " . tablename($this->table_students) . " WHERE id = :id ", array(':id' =>$ckuser['sid']));
+                        $bj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = :sid ", array(':sid' =>$std['bj_id']));
+                        $result['data']['class'] = $bj['sname'];
+                    }
+//                    $result['data'] = "";
                     $result['code'] = 1000;
                     $result['msg'] = "success";
                     $result['ServerTime'] = date('Y-m-d H:i:s',time());
