@@ -709,8 +709,12 @@ class Fm_jiaoyuModuleSite extends Core {
 	}	
 
     public function doMobileMyinfo() {
-		$this->getLogicms ( __FUNCTION__, 'mobile', true );
+		$this->getLogicms ( __FUNCTION__, 'mobile', true);
 	}
+
+	public function doMobileMyqrcode(){
+        $this->getLogicms ( __FUNCTION__, 'mobile', true);
+    }
 
     public function doMobileJiaoliu() {
 		$this->getLogicms ( __FUNCTION__, 'mobile', true );
