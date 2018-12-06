@@ -105,6 +105,7 @@ if($operation == 'display'){
 					'allowpy'    => trim($_GPC['allowpy']),
 					'tid'        => trim($_GPC['tid']),
 					'parentid'   => intval($parentid),
+                    'is_temple'  => trim($_GPC['is_temple']),
 				);
 				pdo_update($this->table_classify, $data, array('sid' => $sid));
 				
@@ -133,6 +134,7 @@ if($operation == 'display'){
 						'class_device'       => trim($_GPC['class_device']),
 						'parentid' => intval($_GPC['parentid_new'][$key]),
 						'type'     => 'theclass',
+                        'is_temple' => trim($_GPC['is_temple_new'][$key]),
 					);				
 					pdo_insert($this->table_classify, $data);	
 								
@@ -168,6 +170,7 @@ if($operation == 'display'){
 						'class_device'       => trim($_GPC['class_device']),
 						'parentid' => intval($_GPC['parentid_new'][$key]),
 						'type'     => 'theclass',
+                        'is_temple' => trim($_GPC['is_temple_new'][$key]),
 					);				
 					pdo_insert($this->table_classify, $data);	
 					
