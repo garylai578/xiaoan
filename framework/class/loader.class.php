@@ -46,6 +46,8 @@ function table($name) {
 		'core_profile_fields',
 		'article_comment',
 		'wxapp_versions',
+		'users_permission',
+		'uni_verifycode',
 	))) {
 		return new $table_classname;
 	}
@@ -94,11 +96,10 @@ class Loader {
 	private $accountMap = array(
 		'account' => 'account/account',
 		'weixin.account' => 'account/weixin.account',
+		'weixin.platform' => 'account/weixin.platform',
 		'aliapp.account' => 'account/aliapp.account',
 		'phoneapp.account' => 'account/phoneapp.account',
 		'webapp.account' => 'account/webapp.account',
-		'weixin.account' => 'account/weixin.account',
-		'weixin.platform' => 'account/weixin.platform',
 		'wxapp.account' => 'account/wxapp.account',
 		'wxapp.platform' => 'account/wxapp.platform',
 		'wxapp.work' => 'account/wxapp.work',

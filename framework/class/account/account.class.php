@@ -7,16 +7,46 @@ defined('IN_IA') or exit('Access Denied');
 
 
 class WeAccount extends ArrayObject {
-		public $account;
+
 	public $uniacid = 0;
-		public $menuFrame;
-		public $type;
-		public $typeName;
-		public $typeSign;
-		public $typeTempalte;
-		public $supportVersion = STATUS_OFF;
-		public $supportOauthInfo = STATUS_OFF;
-		public $supportJssdk = STATUS_OFF;
+
+		protected $account;
+		protected $owner = array();
+	
+	protected $groups = array();
+	protected $setting = array();
+	protected $startTime;
+	protected $endTime;
+		protected $groupLevel;
+	protected $logo;
+	protected $qrcode;
+	protected $switchUrl;
+	protected $displayUrl;
+		protected $setMeal = array();
+		protected $sameAccountExist;
+		protected $menuFrame;
+		protected $type;
+		protected $typeName;
+		protected $typeSign;
+		protected $typeTemplate;
+		protected $supportVersion = STATUS_OFF;
+		protected $supportOauthInfo = STATUS_OFF;
+		protected $supportJssdk = STATUS_OFF;
+
+	protected $toArrayMap = array(
+		'type_sign' => 'typeSign',
+		'starttime' => 'startTime',
+		'endtime' => 'endTime',
+		'groups' => 'groups',
+		'setting' => 'setting',
+		'grouplevel' => 'groupLevel',
+		'logo' => 'logo',
+		'qrcode' => 'qrcode',
+		'type_name' => 'typeName',
+		'switchurl' => 'switchUrl',
+		'setmeal' => 'setMeal',
+	);
+
 		private static $accountClassname = array(
 		ACCOUNT_TYPE_OFFCIAL_NORMAL => 'weixin.account',
 		ACCOUNT_TYPE_OFFCIAL_AUTH => 'weixin.platform',
@@ -31,10 +61,38 @@ class WeAccount extends ArrayObject {
 	);
 		private static $accountObj = array();
 
+	public function __construct($uniaccount = array()) {
+		$this->uniacid = $uniaccount['uniacid'];
+		$cachekey = cache_system_key('uniaccount', array('uniacid' => $this->uniacid));
+		$cache = cache_load($cachekey);
+		if (empty($cache)) {
+			$cache = $this->getAccountInfo($uniaccount['acid']);
+			cache_write($cachekey, $cache);
+		}
+		$this->account = array_merge((array)$cache, $uniaccount);
+	}
+
+	public function __get($name) {
+		if (method_exists($this, $name)) {
+			return $this->$name();
+		}
+		$funcname = 'fetch' . ucfirst($name);
+		if (method_exists($this, $funcname)) {
+			return $this->$funcname();
+		}
+		if (isset($this->$name)) {
+			return $this->$name;
+		}
+		return false;
+	}
+
 	
 	public static function create($acidOrAccount = array()) {
 		global $_W;
 		$uniaccount = array();
+		if (is_object($acidOrAccount)) {
+			return $acidOrAccount;
+		}
 		if (is_array($acidOrAccount) && !empty($acidOrAccount)) {
 			$uniaccount = $acidOrAccount;
 		} else {
@@ -44,9 +102,8 @@ class WeAccount extends ArrayObject {
 		if (is_error($uniaccount) || empty($uniaccount)) {
 			$uniaccount = $_W['account'];
 		}
-		$account_obj_key = md5(iserializer($uniaccount));
-		if (!empty(self::$accountObj[$account_obj_key])) {
-			return self::$accountObj[$account_obj_key];
+		if (!empty(self::$accountObj[$uniaccount['uniacid']])) {
+			return self::$accountObj[$uniaccount['uniacid']];
 		}
 		if(!empty($uniaccount) && isset($uniaccount['type'])) {
 			return self::includes($uniaccount);
@@ -55,31 +112,19 @@ class WeAccount extends ArrayObject {
 		}
 	}
 
-	static public function createByUniacid($uniacid = 0) {
+	public static function token($type = 1) {
+			$obj = self::includes(array('type' => $type));
+			return $obj->fetch_available_token();
+	}
+
+	public static function createByUniacid($uniacid = 0) {
 		global $_W;
 		$uniacid = intval($uniacid) > 0 ? intval($uniacid) : $_W['uniacid'];
 		$uniaccount = table('account')->getUniAccountByUniacid($uniacid);
-		if (is_error($uniaccount) || empty($uniaccount)) {
-			$uniaccount = $_W['account'];
-		}
-		$account_obj_key = md5(iserializer($uniaccount));
-		if (!empty(self::$accountObj[$account_obj_key])) {
-			return self::$accountObj[$account_obj_key];
-		}
-
-		if(!empty($uniaccount) && isset($uniaccount['type'])) {
-			return self::includes($uniaccount);
-		} else {
-			return error('-1', '帐号不存在或是已经被删除');
-		}
+		return self::create($uniaccount);
 	}
 
-	static public function token($type = 1) {
-		$obj = self::includes(array('type' => $type));
-		return $obj->fetch_available_token();
-	}
-
-	static public function includes($uniaccount) {
+	public static function includes($uniaccount) {
 		$type = $uniaccount['type'];
 		if (empty(self::$accountClassname[$type])) {
 			return error('-1', '账号类型不存在');
@@ -88,27 +133,13 @@ class WeAccount extends ArrayObject {
 		$file = self::$accountClassname[$type];
 		$classname = self::getClassName($file);
 		load()->classs($file);
-		$account_obj = new $classname;
-
-		$account_obj->uniacid = $uniaccount['uniacid'];
-		$account_obj->uniaccount = $uniaccount;
-		$account_obj->account = $account_obj->fetchAccountInfo();
-		$account_obj->account['type'] = $account_obj->uniaccount['type'];
-		$account_obj->account['isconnect'] = $account_obj->uniaccount['isconnect'];
-		$account_obj->account['isdeleted'] = $account_obj->uniaccount['isdeleted'];
-		$account_obj->account['endtime'] = $account_obj->uniaccount['endtime'];
-
-		if ($type == ACCOUNT_TYPE_OFFCIAL_NORMAL || $type == ACCOUNT_TYPE_OFFCIAL_AUTH || $type == ACCOUNT_TYPE_XZAPP_NORMAL) {
-			$account_obj->same_account_exist = pdo_getall($account_obj->tablename, array('key' => $account_obj->account['key'], 'uniacid <>' => $account_obj->account['uniacid']), array(), 'uniacid');
-		}
-
-		$account_obj_key = md5(iserializer($uniaccount));
-		self::$accountObj[$account_obj_key] = $account_obj;
+		$account_obj = new $classname($uniaccount);
+		self::$accountObj[$uniaccount['uniacid']] = $account_obj;
 		return $account_obj;
 	}
 
 	
-	static public function getClassName($filename) {
+	public static function getClassName($filename) {
 		$classname = '';
 		$filename = explode('.', $filename);
 		foreach ($filename as $val) {
@@ -116,6 +147,106 @@ class WeAccount extends ArrayObject {
 		}
 		return $classname;
 	}
+
+		public function fetchAccountInfo() {
+		return $this->getAccountInfo($this->account['acid']);
+	}
+
+	protected function fetchDisplayUrl() {
+		return url('account/display', array('type' => $this->typeSign));
+	}
+
+	protected function fetchLogo() {
+		return to_global_media('headimg_'.$this->account['acid']. '.jpg').'?time='.time();
+	}
+
+	protected function fetchQrcode() {
+		return to_global_media('qrcode_'.$this->account['acid']. '.jpg').'?time='.time();
+	}
+
+	protected function fetchSwitchUrl() {
+		return wurl('account/display/switch', array('uniacid' => $this->uniacid));
+	}
+
+	protected function fetchOwner() {
+		$this->owner = account_owner($this->uniacid);
+		return $this->owner;
+	}
+
+	protected function fetchStartTime() {
+		if (empty($this->owner)) {
+			$this->owner = $this->fetchOwner();
+		}
+		return $this->owner['starttime'];
+	}
+
+	protected function fetchEndTime() {
+		if (!empty($this->account['endtime'])) {
+			return $this->account['endtime'] == '-1' ? 0 : $this->account['endtime'];
+		} else {
+			if (empty($this->owner)) {
+				$this->owner = $this->fetchOwner();
+			}
+			return $this->owner['endtime'];
+		}
+	}
+
+	protected function fetchGroups() {
+		load()->model('mc');
+		$this->groups = mc_groups($this->uniacid);
+		return $this->groups;
+	}
+
+	protected function fetchSetting() {
+		$this->setting = uni_setting($this->uniacid);
+		return $this->setting;
+	}
+
+	protected function fetchGroupLevel() {
+		if (empty($this->setting)) {
+			$this->setting = $this->fetchSetting();
+		}
+		return $this->setting['grouplevel'];
+	}
+
+	protected function fetchSetMeal() {
+		return uni_setmeal($this->uniacid);
+	}
+
+	protected function fetchSameAccountExist() {
+		return pdo_getall($this->tablename, array('key' => $this->account['key'], 'uniacid <>' => $this->uniacid), array(), 'uniacid');
+	}
+
+	protected function supportOauthInfo() {
+		if ($this->account['level'] == ACCOUNT_SERVICE_VERIFY || $this->typeSign == XZAPP_TYPE_SIGN) {
+			return STATUS_ON;
+		} else {
+			return STATUS_OFF;
+		}
+	}
+
+	protected function supportJssdk() {
+		if ($this->account['level'] >= ACCOUNT_SUBSCRIPTION_VERIFY || $this->typeSign == XZAPP_TYPE_SIGN) {
+			return STATUS_ON;
+		} else {
+			return STATUS_OFF;
+		}
+	}
+
+	public function __toArray() {
+		foreach ($this->account as $key => $property) {
+			$this[$key] = $property;
+		}
+		foreach($this->toArrayMap as $key => $type) {
+			if (isset($this->$type) && !empty($this->$type)) {
+				$this[$key] = $this->$type;
+			} else {
+				$this[$key] = $this->__get($type);
+			}
+		}
+		return $this;
+	}
+
 	
 	public function parse($message) {
 		global $_W;
@@ -155,19 +286,6 @@ class WeAccount extends ArrayObject {
 							$packet['scene'] = json_decode($packet['scene']);
 						}
 
-					}
-					break;
-				case 'scancode_waitmsg':
-					if ($packet['event'] == 'scancode_waitmsg') {
-						$packet['type'] = 'qr';
-						$packet['scanresult'] = $packet['scancodeinfo']['scanresult'];
-					}
-					if(!empty($packet['eventkey'])) {
-						$packet['scene'] = str_replace('qrscene_', '', $packet['eventkey']);
-						if(strexists($packet['scene'], '\u')) {
-							$packet['scene'] = '"' . str_replace('\\u', '\u', $packet['scene']) . '"';
-							$packet['scene'] = json_decode($packet['scene']);
-						}
 					}
 					break;
 				case 'unsubscribe':
@@ -337,6 +455,16 @@ class WeAccount extends ArrayObject {
 			'40099' => '该code已被核销。',
 			'61005' => '缺少接入平台关键数据，等待微信开放平台推送数据，请十分钟后再试或是检查“授权事件接收URL”是否写错（index.php?c=account&amp;a=auth&amp;do=ticket地址中的&amp;符号容易被替换成&amp;amp;）',
 			'61023' => '请重新授权接入该公众号',
+			'88000' => '没有留言权限',
+			'88001' => '该图文不存在',
+			'88002' => '文章存在敏感信息',
+			'88003' => '精选评论数已达上限',
+			'88004' => '已被用户删除，无法精选',
+			'88005' => '已经回复过了',
+			'88007' => '回复超过长度限制或为0',
+			'88008' => '该评论不存在',
+			'88010' => '获取评论数目不合法',
+			'87009' => '该回复不存在',
 		);
 		$code = strval($code);
 		if($code == '40001' || $code == '42001') {

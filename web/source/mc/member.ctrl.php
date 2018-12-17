@@ -32,6 +32,7 @@ if ($do == 'save_credit_setting') {
 
 if ($do == 'register_setting') {
 	$_W['page']['title'] = '注册设置';
+	permission_check_account_user('mc_member_register_seting');
 	if (checksubmit('submit')) {
 		$passport = $_GPC['passport'];
 		if (!empty($passport)) {
@@ -46,6 +47,7 @@ if ($do == 'register_setting') {
 
 if ($do == 'credit_setting') {
 	$_W['page']['title'] = '积分设置';
+	permission_check_account_user('mc_member_credit_setting');
 	$credit_setting = uni_setting_load('creditnames');
 	$credit_setting = $credit_setting['creditnames'];
 
@@ -66,6 +68,7 @@ if ($do == 'credit_setting') {
 
 if($do == 'display') {
 	$_W['page']['title'] = '会员列表';
+	permission_check_account_user('mc_member_diaplsy');
 	$groups = mc_groups();
 	$search_mod = intval($_GPC['search_mod']) == 1 ? '1' : '2';
 	$pindex = max(1, intval($_GPC['page']));

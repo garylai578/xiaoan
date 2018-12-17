@@ -83,7 +83,7 @@
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1008" data_id="00801" type="checkbox" name="qxarr"  value="1000802" style="float: none;" <?php  if(in_array(1000802,$qx)) { ?> checked="checked" <?php  } ?>>编辑单个成绩</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1008" data_id="00801" type="checkbox" name="qxarr"  value="1000803" style="float: none;" <?php  if(in_array(1000803,$qx)) { ?> checked="checked" <?php  } ?>>批量导入成绩</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1008" data_id="00801" type="checkbox" name="qxarr"  value="1000804" style="float: none;" <?php  if(in_array(1000804,$qx)) { ?> checked="checked" <?php  } ?>>删除成绩</label><br/>
-                        	<?php  if(($school['issale'] == 1)) { ?>
+                        	
                     		<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">课程管理&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1009)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1009)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1009" data_id="00901" pre_id="00901" first_pre="1" type="checkbox" name="qxarr"  value="1000901" style="float: none;" <?php  if(in_array(1000901,$qx)) { ?> checked="checked" <?php  } ?>>查看所有课程</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1009" data_id="00901" type="checkbox" name="qxarr"  value="1000902" style="float: none;" <?php  if(in_array(1000902,$qx)) { ?> checked="checked" <?php  } ?>>新增/编辑课程</label>
@@ -117,7 +117,7 @@
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd"  all_id="1009" data_id="00951" type="checkbox" name="qxarr"  value="1000959" style="float: none;" <?php  if(in_array(1000959,$qx)) { ?> checked="checked" <?php  } ?>>查看统计</label>
                         	<?php  } ?>
                         	<br/>
-                        	<?php  } ?>
+                        	
                         	<?php  if(($school['is_kb'] == 1)) { ?>
                         	<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">公立课表管理&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1010)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1010)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1010" data_id="01001" type="checkbox" name="qxarr"  value="1001001" style="float: none;" <?php  if(in_array(1001001,$qx)) { ?> checked="checked" <?php  } ?>>查看所有公立课表</label>

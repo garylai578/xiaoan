@@ -175,6 +175,7 @@
 					<select class="form-control tpl-category-parent we7-select" id="category_parent" ng-model="user.welcome_link" ng-change="httpChange('welcome_link')">
 						<option ng-selected ="user.welcome_link == {WELCOME_DISPLAY_TYPE} || user.welcome_link == ''" ng-value="{WELCOME_DISPLAY_TYPE}">用户欢迎页</option>
 						<option ng-selected ="user.welcome_link == {PLATFORM_DISPLAY_TYPE}" ng-value="{PLATFORM_DISPLAY_TYPE}">平台</option>
+						<option ng-selected ="user.welcome_link == {MODULE_DISPLAY_TYPE}" ng-value="{MODULE_DISPLAY_TYPE}">应用</option>
 					</select>
 				</td>
 				<td></td>

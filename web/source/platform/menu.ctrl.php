@@ -19,7 +19,9 @@ if($_W['isajax']) {
 	}
 }
 
+
 if($do == 'display') {
+	permission_check_account_user('platform_menu_conditional');
 	set_time_limit(0);
 
 	$type = !empty($_GPC['type']) ? intval($_GPC['type']) : MENU_CURRENTSELF;
@@ -84,6 +86,7 @@ if ($do == 'copy') {
 }
 
 if ($do == 'post') {
+	permission_check_account_user('platform_menu_default');
 	$type = intval($_GPC['type']);
 	$id = intval($_GPC['id']);
 	$copy = intval($_GPC['copy']);
@@ -204,7 +207,7 @@ if ($do == 'post') {
 		}
 
 		$is_conditional = $post['type'] == MENU_CONDITIONAL ? true : false;
-		$account_api = WeAccount::create();
+		$account_api = WeAccount::createByUniacid();
 		$menu = $account_api->menuBuild($post, $is_conditional);
 		if ($_GPC['submit_type'] == 'publish' || $is_conditional) {
 			$result = $account_api->menuCreate($menu);

@@ -24,6 +24,23 @@ $dos = array('subscribe', 'check_subscribe', 'check_upgrade', 'get_upgrade_info'
 $do = in_array($do, $dos) ? $do : 'installed';
 
 
+	if (user_is_vice_founder() && !empty($_GPC['system_welcome'])){
+		itoast('无权限操作！');
+	}
+	if ($do == 'set_site_welcome_module') {
+		if (!$_W['isfounder']) {
+			iajax(1, '非法操作');
+		}
+		if (!empty($_GPC['name'])) {
+			$site = WeUtility::createModuleSystemWelcome($_GPC['name']);
+			if (!method_exists($site, 'systemWelcomeDisplay')) {
+				iajax(1, '应用未实现系统首页功能！');
+			}
+		}
+		setting_save(trim($_GPC['name']), 'site_welcome_module');
+		iajax(0);
+	}
+
 
 if ($do == 'subscribe') {
 	$module_uninstall_total = module_uninstall_total($module_support);
@@ -105,9 +122,9 @@ if ($do == 'get_upgrade_info') {
 }
 
 if ($do == 'check_upgrade') {
-	cache_build_uninstalled_module();
-
 	$module_upgrade = module_upgrade_info();
+
+	cache_build_uninstalled_module();
 
 	iajax(0, $module_upgrade);
 }
@@ -133,6 +150,9 @@ if ($do == 'upgrade') {
 		if (!empty($_GPC['flag'])) {
 			define('ONLINE_MODULE', true);
 			$packet = cloud_m_build($module_name);
+			if (is_error($packet)) {
+				itoast($packet['message'], url('module/manage-system', array('support' => $module_support_name)), 'error');
+			}
 			$manifest = ext_module_manifest_parse($packet['manifest']);
 		}
 	}
@@ -174,8 +194,7 @@ if ($do == 'upgrade') {
 				if ($entry['title'] && $entry['do']) {
 										$not_delete_do[] = $entry['do'];
 					$not_delete_title[] = $entry['title'];
-
-					$module_binding = table('modules_bindings')->isEntryExists($module_name, $point_name, $entry['do']);
+					$module_binding = table('modules_bindings')->getByEntryDo($module_name, $point_name, $entry['do']);
 					if (!empty($module_binding)) {
 						pdo_update('modules_bindings', $entry, array('eid' => $module_binding['eid']));
 						continue;
@@ -183,8 +202,7 @@ if ($do == 'upgrade') {
 
 				} elseif ($entry['call']) {
 					$not_delete_call[] = $entry['call'];
-
-					$module_binding = table('modules_bindings')->isCallExists($module_name, $point_name, $entry['call']);
+					$module_binding = table('modules_bindings')->getByEntryCall($module_name, $point_name, $entry['call']);
 					if (!empty($module_binding)) {
 						pdo_update('modules_bindings', $entry, array('eid' => $module_binding['eid']));
 						continue;
@@ -235,7 +253,7 @@ if ($do == 'upgrade') {
 	cache_delete(cache_system_key('cloud_transtoken'));
 	cache_build_module_info($module_name);
 
-	itoast('模块更新成功！', url('module/manage-system', array('support' => $module_support_name)), 'success');
+	itoast(empty($_GPC['has_new_support']) ? '模块更新成功！' : '模块安装成功！', url('module/manage-system', array('support' => $module_support_name)), 'success');
 }
 
 if ($do =='install') {
@@ -243,16 +261,29 @@ if ($do =='install') {
 		itoast('您没有安装模块的权限', '', 'error');
 	}
 	$module_name = trim($_GPC['module_name']);
-	$module_info = module_fetch($module_name);
-	if (!empty($module_info)) {
-		itoast('模块已经安装或是唯一标识已存在！', '', 'error');
-	}
+	$installed_module = module_fetch($module_name);
 
 	$manifest = ext_module_manifest($module_name);
 	if (!empty($manifest)) {
 		$result = cloud_m_prepare($module_name);
 		if (is_error($result)) {
 			itoast($result['message'], referer(), 'error');
+		}
+		if (!empty($installed_module)) {
+			$new_support = module_check_notinstalled_support($installed_module, $manifest['platform']['supports']);
+			if (empty($new_support)) {
+				itoast('模块已经安装或是唯一标识已存在！', '', 'error');
+			} else {
+				foreach ($new_support as $support => $value) {
+					if ($value == MODULE_NONSUPPORT_ACCOUNT) {
+						unset($new_support[$support]);
+					}
+				}
+				pdo_update('modules', $new_support, array('mid' => $installed_module['mid']));
+				cache_build_account_modules($_W['uniacid'], $_W['uid']);
+				cache_build_module_info($module_name);
+				itoast('模块安装成功！', url('module/manage-system', array('support' => $module_support_name)), 'success');
+			}
 		}
 	} else {
 		$result = cloud_prepare();
@@ -261,20 +292,33 @@ if ($do =='install') {
 		}
 		$module_info = cloud_m_info($module_name);
 		if (!is_error($module_info)) {
+			$packet = cloud_m_build($module_name);
+			if (is_error($packet)) {
+				itoast($packet['message'], '', 'error');
+			}
+			$manifest = ext_module_manifest_parse($packet['manifest']);
+			if (empty($manifest)) {
+				itoast('模块安装配置文件不存在或是格式不正确，请刷新重试！', referer(), 'error');
+			}
+			if (!empty($installed_module)) {
+				$has_new_support = module_check_notinstalled_support($installed_module, $manifest['platform']['supports']);
+				if (empty($has_new_support)) {
+					itoast('模块已经安装或是唯一标识已存在！', '', 'error');
+				}
+			}
 			if (empty($_GPC['flag'])) {
-				header('location: ' . url('cloud/process', array('support' => $module_support_name, 'm' => $module_name)));
+				if (empty($has_new_support)) {
+					header('location: ' . url('cloud/process', array('support' => $module_support_name, 'm' => $module_name)));
+				} else {
+					header('location: ' . url('cloud/process', array('support' => $module_support_name, 'm' => $module_name, 'is_upgrade' => 1, 'has_new_support' => 1)));
+				}
 				exit;
 			} else {
 				define('ONLINE_MODULE', true);
-				$packet = cloud_m_build($module_name);
-				$manifest = ext_module_manifest_parse($packet['manifest']);
 			}
 		} else {
 			itoast($module_info['message'], '', 'error');
 		}
-	}
-	if (empty($manifest)) {
-		itoast('模块安装配置文件不存在或是格式不正确，请刷新重试！', referer(), 'error');
 	}
 
 	if (!empty($manifest['platform']['main_module'])) {
@@ -543,6 +587,18 @@ if ($do == 'recycle_post') {
 
 			if (!empty($module)) {
 		if (empty($module_recycle)) {
+			$modules_cloud = pdo_get('modules_cloud', array('name' => $name, 'install_status' => array(MODULE_CLOUD_UNINSTALL, MODULE_LOCAL_UNINSTALL)));
+			if (!empty($modules_cloud)) {
+				$support = '';
+				$support_name = array('account' => '公众号', 'wxapp' => '小程序', 'webapp' => 'PC', 'phoneapp' => 'APP', 'welcome' => '系统首页', 'xzapp' => '熊掌号', 'aliapp' => '支付宝小程序');
+				foreach ($support_name as $name => $value) {
+					if ($modules_cloud["{$name}_support"] == MODULE_SUPPORT_ACCOUNT) {
+						$support = $value;
+						break;
+					}
+				}
+				itoast("该应用有未安装的{$support}支持, 请先安装", referer(), 'error');
+			}
 			$msg = '模块已停用!';
 			table('modules_recycle')->fill(array('name' => $name, 'type' => 1))->save();
 
@@ -660,6 +716,34 @@ if ($do == 'not_installed') {
 	$pager = pagination($module_cloud_talbe->getLastQueryTotal(), $pageindex, $pagesize);
 
 	$module_uninstall_total = module_uninstall_total($module_support);
+
+	if ($modulelist) {
+		foreach ($modulelist as $name => $info) {
+			$modulelist[$name]['installed_support'] = array();
+			$module = module_fetch($name);
+			if (empty($module)) {
+				continue;
+			}
+			if ($module['account_support'] == MODULE_SUPPORT_ACCOUNT && $info['account_support'] == MODULE_NONSUPPORT_ACCOUNT) {
+				$modulelist[$name]['installed_support'][] = '公众号';
+			}
+			if ($module['wxapp_support'] == MODULE_SUPPORT_ACCOUNT && $info['wxapp_support'] == MODULE_NONSUPPORT_ACCOUNT) {
+				$modulelist[$name]['installed_support'][] = '微信小程序';
+			}
+			if ($module['webapp_support'] == MODULE_SUPPORT_ACCOUNT && $info['webapp_support'] == MODULE_NONSUPPORT_ACCOUNT) {
+				$modulelist[$name]['installed_support'][] = 'PC';
+			}
+			if ($module['phoneapp_support'] == MODULE_SUPPORT_ACCOUNT && $info['phoneapp_support'] == MODULE_NONSUPPORT_ACCOUNT) {
+				$modulelist[$name]['installed_support'][] = 'APP';
+			}
+			if ($module['xzapp_support'] == MODULE_SUPPORT_ACCOUNT && $info['xzapp_support'] == MODULE_NONSUPPORT_ACCOUNT) {
+				$modulelist[$name]['installed_support'][] = '熊账号';
+			}
+			if ($module['aliapp_support'] == MODULE_SUPPORT_ACCOUNT && $info['aliapp_support'] == MODULE_NONSUPPORT_ACCOUNT) {
+				$modulelist[$name]['installed_support'][] = '支付宝小程序';
+			}
+		}
+	}
 }
 
 template('module/manage-system');

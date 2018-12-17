@@ -52,7 +52,7 @@ class CoreModuleReceiver extends WeModuleReceiver {
 			} else {
 				$scene_condition = " `scene_str` = '{$sceneid}'";
 			}
-			$row = pdo_fetch("SELECT `id`, `keyword`, `name`, `acid` FROM " . tablename('qrcode') . " WHERE `uniacid` = '{$uniacid}' AND {$scene_condition}");
+			$row = pdo_fetch("SELECT `id`, `keyword`, `name`, `acid` FROM " . tablename('qrcode') . " WHERE `uniacid` = '{$uniacid}' AND {$scene_condition} AND `type` = 'scene'");
 			$insert = array(
 				'uniacid' => $_W['uniacid'],
 				'acid' => $row['acid'],
@@ -86,7 +86,7 @@ class CoreModuleReceiver extends WeModuleReceiver {
 			}
 		}
 		if ($this->message['event'] == 'subscribe' && !empty($_W['account']) && ($_W['account']['level'] == ACCOUNT_SERVICE_VERIFY || $_W['account']['level'] == ACCOUNT_SUBSCRIPTION_VERIFY)) {
-			$account_obj = WeAccount::create();
+			$account_obj = WeAccount::createByUniacid();
 			$userinfo = $account_obj->fansQueryInfo($this->message['from']);
 			if(!is_error($userinfo) && !empty($userinfo) && !empty($userinfo['subscribe'])) {
 				$userinfo['nickname'] = stripcslashes($userinfo['nickname']);

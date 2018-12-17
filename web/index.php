@@ -1,6 +1,6 @@
 <?php
 /**
- * [WeEngine System] Copyright (c) 20180906163627 WE7.CC
+ * [WeEngine System] Copyright (c) 20181025112647 WE7.CC
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
 define('IN_SYS', true);
@@ -40,8 +40,8 @@ if (($_W['setting']['copyright']['status'] == 1) && empty($_W['isfounder']) && $
 	}
 	isetcookie('__session', '', - 10000);
 	
-		message('站点已关闭，关闭原因：' . $_W['setting']['copyright']['reason'], url('user/login'), 'info');
 	
+		message('站点已关闭，关闭原因：' . $_W['setting']['copyright']['reason'], url('account/welcome'), 'info');
 	
 }
 
@@ -167,7 +167,13 @@ function _calc_current_frames(&$frames) {
 					$get['do'] = $do;
 				}
 				$diff = array_diff_assoc($urls, $get);
-				if (empty($diff) || $get['c'] == 'profile' && $get['a'] == 'reply-setting' && $key == 'platform_reply') {
+				if (empty($diff) ||
+					$key == 'platform_site' && in_array($get['a'], array('style', 'article', 'category')) ||
+					$key == 'mc_member' && in_array($get['a'], array('editor', 'group', 'fields')) ||
+					$key == 'profile_setting' && in_array($get['a'], array('passport', 'tplnotice', 'notify', 'common')) ||
+					$key == 'profile_payment' && in_array($get['a'], array('refund')) ||
+					$key == 'statistics_visit' && in_array($get['a'], array('site', 'setting')) ||
+					$key == 'wxapp_payment' && in_array($get['a'], array('refund'))) {
 					$menu['active'] = ' active';
 				}
 			}

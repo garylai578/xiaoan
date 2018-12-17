@@ -5,6 +5,7 @@
  */
 defined('IN_IA') or exit('Access Denied');
 
+load()->model('permission');
 load()->model('module');
 load()->func('communication');
 load()->classs('wxapp.platform');
@@ -21,7 +22,7 @@ if ($do == 'design_method') {
 	if ($choose) {
 		template('wxapp/design-method');
 	} else {
-		if($account_info['wxapp_limit'] <= 0 && !$_W['isfounder']) {
+		if (!permission_user_account_creatable($_W['uid'], WXAPP_TYPE_SIGN)) {
 			$authurl = "javascript:alert('创建小程序已达上限！');";
 		}
 		if (empty($authurl) && !empty($_W['setting']['platform']['authstate'])) {
@@ -29,14 +30,16 @@ if ($do == 'design_method') {
 			$authurl = $account_platform->getAuthLoginUrl();
 		}
 		template('wxapp/choose-type');
-
 	}
-
 }
 if ($do == 'post') {
 	$uniacid = intval($_GPC['uniacid']);
 	$design_method = intval($_GPC['design_method']);
 	$create_type = intval($_GPC['create_type']);
+
+	if (empty($unicid) && !permission_user_account_creatable($_W['uid'], WXAPP_TYPE_SIGN)) {
+		itoast('创建的小程序已达上限！', '', '');
+	}
 
 	$version_id  = intval($_GPC['version_id']);
 	$isedit  =  $version_id > 0 ? 1 : 0;
@@ -51,10 +54,6 @@ if ($do == 'post') {
 	}
 
 	if (checksubmit('submit')) {
-
-		if ($account_info['wxapp_limit'] <= 0 && empty($uniacid) && !$_W['isfounder']) {
-			iajax(-1, '创建的小程序已达上限！');
-		}
 		if ($design_method == WXAPP_TEMPLATE && empty($_GPC['choose']['modules'])) {
 			iajax(2, '请选择要打包的模块应用', url('wxapp/post'));
 		}
@@ -77,6 +76,12 @@ if ($do == 'post') {
 				'qrcode' => file_is_image( $_GPC['qrcode']) ?  $_GPC['qrcode'] : '',
 			);
 			$uniacid = miniapp_create($account_wxapp_data, ACCOUNT_TYPE_APP_NORMAL);
+
+			$unisettings['creditnames'] = array('credit1' => array('title' => '积分', 'enabled' => 1), 'credit2' => array('title' => '余额', 'enabled' => 1));
+			$unisettings['creditnames'] = iserializer($unisettings['creditnames']);
+			$unisettings['uniacid'] = $uniacid;
+			pdo_insert('uni_settings', array('uniacid' => $uniacid));
+
 			if (is_error($uniacid)) {
 				iajax(3, '添加小程序信息失败', url('wxapp/post'));
 			}

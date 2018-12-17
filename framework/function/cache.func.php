@@ -231,6 +231,12 @@ function cache_key_all() {
 		),
 
 		'caches' => array(
+
+			'test' => array(
+								'key' => 'test:%name:%sex:%age',
+				'group' => '',
+			),
+
 			'module_info' => array(
 								'key' => 'module_info:%module_name',
 				'group' => 'module',
@@ -262,7 +268,7 @@ function cache_key_all() {
 			),
 
 			'unimodules' => array(
-								'key' => 'unimodules:%uniacid:%enabled',
+								'key' => 'unimodules:%uniacid',
 				'group' => '',
 			),
 
@@ -375,6 +381,11 @@ function cache_key_all() {
 
 			'accesstoken_key' => array(
 				'key' => 'accesstoken_key:%key',
+				'group' => '',
+			),
+
+			'account_oauth_refreshtoken' => array(
+				'key' => 'account_oauth_refreshtoken:%acid',
 				'group' => '',
 			),
 
@@ -535,6 +546,10 @@ function cache_key_all() {
 
 			'module_receive_enable' => array(
 				'key' => 'module_receive_enable',
+				'group' => '',
+			),
+			'module_entry_call' => array(
+				'key' => 'module_entry_call:%module_name',
 				'group' => '',
 			),
 		),

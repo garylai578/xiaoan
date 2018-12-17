@@ -3,6 +3,8 @@
 <div class="welcome-container js-system-welcome" ng-controller="WelcomeCtrl" ng-cloak>
 	<div ng-if="ads" class="ad-img we7-margin-bottom">
 		
+		<div ng-click="close_ads()" class="close">关闭</div>
+		
 		<div id="welcome-ad" class="carousel slide" data-ride="carousel">
 			<!-- Wrapper for slides -->
 			<div class="carousel-inner" role="listbox">
@@ -138,7 +140,7 @@
 		</div>
 		<div class="panel-body welcome-apple-list">
 			<div class="apply-item" ng-repeat="module in upgrade_modules" ng-if="!module.is_ignore && $index+1 <= 8">
-				<a href="{{module.link}}" target="_blank"><img src="{{module.logo}}" class="apply-img"/></a>
+				<a href="{{module.link}}" target="_blank"><img ng-src="{{module.logo}}" class="apply-img"/></a>
 				<a href="{{module.link}}" target="_blank"><span class="text-over">{{module.title|limitTo:4}}</span></a>
 				<a href="{{module.link}}" target="_blank" class="color-red" ng-if="module.has_new_version == 1">升级</a>
 				<a href="{{module.link}}" target="_blank" class="color-red" ng-if="module.has_new_branch == 1">新分支</a>
@@ -160,7 +162,7 @@
 		</div>
 		<div class="panel-body">
 			<a href="{{module.link}}" target="_blank" class="apply-item" ng-repeat="module in not_installed_module" ng-if="$index+1 <= 8">
-				<img src="{{module.logo}}" class="apply-img"/>
+				<img ng-src="{{module.logo}}" class="apply-img"/>
 				<span class="text-over">{{module.title|limitTo:4}}</span>
 				<span class="color-red">未安装</span>
 			</a>

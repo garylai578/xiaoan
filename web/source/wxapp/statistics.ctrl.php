@@ -10,6 +10,8 @@ load()->model('statistics');
 $dos = array('display', 'get_visit_api');
 $do = in_array($do, $dos) ? $do : 'display';
 
+permission_check_account_user('statistics_visit_wxapp');
+
 if ($do == 'display') {
 		miniapp_update_daily_visittrend();
 	$yesterday = date('Ymd', strtotime('-1 days'));

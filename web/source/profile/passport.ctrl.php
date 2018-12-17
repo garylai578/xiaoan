@@ -14,22 +14,26 @@ load()->model('user');
 
 if ($do == 'save_oauth') {
 	$type = $_GPC['type'];
-	$account = trim($_GPC['account']);
+	$account = intval($_GPC['account']);
 	if ($type == 'oauth') {
 		$host = safe_gpc_url(rtrim($_GPC['host'],'/'), false);
 
 		if (!empty($_GPC['host']) && empty($host)) {
 			iajax(-1, '域名不合法');
 		}
-		$data = array(
-			'host' => $host,
-			'account' => $account,
-		);
-		pdo_update('uni_settings', array('oauth' => iserializer($data)), array('uniacid' => $_W['uniacid']));
+		if (empty($host) && empty($account)) {
+			uni_setting_save('oauth', '');
+		} else {
+			$data = array(
+				'host' => $host,
+				'account' => $account,
+			);
+			uni_setting_save('oauth', iserializer($data));
+		}
 		cache_delete(cache_system_key('unisetting', array('uniacid' => $_W['uniacid'])));
 	}
 	if ($type == 'jsoauth') {
-		pdo_update('uni_settings', array('jsauth_acid' => $account), array('uniacid' => $_W['uniacid']));
+		uni_setting_save('jsauth_acid', $account);
 		cache_delete(cache_system_key('unisetting', array('uniacid' => $_W['uniacid'])));
 	}
 	iajax(0, '');
@@ -37,7 +41,8 @@ if ($do == 'save_oauth') {
 
 if ($do == 'oauth') {
 	$oauthInfo = table('unisetting')->getOauthByUniacid($_W['uniacid']);
-	$oauth = iunserializer($oauthInfo['oauth']) ? iunserializer($oauthInfo['oauth']) : array();
+	$oauth = !empty($oauthInfo['oauth']) ? iunserializer($oauthInfo['oauth']) : array();
+
 	$jsoauth = $oauthInfo['jsauth_acid'];
 
 	$user_have_accounts = user_borrow_oauth_account_list();

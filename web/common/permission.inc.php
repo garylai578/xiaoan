@@ -177,17 +177,20 @@ $we7_file_permission = array(
 		'manager' => array(
 			'cover',
 			'reply',
-			'material'
+			'material',
+			'material-post'
 		),
 		'operator' => array(
 			'cover',
 			'reply',
-			'material'
+			'material',
+			'material-post'
 		),
 		'clerk' => array(
 			'reply',
 			'cover',
-			'material'
+			'material',
+			'material-post'
 		),
 		'unbind_user' => array(),
 	),
@@ -271,24 +274,18 @@ $we7_file_permission = array(
 		'vice_founder' => array(
 			'template',
 			'updatecache',
-			'workorder',
 		),
 		'owner' => array(
 			'updatecache',
-			'workorder',
 		),
 		'manager' => array(
 			'updatecache',
-			'workorder',
 		),
 		'operator' => array(
 			'account',
 			'updatecache',
-			'workorder',
 		),
-		'clerk' => array(
-			'workorder',
-		),
+		'clerk' => array(),
 		'unbind_user' => array(),
 		'expired' => array(
 			'updatecache',
@@ -338,6 +335,8 @@ $we7_file_permission = array(
 		),
 		'clerk' => array(
 			'display',
+			'version',
+			'post',
 		),
 		'unbind_user' => array(),
 	),

@@ -28,23 +28,27 @@
 		<div class="panel-body we7-padding-vertical create">
 			<div class="col-sm-3 text-center create-item">
 				<div class="create-item__head">可创建公众号</div>
-				<div class="num">{{account_num.maxaccount}}</div>
-				<div class="has">已创建  {{account_num.uniacid_num}} | <a href="{php echo url('account/post-step')}" class="color-default">去创建 ></a></div>
+				<div class="num" ng-if="account_num.maxaccount >= 0">{{account_num.maxaccount}}</div>
+				<div class="num" ng-if="account_num.maxaccount < 0">0</div>
+				<div class="has">已创建  {{account_num.uniacid_num}}  <a href="{php echo url('account/post-step')}" ng-if="account_num.maxaccount > 0" class="color-default">| 去创建 ></a></div>
 			</div>
 			<div class="col-sm-3 text-center create-item">
 				<div class="create-item__head">可创建小程序</div>
-				<div class="num">{{account_num.maxwxapp}}</div>
-				<div class="has">已创建  {{account_num.wxapp_num}} | <a href="{php echo url('wxapp/post/design_method')}" class="color-default">去创建 ></a></div>
+				<div class="num" ng-if="account_num.maxwxapp >= 0">{{account_num.maxwxapp}}</div>
+				<div class="num" ng-if="account_num.maxwxapp < 0">0</div>
+				<div class="has">已创建  {{account_num.wxapp_num}}  <a href="{php echo url('wxapp/post/design_method')}" ng-if="account_num.maxwxapp > 0" class="color-default">| 去创建 ></a></div>
 			</div>
 			<div class="col-sm-3 text-center create-item">
 				<div class="create-item__head">可创建PC</div>
-				<div class="num">{{account_num.maxwebapp}}</div>
-				<div class="has">已创建  {{account_num.webapp_num}} | <a href="{php echo url('webapp/manage/create_display')}" class="color-default">去创建 ></a></div>
+				<div class="num" ng-if="account_num.maxwebapp >= 0"> {{account_num.maxwebapp}}</div>
+				<div class="num" ng-if="account_num.maxwebapp < 0">0</div>
+				<div class="has">已创建  {{account_num.webapp_num}} <a href="{php echo url('webapp/manage/create_display')}" ng-if="account_num.maxwebapp > 0" class="color-default">| 去创建 ></a></div>
 			</div>
 			<div class="col-sm-3 text-center create-item">
 				<div class="create-item__head">可创建APP</div>
-				<div class="num">{{account_num.maxphoneapp}}</div>
-				<div class="has">已创建  {{account_num.phoneapp_num}} | <a href="{php echo url('phoneapp/manage/create_display')}" class="color-default">去创建 ></a></div>
+				<div class="num" ng-if="account_num.maxphoneapp >= 0"> {{account_num.maxphoneapp}}</div>
+				<div class="num" ng-if="account_num.maxphoneapp < 0"> 0</div>
+				<div class="has">已创建  {{account_num.phoneapp_num}} <a href="{php echo url('phoneapp/manage/create_display')}"  ng-if="account_num.maxphoneapp > 0" class="color-default">| 去创建 ></a></div>
 			</div>
 		</div>
 	</div>

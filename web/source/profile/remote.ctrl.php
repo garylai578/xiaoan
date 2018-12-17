@@ -3,6 +3,7 @@
  * [WeEngine System] Copyright (c) 2014 WE7.CC
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
+defined('IN_IA') or exit('Access Denied');
 load()->func('communication');
 load()->model('attachment');
 load()->model('miniapp');
@@ -10,6 +11,8 @@ load()->model('miniapp');
 $dos = array('display', 'save', 'test_setting', 'upload_remote');
 $do = in_array($do, $dos) ? $do : 'display';
 $_W['page']['title'] = '远程附件 - 公众号选项';
+
+permission_check_account_user('profile_setting_remote');
 
 if (!empty($_GPC['version_id'])) {
 	$version_id = intval($_GPC['version_id']);

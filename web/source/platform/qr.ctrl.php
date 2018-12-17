@@ -11,7 +11,7 @@ load()->func('communication');
 load()->model('setting');
 
 $dos = array('display', 'post', 'list', 'del', 'extend', 'SubDisplay', 'check_scene_str', 'down_qr', 'change_status');
-$do = !empty($_GPC['do']) && in_array($do, $dos) ? $do : 'list';
+$do = in_array($do, $dos) ? $do : 'list';
 
 if ($do == 'check_scene_str') {
 	$scene_str = trim($_GPC['scene_str']);
@@ -24,6 +24,7 @@ if ($do == 'check_scene_str') {
 
 if ($do == 'list') {
 	$_W['page']['title'] = '二维码管理 - 高级功能';
+	permission_check_account_user('platform_qr_qr');
 	$wheresql = " WHERE uniacid = :uniacid AND acid = :acid AND type = 'scene'";
 	$param = array(':uniacid' => $_W['uniacid'], ':acid' => $_W['acid']);
 	$keyword = trim($_GPC['keyword']);
@@ -88,7 +89,7 @@ if ($do == 'post') {
 		);
 		$qrctype = intval($_GPC['qrc-model']);
 		$acid = intval($_W['acid']);
-		$uniacccount = WeAccount::create($acid);
+		$uniacccount = WeAccount::createByUniacid();
 		$id = intval($_GPC['id']);
 		$keyword_id = intval(trim(htmlspecialchars_decode($_GPC['reply']['reply_keyword']), "\""));;
 		$keyword = pdo_get('rule_keyword', array('id' => $keyword_id), array('content'));
@@ -159,7 +160,7 @@ if ($do == 'extend') {
 		$qrcrow = pdo_fetch("SELECT * FROM ".tablename('qrcode')." WHERE uniacid = :uniacid AND id = :id LIMIT 1", array(':uniacid' => $_W['uniacid'], ':id' => $id));
 		$update = array();
 		if ($qrcrow['model'] == 1) {
-			$uniacccount = WeAccount::create($qrcrow['acid']);
+			$uniacccount = WeAccount::createByUniacid();
 			$barcode['action_info']['scene']['scene_id'] = $qrcrow['qrcid'];
 			$barcode['expire_seconds'] = 2592000;
 			$barcode['action_name'] = 'QR_SCENE';
@@ -184,6 +185,7 @@ if ($do == 'display' || $do == 'change_status') {
 
 if ($do == 'display') {
 	$_W['page']['title'] = '扫描统计 - 二维码管理 - 高级功能';
+	permission_check_account_user('platform_qr_statistics');
 	$pindex = max(1, intval($_GPC['page']));
 	$psize = 30;
 	$qrcode_table = table('qrcode');

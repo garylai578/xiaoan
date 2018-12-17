@@ -56,9 +56,9 @@ if ($do == 'bind_oauth') {
 	}
 
 	if ($_W['ispost']) {
-		$member['username'] = trim($_GPC['username']);
-		$member['password'] = trim($_GPC['password']);
-		$member['repassword'] = trim($_GPC['repassword']);
+		$member['username'] = safe_gpc_string($_GPC['username']);
+		$member['password'] = safe_gpc_string($_GPC['password']);
+		$member['repassword'] = safe_gpc_string($_GPC['repassword']);
 		$member['is_bind'] = 1;
 
 		if (empty($member['username']) || empty($member['password']) || empty($member['repassword'])) {

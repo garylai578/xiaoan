@@ -21,7 +21,13 @@
 				</script>
 			</div>
 			<?php  } else { ?>
-				<p><a href="javascript:history.go(-1);" class="btn btn-primary">点击这里返回上一页</a> &nbsp; <a href="./?refresh" class="btn btn-primary">首页</a></p>
+				<p>
+					<a href="javascript:history.go(-1);" class="btn btn-primary">点击这里返回上一页</a>
+					<a href="./?c=account&a=display" class="btn btn-primary">首页</a>
+					<?php  if(is_array($extend)) { foreach($extend as $button) { ?>
+						<a href="<?php  echo $button['url'];?>" class="<?php  echo $button['class'];?>"><?php  echo $button['title'];?></a>
+					<?php  } } ?>
+				</p>
 			<?php  } ?>		
 		</div>
 	<?php (!empty($this) && $this instanceof WeModuleSite || 0) ? (include $this->template('common/footer', TEMPLATE_INCLUDEPATH)) : (include template('common/footer', TEMPLATE_INCLUDEPATH));?>

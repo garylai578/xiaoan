@@ -61,12 +61,13 @@ if($do == 'base') {
 					'qrcodeimgsrc' => ATTACHMENT_ROOT . 'qrcode_' . $acid . '.jpg',
 					'headimgsrc' => ATTACHMENT_ROOT . 'headimg_' . $acid . '.jpg'
 				);
-				$imgsrc = $_GPC['imgsrc'];
-				if(!file_is_image($imgsrc)){
+				$imgsrc = safe_gpc_path($_GPC['imgsrc']);
+				if(file_is_image($imgsrc)){
+					$result = utility_image_rename($imgsrc, $image_type[$type]);
+				} else {
 					$result = '';
 				}
-				$result = utility_image_rename($imgsrc, $image_type[$type]);
-				break;
+			break;
 			case 'name':
 				$uni_account = pdo_update('uni_account', array('name' => trim($_GPC['request_data'])), array('uniacid' => $uniacid));
 				$account_wechats = pdo_update(uni_account_tablename(ACCOUNT_TYPE), array('name' => trim($_GPC['request_data'])), array('acid' => $acid, 'uniacid' => $uniacid));
@@ -99,11 +100,13 @@ if($do == 'base') {
 				$data = array('encodingaeskey' => trim($_GPC['request_data']));
 				break;
 			case 'jointype':
-				$original_type = pdo_get('account', array('uniacid' => $uniacid), 'type');
-				if ($original_type['type'] == ACCOUNT_NORMAL_LOGIN) {
+				if (in_array($account['type'], array(ACCOUNT_TYPE_OFFCIAL_NORMAL, ACCOUNT_TYPE_APP_NORMAL))) {
 					$result = true;
 				} else {
-					$update_type = pdo_update('account', array('type' => ACCOUNT_NORMAL_LOGIN), array('uniacid' => $uniacid));
+					$change_type = array(
+						'type' => $account->typeSign == 'account' ? ACCOUNT_TYPE_OFFCIAL_NORMAL : ACCOUNT_TYPE_APP_NORMAL
+					);
+					$update_type = pdo_update('account', $change_type, array('uniacid' => $uniacid));
 					$result = $update_type ? true : false;
 				}
 				break;
@@ -183,13 +186,6 @@ if($do == 'base') {
 			);
 		}
 	}
-
-	$table_name = in_array(ACCOUNT_TYPE, array(ACCOUNT_TYPE_OFFCIAL_NORMAL, ACCOUNT_TYPE_OFFCIAL_AUTH)) ? 'account_wechats' : 'account_' . TYPE_SIGN;
-	if (in_array(ACCOUNT_TYPE, array(ACCOUNT_TYPE_OFFCIAL_NORMAL, ACCOUNT_TYPE_OFFCIAL_AUTH, ACCOUNT_TYPE_APP_NORMAL, ACCOUNT_TYPE_APP_AUTH, ACCOUNT_TYPE_XZAPP_NORMAL))) {
-		$account_other_info = pdo_get($table_name, array('uniacid' => $uniacid, 'acid' => $acid), array('key', 'secret', 'token', 'encodingaeskey'));
-	}
-	$account_other_info = (array)$account_other_info;
-	$account = array_merge($account, $account_other_info);
 	$account['start'] = date('Y-m-d', $account['starttime']);
 	$account['end'] = $account['endtime'] == 0 ? '永久' : date('Y-m-d', $account['endtime']);
 	$account['endtype'] = $account['endtime'] == 0 ? 1 : 2;
@@ -236,6 +232,7 @@ if($do == 'sms') {
 		$notify = iserializer($notify);
 		$updatedata['notify'] = $notify;
 		$result = pdo_update('uni_settings', $updatedata , array('uniacid' => $uniacid));
+		cache_delete(cache_system_key('uniaccount', array('uniacid' => $uniacid)));
 		if($result){
 			iajax(0, array('count' => $count_num, 'num' => $num), '');
 		}else {
@@ -265,7 +262,7 @@ if($do == 'sms') {
 }
 
 if($do == 'modules_tpl') {
-	$owner = account_owner($uniacid);
+	$owner = $account->owner;
 	if($_W['isajax'] && $_W['ispost'] && ($role_permission)) {
 		if($_GPC['type'] == 'group') {
 			$groups = $_GPC['groupdata'];
@@ -383,6 +380,7 @@ if($do == 'modules_tpl') {
 				}else {
 					$defaultmodule = current(uni_groups(array($package_value)));
 					$defaultmodule['type'] = 'default';
+					$defaultmodule['modules'] = $account->typeSign == 'account' ? $defaultmodule['modules'] : $defaultmodule[$account->typeSign];
 					$modules_tpl[] = $defaultmodule;
 				}
 			}
@@ -438,6 +436,5 @@ if($do == 'modules_tpl') {
 		$extend['templates'] = pdo_getall('site_templates', array('id' => $extend['templates']), array('id', 'name', 'title'));
 	}
 	
-
-	template('account/manage-modules-tpl' . ACCOUNT_TYPE_TEMPLATE);
+	template('account/manage-modules-tpl');
 }

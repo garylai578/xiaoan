@@ -7,7 +7,11 @@ defined('IN_IA') or exit('Access Denied');
 
 
 class WeixinAccount extends WeAccount {
-	public $tablename = 'account_wechats';
+	protected $tablename = 'account_wechats';
+	protected $menuFrame = 'account';
+	protected $type = ACCOUNT_TYPE_OFFCIAL_NORMAL;
+	protected $typeName = '公众号';
+	protected $typeSign = ACCOUNT_TYPE_SIGN;
 	
 	public $types = array(
 		'view', 'click', 'scancode_push',
@@ -15,20 +19,8 @@ class WeixinAccount extends WeAccount {
 		'pic_weixin', 'location_select', 'media_id', 'view_limited'
 	);
 
-	public function __construct($account = array()) {
-		$this->menuFrame = 'account';
-		$this->type = ACCOUNT_TYPE_OFFCIAL_NORMAL;
-		$this->typeName = '公众号';
-		$this->typeSign = ACCOUNT_TYPE_SIGN;
-	}
-
-	public function accountDisplayUrl() {
-		return url('account/display');
-	}
-
-	public function fetchAccountInfo() {
-		$account_table = table('account');
-		$account = $account_table->getWechatappAccount($this->uniaccount['acid']);
+	protected function getAccountInfo($acid) {
+		$account = table('account')->getWechatappAccount($acid);
 		$account['encrypt_key'] = $account['key'];
 		return $account;
 	}
@@ -50,7 +42,7 @@ class WeixinAccount extends WeAccount {
 	}
 
 	public function checkIntoManage() {
-		if (empty($this->uniaccount) || (!empty($this->uniaccount['account']) && !in_array($this->uniaccount['type'], array(ACCOUNT_TYPE_OFFCIAL_NORMAL, ACCOUNT_TYPE_OFFCIAL_AUTH)) && !defined('IN_MODULE'))) {
+		if (empty($this->account) || (!empty($this->account['account']) && !in_array($this->account['type'], array(ACCOUNT_TYPE_OFFCIAL_NORMAL, ACCOUNT_TYPE_OFFCIAL_AUTH)) && !defined('IN_MODULE'))) {
 			return false;
 		}
 		return true;
@@ -1158,13 +1150,10 @@ class WeixinAccount extends WeAccount {
 			return $token;
 		}
 		
-
+		$data = array();
 		if (!empty($miniprogram['appid']) && !empty($miniprogram['pagepath'])) {
-			$url = 'http://weixin.qq.com/download';
 			$data['miniprogram'] = $miniprogram;
 		}
-
-		$data = array();
 		$data['touser'] = $touser;
 		$data['template_id'] = trim($template_id);
 		$data['url'] = trim($url);
@@ -1645,6 +1634,97 @@ class WeixinAccount extends WeAccount {
 			}
 		}
 		return $result;
+	}
+
+	
+	public function getComment($msg_data_id, $index, $type = 0, $begin = 0, $count = 50) {
+		$token = $this->getAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/comment/list?access_token={$token}";
+		$data = array(
+			'msg_data_id' => $msg_data_id,
+			'index' => $index,
+			'begin' => $begin,
+			'count' => $count,
+			'type' => $type,
+		);
+		$response = $this->requestApi($url, json_encode($data));
+		return $response;
+	}
+
+	
+	public function commentReply($msg_data_id,  $user_comment_id, $content, $index = 0) {
+		$token = $this->getAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/comment/reply/add?access_token={$token}";
+		$data = array(
+			'msg_data_id' => $msg_data_id,
+			'user_comment_id' => $user_comment_id,
+			'content' => $content,
+			'index' => $index,
+		);
+		$response = $this->requestApi($url, stripslashes(ijson_encode($data, JSON_UNESCAPED_UNICODE)));
+		return $response;
+	}
+
+	
+	public function commentMark($msg_data_id, $user_comment_id, $comment_type, $index = 0) {
+		$token = $this->getAccessToken();
+		if ($comment_type != 1) {
+			$url = "https://api.weixin.qq.com/cgi-bin/comment/markelect?access_token={$token}";
+		} else {
+			$url = "https://api.weixin.qq.com/cgi-bin/comment/unmarkelect?access_token={$token}";
+		}
+
+		$data = array(
+			'msg_data_id' => $msg_data_id,
+			'user_comment_id' => $user_comment_id,
+			'index' => $index,
+		);
+		$response = $this->requestApi($url, json_encode($data));
+		return $response;
+	}
+
+	
+	public function commentDelete($msg_data_id, $user_comment_id, $index = 0) {
+		$token = $this->getAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/comment/delete?access_token={$token}";
+
+		$data = array(
+			'msg_data_id' => $msg_data_id,
+			'user_comment_id' => $user_comment_id,
+			'index' => $index,
+		);
+		$response = $this->requestApi($url, json_encode($data));
+		return $response;
+	}
+
+	
+	public function commentReplyDelete($msg_data_id, $user_comment_id, $index = 0) {
+		$token = $this->getAccessToken();
+		$url = "https://api.weixin.qq.com/cgi-bin/comment/reply/delete?access_token={$token}";
+		$data = array(
+			'msg_data_id' => $msg_data_id,
+			'user_comment_id' => $user_comment_id,
+			'index' => $index,
+		);
+		$response = $this->requestApi($url, json_encode($data));
+		return $response;
+	}
+
+	
+	public function commentSwitch($msg_data_id, $need_open_comment, $index = 0) {
+		$token = $this->getAccessToken();
+		if ($need_open_comment == 1) {
+			$url = "https://api.weixin.qq.com/cgi-bin/comment/close?access_token={$token}";
+		} else {
+			$url = "https://api.weixin.qq.com/cgi-bin/comment/open?access_token={$token}";
+		}
+
+		$data = array(
+			'msg_data_id' => $msg_data_id,
+			'index' => $index,
+		);
+		$response = $this->requestApi($url, json_encode($data));
+		return $response;
 	}
 
 	protected function requestApi($url, $post = '') {

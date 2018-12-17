@@ -15,12 +15,6 @@
 			<a href="<?php  echo url('account/post', array('uniacid' => $_W['account']['uniacid'], 'acid' => $_W['acid']))?>">立即接入</a>
 		</span>
 		<?php  } ?>
-		<span class="pull-right"><a href="<?php  echo url('account/display', array('type' => 'all'))?>" class="color-default we7-margin-left"><i class="wi wi-cut color-default"></i>切换平台</a></span>
-	<?php  if(permission_account_user_role($_W['uid'], $_W['uniacid']) != ACCOUNT_MANAGE_NAME_OPERATOR) { ?>
-		<span class="pull-right"><a href="<?php  echo url('account/post', array('uniacid' => $_W['account']['uniacid'], 'acid' => $_W['acid'], 'account_type' => $_W['account']['type']))?>"><i class="wi wi-appsetting"></i>公众号设置</a></span>
-	<?php  } ?>
-	<span class="pull-right"><a href="<?php  echo url('utility/emulator');?>" target="_blank"><i class="wi wi-iphone"></i>模拟测试</a></span>
-
 <?php  } else if($_W['account']['type'] == ACCOUNT_TYPE_XZAPP_NORMAL || $_W['account']['type'] == ACCOUNT_TYPE_XZAPP_AUTH) { ?>
 	<?php  if($_W['account']['level'] == 1) { ?>
 		<span class="label label-primary">个人</span>
@@ -40,17 +34,18 @@
 			<a href="<?php  echo url('account/post', array('uniacid' => $_W['account']['uniacid'], 'acid' => $_W['acid'], 'account_type' => ACCOUNT_TYPE_XZAPP_NORMAL))?>">立即接入</a>
 		</span>
 	<?php  } ?>
+<?php  } ?>
 
-	<span class="pull-right">
-		<a href="<?php  echo url('account/display', array('type' => 'all'))?>" class="color-default we7-margin-left">
-			<i class="wi wi-cut color-default"></i>切换平台
-		</a>
-	</span>
-
-	<?php  if(permission_account_user_role($_W['uid'], $_W['uniacid']) != ACCOUNT_MANAGE_NAME_OPERATOR) { ?>
-		<span class="pull-right"><a href="<?php  echo url('account/post', array('uniacid' => $_W['account']['uniacid'], 'acid' => $_W['acid'], 'account_type' => ACCOUNT_TYPE_XZAPP_NORMAL))?>">
-				<i class="wi wi-appsetting"></i>熊掌号设置</a>
-		</span>
-	<?php  } ?>
-
+<span class="pull-right">
+	<a href="<?php  echo url('account/display', array('type' => 'all'))?>" class="color-default we7-margin-left">
+		<i class="wi wi-cut color-default"></i>切换平台
+	</a>
+</span>
+<?php  if($_W['role'] != ACCOUNT_MANAGE_NAME_OPERATOR) { ?>
+<span class="pull-right"><a href="<?php  echo url('account/post', array('uniacid' => $_W['account']['uniacid'], 'acid' => $_W['acid'], 'account_type' => $_W['account']->type))?>">
+	<i class="wi wi-appsetting"></i><?php  echo $_W['account']->typeName?>设置</a>
+</span>
+<?php  } ?>
+<?php  if($_W['account']['type'] == ACCOUNT_TYPE_OFFCIAL_NORMAL || $_W['account']['type'] == ACCOUNT_TYPE_OFFCIAL_AUTH) { ?>
+<span class="pull-right"><a href="<?php  echo url('utility/emulator');?>" target="_blank"><i class="wi wi-iphone"></i>模拟测试</a></span>
 <?php  } ?>

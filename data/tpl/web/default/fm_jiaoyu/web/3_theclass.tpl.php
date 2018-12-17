@@ -63,7 +63,14 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 						</div>
 						<div class="col-sm-2 col-lg-2" style="width: 45px;margin-left: -31px;">	
 							<span class="btn btn-default"><i class="fa fa-search"></i></span>
-						</div>						
+						</div>
+						<div class="col-sm-2 col-lg-2">
+							<select style="margin-right:15px;" name="is_temple" class="form-control">
+								<option value="0">班级类型</option>
+								<option value="1" <?php  if($theclass['is_temple'] == 1) { ?> selected="selected"<?php  } ?>>临时托管班</option>
+							</select>
+							幼儿园选填
+						</div>
 						<div class="col-sm-2 col-lg-2">
 							<input type="text" name="cost" placeholder="报名费/元" class="form-control" value="<?php  echo $theclass['cost'];?>" />
 							报名需要付费,留空不付
@@ -99,21 +106,6 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 					</div>	
 					<?php  } ?>
 				</div>	
-					<div class="panel panel-info"><div class="panel-heading">考勤时段设置</div>
-					<div class="panel-body">
-						<div class="form-group">早晚(提示：早上进校)
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">进校时段</label>
-							<div class="col-sm-9 col-xs-9 col-md-4">
-									<div class="input-group clockpicker" style="margin-bottom: 15px">
-										<?php  echo tpl_form_field_clock('jxstart', $reply['jxstart'])?>
-										<span class="input-group-addon">至</span>
-										<?php  echo tpl_form_field_clock('jxend', $reply['jxend'])?>
-										
-									</div>
-							</div>
-						</div>
-									
-					</div>	
 					<div class="clearfix template"> 
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"></label>
@@ -122,7 +114,6 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 						</div>
 					</div>	
 				</div>	
-				</div>
 								
 				<?php  } else { ?>
 				<div id="custom-url">
@@ -153,6 +144,13 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 						</div>
 						<div class="col-sm-2 col-lg-2" style="width: 45px;margin-left: -31px;">	
 							<span class="btn btn-default"><i class="fa fa-search"></i></span>
+						</div>
+						<div class="col-sm-2 col-lg-2">
+							<select style="margin-right:15px;" name="is_temple_new[]" class="form-control">
+								<option value="0">班级类型</option>
+								<option value="1" >临时托管班</option>
+							</select>
+							幼儿园选填
 						</div>
 						<div class="col-sm-2 col-lg-2">
 							<input type="text" name="cost_new[]" placeholder="报名费/元" class="form-control" value="<?php  echo $theclass['sname'];?>" />
@@ -207,7 +205,14 @@ $('#custom-url-add').click(function(){
 				'		</div>'+
 				'		<div class="col-sm-2 col-lg-2" style="width: 45px;margin-left: -31px;">'+
 				'			<span class="btn btn-default"><i class="fa fa-search"></i></span>'+
-				'		</div>'+				
+				'		</div>'+
+				'		<div class="col-sm-2 col-lg-2">'+
+				'			<select style="margin-right:15px;" name="is_temple_new[]" class="form-control">'+
+				'				<option value="0">班级类型</option>'+
+        		'				<option value="1" >临时托管班</option>'+
+        		'			</select>'+
+				'			幼儿园选填'+
+				'       </div>'+
 				'		<div class="col-sm-2 col-lg-2">'+
 				'			<input type="text" name="cost_new[]" placeholder="报名费/元" class="form-control" value="" />报名需要付费,留空不付'+
 				'		</div>'+
@@ -282,6 +287,7 @@ $(document).on('click', '.btn-default', function(){
 						<th>所属年级</th>
                         <th>班级名称</th>
 						<th>班级主任</th>
+						<th>班级类型</th>
 						<th>学生人数</th>
 						<th>班级圈消息</th>
 						<th>班级之星</th>
@@ -297,6 +303,7 @@ $(document).on('click', '.btn-default', function(){
 						<td><div class="type-parent"><?php  echo $row['xueqi'];?></div></td>
                         <td><div class="type-parent"><?php  echo $row['sname'];?>&nbsp;&nbsp;</div></td>
 						<td><div class="type-parent"><?php  echo $row['name'];?></div></td>
+						<td><div class="type-parent"> <?php  if($row['is_temple'] == 1) { ?>临时托管班<?php  } ?></div></td>
 						<td><span class="label label-danger"><?php  echo $row['renshu'];?>人</span></td>
 						<td><span class="label label-info"><?php  echo $row['bjqsm'];?>条</span></td>
 						<td><input type="checkbox" value="<?php  echo $row['is_bjzx'];?>" name="is_on[]" data-id="<?php  echo $row['sid'];?>" <?php  if($row['is_bjzx'] == 1) { ?>checked<?php  } ?>></td>

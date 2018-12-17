@@ -1,6 +1,6 @@
 <?php
 /**
- * [WeEngine System] Copyright (c) 20180906163627 WE7.CC
+ * [WeEngine System] Copyright (c) 20181025112647 WE7.CC
  * WeEngine is NOT a free software, it under the license terms, visited http://www.we7.cc/ for more details.
  */
 
@@ -14,9 +14,21 @@ if (!empty($host)) {
 		exit;
 	}
 	
+		$pc_bind = pdo_get('uni_settings', array('bind_domain IN ' => array('http://' . $host, 'https://' . $host), 'default_module <>' => ''), array('uniacid', 'default_module', 'bind_domain'));
+		if (!empty($pc_bind)) {
+			$account_type = pdo_getcolumn('account', array('uniacid' => $pc_bind['uniacid']), 'type');
+			if ($account_type == ACCOUNT_TYPE_WEBAPP_NORMAL) {
+				$_W['uniacid'] = $pc_bind['uniacid'];
+				$_W['account'] = array('type' => $account_type);
+				$url = module_app_entries($pc_bind['default_module'], array('cover'));
+				header('Location: ' . $pc_bind['bind_domain'] . '/app/' . $url['cover'][0]['url']);
+				exit;
+			}
+		}
+	
 }
 if($_W['os'] == 'mobile' && (!empty($_GPC['i']) || !empty($_SERVER['QUERY_STRING']))) {
 	header('Location: ./app/index.php?' . $_SERVER['QUERY_STRING']);
 } else {
-	header('Location: ./web/index.php?' . $_SERVER['QUERY_STRING']);
+	header('Location: ./web/index.php?' . (!empty($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : 'c=account&a=display'));
 }

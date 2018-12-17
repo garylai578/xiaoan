@@ -11,6 +11,7 @@ load()->model('account');
 load()->model('material');
 load()->model('attachment');
 load()->model('mc');
+load()->model('module');
 
 if (!in_array($do, array('upload', 'fetch', 'browser', 'delete', 'image' ,'module' ,'video', 'voice', 'news', 'keyword',
 	'networktowechat', 'networktolocal', 'towechat', 'tolocal','wechat_upload',
@@ -368,7 +369,7 @@ if ($do == 'wechat_upload') {
 
 	$pathname = $file['path'];
 	$fullname = ATTACHMENT_ROOT  . '/' . $pathname;
-	$acc = WeAccount::create($acid);
+	$acc = WeAccount::createByUniacid();
 	if ($mode == 'perm' || $mode == 'temp') {
 		if ($type != 'video') {
 			$result = $acc->uploadMediaFixed($pathname, $type);
@@ -478,10 +479,10 @@ if ($do == 'module') {
 	if ($is_user_module) {
 		$installedmodulelist = user_modules($_W['uid']);
 	} else {
-		$installedmodulelist = uni_modules(false);
+		$installedmodulelist = uni_modules();
 	}
 
-	$sysmods = system_modules();
+	$sysmods = module_system();
 	foreach ($installedmodulelist as $k => $value) {
 		if ($value['type'] == 'system' || in_array($value['name'], $sysmods)) {
 			unset($installedmodulelist[$k]);
@@ -519,11 +520,7 @@ if ($do == 'module') {
 			}
 		}
 		$module['icon'] = $cion;
-		if ($module['enabled'] == 1 || $is_user_module) {
-			$enable_modules[] = $module;
-		} else {
-			$unenable_modules[$name] = $module;
-		}
+		$enable_modules[] = $module;
 	}
 	$result = array('items' => $enable_modules, 'pager' => '');
 	iajax(0, $result);
@@ -601,7 +598,11 @@ if ($do == 'image') {
 				$meterial['url'] = tomedia($meterial['attachment']);
 				unset($meterial['uid']);
 			} else {
-				$meterial['attach'] = tomedia($meterial['attachment'], true);
+				if(!empty($_W['setting']['remote']['type'])) {
+					$meterial['attach'] = tomedia($meterial['attachment']);
+				} else {
+					$meterial['attach'] = tomedia($meterial['attachment'], true);
+				}
 				$meterial['url'] = $meterial['attach'];
 			}
 		}
@@ -741,7 +742,7 @@ if ($do == 'move_to_group') {
 	$ids = safe_gpc_array($ids);
 
 	$table = table('attachment')->local($is_local_image);
-	$updated = $table->where('id', $ids)->fill('group_id', $group_id)->save();
+	$updated = $table->where('id', $ids)->where('uniacid', $_W['uniacid'])->fill('group_id', $group_id)->save();
 
 	iajax($updated ? 0 : 1, $updated ? '更新成功' : '更新失败');
 }

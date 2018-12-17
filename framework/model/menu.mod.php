@@ -58,7 +58,7 @@ function menu_default() {
 
 function menu_update_currentself() {
 	global $_W;
-	$account_api = WeAccount::create();
+	$account_api = WeAccount::createByUniacid();
 	$default_menu_info = $account_api->menuCurrentQuery();
 	if (is_error($default_menu_info)) {
 		return error(-1, $default_menu_info['message']);
@@ -139,7 +139,7 @@ function menu_update_currentself() {
 
 function menu_update_conditional() {
 	global $_W;
-	$account_api = WeAccount::create();
+	$account_api = WeAccount::createByUniacid();
 	$conditional_menu_info = $account_api->menuQuery();
 	if (is_error($conditional_menu_info)) {
 		return error(-1, $conditional_menu_info['message']);
@@ -187,7 +187,7 @@ function menu_delete($id) {
 		return error(0, '删除菜单成功！');
 	}
 	if ($menu_info['type'] == MENU_CONDITIONAL && $menu_info['menuid'] > 0 && $menu_info['status'] != STATUS_OFF) {
-		$account_api = WeAccount::create($_W['acid']);
+		$account_api = WeAccount::createByUniacid();
 		$result = $account_api->menuDelete($menu_info['menuid']);
 		if (is_error($result)) {
 			return error(-1, $result['message']);
@@ -211,7 +211,7 @@ function menu_push($id) {
 		}
 		$is_conditional = (!empty($post['matchrule']) && $menu_info['type'] == MENU_CONDITIONAL) ? true : false;
 
-		$account_api = WeAccount::create();
+		$account_api = WeAccount::createByUniacid();
 		$menu = $account_api->menuBuild($post, $is_conditional);
 		$result = $account_api->menuCreate($menu);
 		if (is_error($result)) {
@@ -230,7 +230,7 @@ function menu_push($id) {
 		return true;
 	}
 		if ($menu_info['status'] == STATUS_ON && $menu_info['type'] == MENU_CONDITIONAL && $menu_info['menuid'] > 0) {
-		$account_api = WeAccount::create();
+		$account_api = WeAccount::createByUniacid();
 		$result = $account_api->menuDelete($menu_info['menuid']);
 		if (is_error($result)) {
 			return error(-1, $result['message']);

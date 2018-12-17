@@ -132,6 +132,7 @@ if ($do == 'set_manager') {
 					if ($result) {
 												pdo_delete('users_permission', array('uniacid' => $uniacid, 'uid' => $user['uid']));
 						cache_clean(cache_system_key("user_accounts"));
+						cache_clean(cache_system_key('unimodules', array('uniacid' => $uniacid)));
 						iajax(0, '修改成功！', '');
 					} else  {
 						iajax(1, '修改失败！', '');
@@ -153,6 +154,7 @@ if ($do == 'set_manager') {
 					pdo_delete('users_permission', array('uniacid' => $uniacid, 'uid' => $user['uid']));
 				}
 				cache_clean(cache_system_key("user_accounts"));
+				cache_clean(cache_system_key('unimodules', array('uniacid' => $uniacid)));
 				iajax(0, '添加成功！', '');
 			} else  {
 				iajax(1, '添加失败！', '');

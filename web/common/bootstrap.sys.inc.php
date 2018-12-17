@@ -20,8 +20,7 @@ $_W['token'] = token();
 $session = json_decode(authcode($_GPC['__session']), true);
 if (is_array($session)) {
 	$user = user_single(array('uid'=>$session['uid']));
-		if (is_array($user) && ($session['hash'] === md5($user['password'] . $user['salt']) || $session['hash'] == $user['hash'])) {
-		unset($user['password'], $user['salt']);
+	if (is_array($user) && $session['hash'] === $user['hash']) {
 		$_W['uid'] = $user['uid'];
 		$_W['username'] = $user['username'];
 		$user['currentvisit'] = $user['lastvisit'];

@@ -64,8 +64,8 @@
 	angular.module('accountApp').value('config', {
 		del_accounts: {php echo !empty($del_accounts) ? json_encode($del_accounts) : 'null'},
 		links: {
-			postRecover: "{php echo url('account/recycle/recover', array('type' => ACCOUNT_TYPE))}",
-			postDel: "{php echo url('account/recycle/delete', array('type' => ACCOUNT_TYPE))}",
+			postRecover: "{php echo url('account/recycle/recover', array('account_type' => ACCOUNT_TYPE))}",
+			postDel: "{php echo url('account/recycle/delete', array('account_type' => ACCOUNT_TYPE))}",
 		}
 	});
 	angular.bootstrap($('#js-system-account-recycle'), ['accountApp']);

@@ -20,7 +20,7 @@
 			<!--搜索、新建、管理-->
 			<div class="we7-page-search cut-header">
 
-				<div ng-if="searchShow" ng-cloak>
+				<div ng-cloak>
 					<form action="./index.php" method="get">
 						<input type="hidden" name="c" value="account">
 						<input type="hidden" name="a" value="display">
@@ -28,10 +28,24 @@
 						<input type="hidden" name="type" value="{{type}}">
 						<input type="hidden" name="title" value="{{title}}">
 						<input type="text" name="letter" ng-model="activeLetter" ng-style="{'display': 'none'}">
-						<div class="cut-search">
-							<div class="input-group pull-left">
-								<input type="text" class="form-control" name="keyword" value="<?php  echo $_GPC['keyword'];?>" placeholder="请输入{{title}}名称">
-								<span class="input-group-btn"><button class="btn btn-default button"><i class="wi wi-search"></i></button></span>
+						<div class="row">
+							<?php  if($founders) { ?>
+							<div class="col-md-3 col-lg-2 hidden">
+								<div class="input-group" style="width: 100%;">
+									<select name="founder_id" class="form-control">
+										<option value="0">请选择副创始人</option>
+										<?php  if(is_array($founders)) { foreach($founders as $founder) { ?>
+										<option value="<?php  echo $founder['uid'];?>" <?php  if($founder['uid'] == $founder_id) { ?>selected<?php  } ?>><?php  echo $founder['username'];?></option>
+										<?php  } } ?>
+									</select>
+								</div>
+							</div>
+							<?php  } ?>
+							<div class="col-md-6">
+								<div class="input-group">
+									<input type="text" class="form-control" name="keyword" value="<?php  echo $_GPC['keyword'];?>" placeholder="请输入{{title}}名称">
+									<span class="input-group-btn"><button class="btn btn-primary button"><i class="wi wi-search"></i></button></span>
+								</div>
 							</div>
 						</div>
 					</form>
@@ -114,17 +128,28 @@
 
 			<!--首字母检索-->
 			<div class="clearfix"></div>
-			<ul class="letters-list" ng-if="searchShow" ng-cloak>
+			<ul class="letters-list" ng-cloak>
 				<li ng-repeat="letter in alphabet" ng-style="{'background-color': letter == activeLetter ? '#ddd' : 'none'}" ng-class="{'active': letter == activeLetter}" ng-click="searchModule(letter)" class="ng-scope">
 					<a href="javascript:;" ng-bind="letter" class="ng-binding"></a>
 				</li>
 			</ul>
-
+			<div class="count we7-margin-bottom hidden">
+				<?php  if($total_list) { ?>
+				<span class="we7-margin-right">公众号 : <?php  echo $total_list['account'];?></span>
+				<span class="we7-margin-right">熊账号 : <?php  echo $total_list['xzapp'];?></span>
+				<span class="we7-margin-right">微信小程序 : <?php  echo $total_list['wxapp'];?></span>
+				<span class="we7-margin-right">PC : <?php  echo $total_list['webapp'];?></span>
+				<span class="we7-margin-right">APP : <?php  echo $total_list['phoneapp'];?></span>
+				<span class="we7-margin-right">支付宝小程序 : <?php  echo $total_list['aliapp'];?></span>
+				<?php  } else { ?>
+				<span class="we7-margin-right"><?php  echo $title;?>总量 : <?php  echo $total;?></span>
+				<?php  } ?>
+			</div>
 			<!--列表数据-->
 			<!--add-->
 			<div class="mixMenu-list clearfix" ng-if="list" infinite-scroll='loadMore()' infinite-scroll-disabled='busy' infinite-scroll-distance='0' infinite-scroll-use-document-bottom="true">
 				<!--add-->
-				<div class="item module-list-item ng-scope" ng-repeat="detail in list" ng-if="list" style="">
+				<div class="item module-list-item ng-scope" ng-repeat="detail in list|orderBy:'endtime_status'" ng-if="list" style="" ng-class="detail.endtime_status == 1 ? 'expire' : ''">
 					<div class="content">
 						<img class="item-logo" ng-src="{{detail.logo}}" onerror="this.src='./resource/images/nopic-107.png'">
 						<div class="item-footer">
@@ -284,6 +309,7 @@
 		'title' : "<?php  echo $title;?>",
 		'keyword' : "<?php  echo $keyword;?>",
 		'letter' : "<?php  echo $letter;?>",
+		'founder_id' : "<?php  echo $founder_id;?>",
 		'total' : '<?php  echo $total;?>',
 		'account_type_phoneapp' : "<?php echo ACCOUNT_TYPE_PHONEAPP_NORMAL;?>",
 		'links' : {

@@ -1,7 +1,7 @@
 <?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 0) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
-<div class="we7-page-title">公众号管理</div>
+<div class="we7-page-title"><?php  echo $account->typeName?>管理</div>
 <ul class="we7-page-tab">
-	<li class="active"><a href="<?php  echo url('account/manage', array('account_type' => ACCOUNT_TYPE))?>">公众号列表</a></li>
+	<li class="active"><a href="<?php  echo url('account/manage', array('account_type' => ACCOUNT_TYPE))?>"><?php  echo $account->typeName?>列表</a></li>
 	
 	
 		<?php  if($_W['role'] == ACCOUNT_MANAGE_NAME_OWNER || $_W['role'] == ACCOUNT_MANAGE_NAME_FOUNDER) { ?>

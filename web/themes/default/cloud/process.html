@@ -330,7 +330,7 @@
 			</script>
 			{else}
 			<script>
-				location.href = '{url "module/manage-system/upgrade" array("module_name" => $m, "flag" => 1, "support" => $_GPC["support"])}';
+				location.href = '{url "module/manage-system/upgrade" array("module_name" => $m, "flag" => 1, "support" => $_GPC["support"], "has_new_support" => $has_new_support)}';
 			</script>
 			{/if}
 			

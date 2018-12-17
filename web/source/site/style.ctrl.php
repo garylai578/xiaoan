@@ -11,7 +11,7 @@ load()->func('file');
 
 $dos = array('default', 'designer', 'module', 'template', 'copy', 'build', 'del');
 $do = in_array($do, $dos) ? $do : 'template';
-permission_check_account_user('platform_site');
+permission_check_account_user('platform_site_style');
 
 $templateid = intval($_GPC['templateid']);
 
@@ -180,8 +180,8 @@ if ($do == 'designer') {
 		if (!empty($_GPC['custom']['name'])) {
 			$_GPC['custom']['name'] = safe_gpc_array($_GPC['custom']['name']);
 			foreach ($_GPC['custom']['name'] as $i => $variable) {
-				$value = $_GPC['custom']['value'][$i];
-				$desc = $_GPC['custom']['desc'][$i];
+				$value = safe_gpc_string($_GPC['custom']['value'][$i]);
+				$desc = safe_gpc_string($_GPC['custom']['desc'][$i]);
 				if (!empty($value)) {
 					if (!empty($styles[$variable])) {
 						if ($styles[$variable] != $value) {
@@ -215,7 +215,7 @@ if ($do == 'designer') {
 			$stylekeys_str = implode(',', $stylekeys);
 			pdo_query("DELETE FROM " . tablename('site_styles_vars') . " WHERE variable IN ('" . $stylekeys_str . "') AND styleid = :styleid AND uniacid = '{$_W['uniacid']}'", array(':styleid' => $styleid));
 		}
-		pdo_update('site_styles', array('name' => $_GPC['name']), array('id' => $styleid));
+		pdo_update('site_styles', array('name' => safe_gpc_string($_GPC['name'])), array('id' => $styleid, 'uniacid' => $_W['uniacid']));
 		itoast('更新风格成功！', url('site/style'), 'success');
 	}
 	$systemtags = array(

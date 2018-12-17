@@ -20,6 +20,9 @@ $user = user_single($uid);
 if (empty($user)) {
 	itoast('访问错误, 未找到该操作员.', url('user/display'), 'error');
 }
+if ($user['status'] != USER_STATUS_NORMAL) {
+	itoast('', url('user/display'), 'info');
+}
 
 $founders = explode(',', $_W['config']['setting']['founder']);
 $profile = pdo_get('users_profile', array('uid' => $uid));

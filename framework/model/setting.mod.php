@@ -43,7 +43,7 @@ function setting_load($key = '') {
 	if (!is_array($_W['setting'])) {
 		$_W['setting'] = array();
 	}
-	$_W['setting'] = array_merge($_W['setting'], $settings);
+	$_W['setting'] = array_merge($settings, $_W['setting']);
 	if (!empty($key)) {
 		return array($key => $settings[$key]);
 	} else {
@@ -61,9 +61,9 @@ function setting_upgrade_version($family, $version, $release) {
  */
 defined('IN_IA') or exit('Access Denied');
 
-define('IMS_FAMILY', '{$family}');
-define('IMS_VERSION', '{$version}');
-define('IMS_RELEASE_DATE', '{$release}');
+define('IMS_FAMILY', "{$family}");
+define('IMS_VERSION', "{$version}");
+define('IMS_RELEASE_DATE', "{$release}");
 VER;
 	return file_put_contents($verfile, trim($verdat));
 }
