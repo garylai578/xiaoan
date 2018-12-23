@@ -257,7 +257,7 @@ if ($operation == 'classinfo') {
                                 if($checkdateset['saturday'] == 1){
                                     $timeset_sat = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=3 ORDER BY id ASC ");
                                     $todaytimeset1 = transTimeset4T1($timeset_sat);
-                                    $todaytimeset2 = array('startTime'=>$timeset_sat[count($timeset_sat)-1]['end'], 'endTime'=>"23:59");
+                                    $todaytimeset2 = array(array('startTime'=>$timeset_sat[count($timeset_sat)-1]['end'], 'endTime'=>"23:59"));
                                     $todaytimeset3 =  transTimeset4T3($timeset_sat);
                                 }else{
                                     $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = array(array('startTime'=>"00:00", 'endTime'=>"23:59"));
@@ -266,7 +266,7 @@ if ($operation == 'classinfo') {
                                 if($checkdateset['sunday'] == 1){
                                     $timeset_sun = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=4 ORDER BY id ASC ");
                                     $todaytimeset1 = transTimeset4T1($timeset_sun);
-                                    $todaytimeset2 = array('startTime'=>$timeset_sun[count($timeset_sun)-1]['end'], 'endTime'=>"23:59");
+                                    $todaytimeset2 = array(array('startTime'=>$timeset_sun[count($timeset_sun)-1]['end'], 'endTime'=>"23:59"));
                                     $todaytimeset3 =  transTimeset4T3($timeset_sun);
                                 }else{
                                     $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = array(array('startTime'=>"00:00", 'endTime'=>"23:59"));
@@ -278,9 +278,9 @@ if ($operation == 'classinfo') {
                             }
                         }
                     }
-                    $week1[$k] = array('weekno'=>$k, 'group'=>$todaytimeset1);
-                    $week2[$k] =array('weekno'=>$k, 'group'=>$todaytimeset2);
-                    $week3[$k] =array('weekno'=>$k, 'group'=>$todaytimeset3);
+                    $week1[$k] = array('weekno'=>$k, 'groups'=>$todaytimeset1);
+                    $week2[$k] =array('weekno'=>$k, 'groups'=>$todaytimeset2);
+                    $week3[$k] =array('weekno'=>$k, 'groups'=>$todaytimeset3);
                 }
                 $timeset1[0] = array('id'=>0, 'weeks'=>$week2);
                 $timeset1[1] = array('id'=>1, 'weeks'=>$week1);
