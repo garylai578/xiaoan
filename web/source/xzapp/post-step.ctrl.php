@@ -118,9 +118,9 @@ if ($step == 2) {
 			pdo_update('account', array('type' => ACCOUNT_TYPE_XZAPP_NORMAL, 'hash' => ''), array('acid' => $acid, 'uniacid' => $uniacid));
 			unset($update['type']);
 		}
-
-		if(parse_path($_GPC['headimg']) && in_array(pathinfo($_GPC['qrcode'], PATHINFO_EXTENSION), $_W['config']['upload']['image']['extentions'])) {
-			copy($_GPC['headimg'], IA_ROOT . '/attachment/headimg_'.$acid.'.jpg');
+		$headimg = safe_gpc_path($_GPC['headimg']);
+		if(file_is_image($headimg)) {
+			copy($headimg, IA_ROOT . '/attachment/headimg_'.$acid.'.jpg');
 		}
 
 		if (!empty($_GPC['uniacid']) || empty($_W['isfounder'])) {
@@ -319,6 +319,10 @@ if ($step == 4) {
 
 	if (empty($uni_account)) {
 		itoast('非法访问', '', '');
+	}
+	$owner_info = account_owner($uniacid);
+	if (!(user_is_founder($_W['uid'], true) || $_W['uid'] == $owner_info['uid'])) {
+		itoast('非法访问');
 	}
 	$account = account_fetch($uni_account['default_acid']);
 }

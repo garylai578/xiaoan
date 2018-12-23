@@ -10,11 +10,6 @@ load()->model('app');
 $dos = array('showjs', 'health');
 $do = in_array($do, $dos) ? $do : 'showjs';
 
-	if ($do == 'showjs') {
-		echo '';
-		exit;
-	}
-
 
 
 if($do == 'health') {

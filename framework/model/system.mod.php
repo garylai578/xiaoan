@@ -17,9 +17,6 @@ function system_menu_permission_list($role = '') {
 		unset($system_menu['appmarket']);
 		unset($system_menu['advertisement']);
 		unset($system_menu['system']);
-	} if ($role == ACCOUNT_MANAGE_NAME_OPERATOR) {
-		unset($system_menu['appmarket']);
-		unset($system_menu['advertisement']);
 	}
 	return $system_menu;
 }

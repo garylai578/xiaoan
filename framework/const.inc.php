@@ -8,7 +8,7 @@ defined('IN_IA') or exit('Access Denied');
 
 define('REGULAR_EMAIL', '/\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/i');
 define('REGULAR_MOBILE', '/^\d{6,15}$/');
-define('REGULAR_USERNAME', '/^[\x{4e00}-\x{9fa5}a-z\d_\.]{3,15}$/iu');
+define('REGULAR_USERNAME', '/^[\x{4e00}-\x{9fa5}a-z\d_\.]{3,30}$/iu');
 
 define('TEMPLATE_DISPLAY', 0);
 define('TEMPLATE_FETCH', 1);
@@ -120,10 +120,7 @@ define('PERMISSION_ACCOUNT', 'system');
 define('PERMISSION_WXAPP', 'wxapp');
 define('PERMISSION_SYSTEM', 'site');
 
-define('PAYMENT_WECHAT_TYPE_NORMAL', 1);
-define('PAYMENT_WECHAT_TYPE_BORROW', 2);
-define('PAYMENT_WECHAT_TYPE_SERVICE', 3);
-define('PAYMENT_WECHAT_TYPE_CLOSE', 4);
+define('PAYMENT_WECHAT_TYPE_NORMAL', 1);define('PAYMENT_WECHAT_TYPE_BORROW', 2);define('PAYMENT_WECHAT_TYPE_SERVICE', 3);define('PAYMENT_WECHAT_TYPE_CLOSE', 4);
 
 define('FANS_CHATS_FROM_SYSTEM', 1);
 
@@ -214,6 +211,7 @@ define('WXAPP_DISPLAY_TYPE', 3);
 define('WEBAPP_DISPLAY_TYPE', 4);
 define('PHONEAPP_DISPLAY_TYPE', 5);
 define('PLATFORM_DISPLAY_TYPE', 6);
+define('MODULE_DISPLAY_TYPE', 7);
 
 define('PASSWORD_STRONG_STATE', '至少8-16个字符，至少1个大写字母，1个小写字母和1个数字，其他可以是任意字符');
 define('PASSWORD_STRONG_REGULAR', '/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,30}/');

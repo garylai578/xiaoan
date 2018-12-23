@@ -63,6 +63,7 @@ class CoreModuleSite extends WeModuleSite {
 		
 		include $this->template('pay');
 	}
+
 	
 	public function doMobilePay() {
 		global $_W, $_GPC;
@@ -76,22 +77,22 @@ class CoreModuleSite extends WeModuleSite {
 		
 		$setting = uni_setting($_W['uniacid'], 'payment');
 		$dos = array();
-		if(!empty($setting['payment']['credit']['switch'])) {
+		if(!empty($setting['payment']['credit']['pay_switch'])) {
 			$dos[] = 'credit';
 		}
-		if(!empty($setting['payment']['alipay']['switch'])) {
+		if(!empty($setting['payment']['alipay']['pay_switch'])) {
 			$dos[] = 'alipay';
 		}
-		if(!empty($setting['payment']['wechat']['switch'])) {
+		if(!empty($setting['payment']['wechat']['pay_switch'])) {
 			$dos[] = 'wechat';
 		}
-		if(!empty($setting['payment']['delivery']['switch'])) {
+		if(!empty($setting['payment']['delivery']['pay_switch'])) {
 			$dos[] = 'delivery';
 		}
-		if(!empty($setting['payment']['unionpay']['switch'])) {
+		if(!empty($setting['payment']['unionpay']['pay_switch'])) {
 			$dos[] = 'unionpay';
 		}
-		if(!empty($setting['payment']['baifubao']['switch'])) {
+		if(!empty($setting['payment']['baifubao']['pay_switch'])) {
 			$dos[] = 'baifubao';
 		}
 		$type = in_array($params['method'], $dos) ? $params['method'] : '';

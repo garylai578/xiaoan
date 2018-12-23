@@ -14,12 +14,12 @@ $_W['uniacid'] = intval($_GPC['i']);
 if(empty($_W['uniacid'])) {
 	$_W['uniacid'] = intval($_GPC['weid']);
 }
-$_W['uniaccount'] = $_W['account'] = uni_fetch($_W['uniacid']);
-if(empty($_W['uniaccount'])) {
+if(empty($_W['uniacid'])) {
 	header('HTTP/1.1 404 Not Found');
 	header("status: 404 Not Found");
 	exit;
 }
+$_W['uniaccount'] = $_W['account'] = uni_fetch($_W['uniacid']);
 
 if (!empty($_W['uniaccount']['endtime']) && TIMESTAMP > $_W['uniaccount']['endtime']) {
 	exit('抱歉，您的公众号服务已过期，请及时联系管理员');
@@ -33,6 +33,11 @@ if (!empty($isdel_account)) {
 	exit('指定公众号已被删除');
 }
 
+	if (!empty($_W['account']['setting']['bind_domain']) && !empty($_W['account']['setting']['bind_domain']['domain']) && strpos($_W['siteroot'], $_W['account']['setting']['bind_domain']['domain']) === false) {
+		header('Location:' . $_W['account']['setting']['bind_domain']['domain']. $_SERVER['REQUEST_URI']);
+		exit;
+	}
+
 $_W['session_id'] = '';
 if (isset($_GPC['state']) && !empty($_GPC['state']) && strexists($_GPC['state'], 'we7sid-')) {
 	$pieces = explode('-', $_GPC['state']);
@@ -45,7 +50,7 @@ if (empty($_W['session_id'])) {
 if (empty($_W['session_id'])) {
 	$_W['session_id'] = "{$_W['uniacid']}-" . random(20) ;
 	$_W['session_id'] = md5($_W['session_id']);
-	setcookie(session_name(), $_W['session_id']);
+	setcookie(session_name(), $_W['session_id'], 0, '/');
 }
 session_id($_W['session_id']);
 
@@ -66,9 +71,8 @@ if (!empty($_SESSION['__acid']) && $_SESSION['__uniacid'] == $_W['uniacid']) {
 	$_W['acid'] = intval($_SESSION['__acid']);
 	$_W['account'] = account_fetch($_W['acid']);
 }
-
-if ((!empty($_SESSION['acid']) && $_W['acid'] != $_SESSION['acid']) ||
-	(!empty($_SESSION['uniacid']) && $_W['uniacid'] != $_SESSION['uniacid'])) {
+if (strpos($_SERVER['QUERY_STRING'], 'favicon.ico') === false && ((!empty($_SESSION['acid']) && $_W['acid'] != $_SESSION['acid']) ||
+		(!empty($_SESSION['uniacid']) && $_W['uniacid'] != $_SESSION['uniacid']))) {
 	$keys = array_keys($_SESSION);
 	foreach ($keys as $key) {
 		unset($_SESSION[$key]);
@@ -99,9 +103,20 @@ if (empty($_W['openid']) && !empty($_SESSION['oauth_openid'])) {
 		'follow' => 0
 	);
 }
+
+$_W['oauth_account'] = $_W['account']['oauth'] = array(
+	'key' => $_W['account']['key'],
+	'secret' => $_W['account']['secret'],
+	'acid' => $_W['account']['acid'],
+	'type' => $_W['account']['type'],
+	'level' => $_W['account']['level'],
+	'support_oauthinfo' => $_W['account']->supportOauthInfo,
+	'support_jssdk' => $_W['account']->supportJssdk,
+);
 $unisetting = uni_setting_load();
-if (empty($unisetting['oauth'])) {
-	$unisetting['oauth'] = uni_account_global_oauth();
+if (empty($unisetting['oauth']) && $_W['account']->typeSign == 'account') {
+	$global_oauth = uni_account_global_oauth();
+	$unisetting['oauth'] = (array)$global_oauth['oauth'];
 }
 if (!empty($unisetting['oauth']['account'])) {
 	$oauth = account_fetch($unisetting['oauth']['account']);
@@ -112,32 +127,18 @@ if (!empty($unisetting['oauth']['account'])) {
 			'acid' => $oauth['acid'],
 			'type' => $oauth['type'],
 			'level' => $oauth['level'],
+			'support_oauthinfo' => $oauth->supportOauthInfo,
+			'support_jssdk' => $oauth->supportJssdk,
 		);
 		unset($oauth);
-	} else {
-		$_W['oauth_account'] = $_W['account']['oauth'] = array(
-			'key' => $_W['account']['key'],
-			'secret' => $_W['account']['secret'],
-			'acid' => $_W['account']['acid'],
-			'type' => $_W['account']['type'],
-			'level' => $_W['account']['level'],
-		);
 	}
-} else {
-	$_W['oauth_account'] = $_W['account']['oauth'] = array(
-		'key' => $_W['account']['key'],
-		'secret' => $_W['account']['secret'],
-		'acid' => $_W['account']['acid'],
-		'type' => $_W['account']['type'],
-		'level' => $_W['account']['level'],
-		'level' => $_W['account']['type'] == ACCOUNT_TYPE_XZAPP_NORMAL ? 4 : $_W['account']['level'],
-	);
 }
 
 if($controller != 'utility') {
 	$_W['token'] = token();
 }
-if (!empty($_W['account']['oauth']) && $_W['account']['oauth']['level'] == '4' && empty($_W['isajax']) || $_W['account']['oauth']['type'] == ACCOUNT_TYPE_XZAPP_NORMAL) {
+
+if (!empty($_W['account']['oauth']) && $_W['account']['oauth']['support_oauthinfo'] && empty($_W['isajax'])) {
 	if (($_W['platform'] == 'account' && !$_GPC['logout'] && empty($_W['openid']) && ($controller != 'auth' || ($controller == 'auth' && !in_array($action, array('forward', 'oauth'))))) ||
 		($_W['platform'] == 'account' && !$_GPC['logout'] && empty($_SESSION['oauth_openid']) && ($controller != 'auth'))) {
 		$state = 'we7sid-'.$_W['session_id'];
@@ -172,7 +173,7 @@ $_W['account']['groupid'] = $_W['uniaccount']['groupid'];
 $_W['account']['qrcode'] = tomedia('qrcode_'.$_W['acid'].'.jpg').'?time='.$_W['timestamp'];
 $_W['account']['avatar'] = tomedia('headimg_'.$_W['acid'].'.jpg').'?time='.$_W['timestamp'];
 
-if ($_W['platform'] == 'account' && in_array($_W['account']['type'], array(ACCOUNT_TYPE_OFFCIAL_NORMAL, ACCOUNT_TYPE_OFFCIAL_AUTH, ACCOUNT_TYPE_APP_NORMAL, ACCOUNT_TYPE_APP_AUTH, ACCOUNT_TYPE_XZAPP_NORMAL, ACCOUNT_TYPE_XZAPP_AUTH)) && $controller != 'utility') {
+if ($_W['platform'] == 'account' && $_W['account']->supportJssdk && $controller != 'utility') {
 	if (!empty($unisetting['jsauth_acid'])) {
 		$jsauth_acid = $unisetting['jsauth_acid'];
 	} else {

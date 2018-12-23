@@ -7,37 +7,36 @@ defined('IN_IA') or exit('Access Denied');
 
 load()->model('user');
 load()->model('setting');
-
+load()->model('utility');
 $dos = array('find_password', 'valid_mobile', 'valid_code', 'set_password', 'success');
 $do = in_array($do, $dos) ? $do : 'find_password';
 
-$mobile = safe_gpc_string($_GPC['mobile']);
-if (in_array($do, array('valid_mobile', 'valid_code', 'set_password'))) {
-	if (empty($mobile)) {
-		iajax(-1, '手机号不能为空');
+$setting_sms_sign = setting_load('site_sms_sign');
+$find_password_sign = !empty($setting_sms_sign['site_sms_sign']['find_password']) ? $setting_sms_sign['site_sms_sign']['find_password'] : '';
+$mobile = safe_gpc_string($_GPC['receiver']);
+if (in_array($do, array('valid_code', 'set_password'))) {
+	$check_res = user_check_mobile($mobile);
+	if (is_error($check_res)) {
+		iajax($check_res['errno'], $check_res['message']);
 	}
-	if (!preg_match(REGULAR_MOBILE, $mobile)) {
-		iajax(-1, '手机号格式不正确');
-	}
+}
 
-	$user_profile = table('users');
-	$find_mobile = $user_profile->userProfileMobile($mobile);
-	if (empty($find_mobile)) {
-		iajax(-1, '手机号不存在');
-	}
+if ($do == 'valid_mobile') {
+	$check_res = user_check_mobile($mobile);
+	iajax($check_res['errno'], $check_res['message']);
 }
 
 if ($do == 'valid_code') {
 	if ($_W['isajax'] && $_W['ispost']) {
-		$image_verify =trim($_GPC['verify']);
+		$code = trim($_GPC['code']);
 
-		if (empty($image_verify)) {
-			iajax(-1, '图形验证码不能为空');
+		if (empty($code)) {
+			iajax(-1, '短信验证码不能为空');
 		}
 
-		$captcha = checkcaptcha($image_verify);
-		if (empty($captcha)) {
-			iajax(-1, '图形验证码错误,请重新获取');
+		$verify_res = utility_smscode_verify(0, $mobile, $code);
+		if (is_error($verify_res)) {
+			iajax($verify_res['errno'], $verify_res['message']);
 		}
 		iajax(0, '');
 	} else {

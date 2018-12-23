@@ -4,17 +4,11 @@
 		自动回复
 	</div>
 	<ul class="we7-page-tab">
-		<li <?php  if($m == 'keyword' || $m == '') { ?>class="active" <?php  } ?>><a href="<?php  echo url('platform/reply', array('m' => 'keyword'));?>">关键字自动回复 </a></li>
-		<li <?php  if($m == 'special') { ?>class="active"<?php  } ?>><a href="<?php  echo url('platform/reply', array('m' => 'special'));?>">非文字自动回复</a></li>
-		<li <?php  if($m == 'welcome') { ?>class="active"<?php  } ?>><a href="<?php  echo url('platform/reply', array('m' => 'welcome'));?>">首次访问自动回复</a></li>
-		<li <?php  if($m == 'default') { ?>class="active"<?php  } ?>><a href="<?php  echo url('platform/reply', array('m' => 'default'));?>">默认回复</a></li>
-
-		<?php  if(!in_array($_W['account']['type'], array(ACCOUNT_TYPE_XZAPP_NORMAL, ACCOUNT_TYPE_XZAPP_AUTH))) { ?>
-		<li <?php  if($m == 'service') { ?>class="active"<?php  } ?>><a href="<?php  echo url('platform/reply', array('m' => 'service'));?>">常用服务</a></li>
-		<li <?php  if($m == 'userapi') { ?>class="active"<?php  } ?>><a href="<?php  echo url('platform/reply', array('m' => 'userapi'));?>">自定义接口回复</a></li>
-		<?php  } ?>
-
-		<li><a href="<?php  echo url('profile/reply-setting');?>">回复设置</a></li>
+		<?php  if(is_array($active_sub_permission)) { foreach($active_sub_permission as $active_menu) { ?>
+			<?php  if(permission_check_account_user($active_menu['permission_name'], false) && (empty($active_menu['is_display']) || is_array($active_menu['is_display']) && in_array($_W['account']['type'], $active_menu['is_display']))) { ?>
+				<li <?php  if($m == $active_menu['active']) { ?>class="active"<?php  } ?>><a href="<?php  echo $active_menu['url'];?>"><?php  echo $active_menu['title'];?></a></li>
+			<?php  } ?>
+		<?php  } } ?>
 	</ul>
 <?php  } else { ?>
 	<div class="we7-page-title">

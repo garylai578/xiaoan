@@ -125,7 +125,7 @@ if ($do == 'openid') {
 			'headimgurl' => $userinfo['avatarUrl'],
 		))),
 	);
-			if (!empty($userinfo['unionId'])) {
+		if (!empty($userinfo['unionId'])) {
 		$union_fans = pdo_get('mc_mapping_fans', array('unionid' => $userinfo['unionId'], 'openid !=' => $userinfo['openId']));
 		if (!empty($union_fans['uid'])) {
 			if (!empty($fans['uid'])) {
@@ -135,9 +135,30 @@ if ($do == 'openid') {
 			$_SESSION['uid'] = $union_fans['uid'];
 		}
 	}
-	pdo_update('mc_mapping_fans', $fans_update, array('fanid' => $fans['fanid']));
-	pdo_update('mc_members', array('nickname' => $userinfo['nickName'], 'avatar' => $userinfo['avatarUrl'], 'gender' => $userinfo['gender']), array('uid' => $fans['uid']));
+	
 	$member = mc_fetch($fans['uid']);
+	if (!empty($member)) {
+		pdo_update('mc_members', array('nickname' => $userinfo['nickName'], 'avatar' => $userinfo['avatarUrl'], 'gender' => $userinfo['gender']), array('uid' => $fans['uid']));
+	} else {
+		$default_groupid = pdo_fetchcolumn('SELECT groupid FROM ' .tablename('mc_groups') . ' WHERE uniacid = :uniacid AND isdefault = 1', array(':uniacid' => $_W['uniacid']));
+		$member = array(
+			'uniacid' => $_W['uniacid'],
+			'email' => md5($_SESSION['openid']).'@we7.cc',
+			'salt' => random(8),
+			'groupid' => $default_groupid,
+			'createtime' => TIMESTAMP,
+			'password' => md5($member['salt'] . $_W['config']['setting']['authkey']),
+			'nickname' => $userinfo['nickName'],
+			'avatar' => $userinfo['avatarUrl'],
+			'gender' => $userinfo['gender'],
+			'nationality' => '',
+			'resideprovince' => '',
+			'residecity' => '',
+		);
+		pdo_insert('mc_members', $member);
+		$fans_update['uid'] = pdo_insertid();
+	}
+	pdo_update('mc_mapping_fans', $fans_update, array('fanid' => $fans['fanid']));
 	unset($member['password']);
 	unset($member['salt']);
 	$account_api->result(0, '', $member);

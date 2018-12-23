@@ -27,9 +27,13 @@
 				<div class="version">
 					<span class="name">支持</span>
 					<div class="version-detail">
-						<span ng-if="list.<?php echo MODULE_SUPPORT_ACCOUNT_NAME;?> == 2">公众号</span>
-						<span ng-if="list.<?php echo MODULE_SUPPORT_ACCOUNT_NAME;?> == 2 && list.wxapp_support == 2">、</span>
-						<span ng-if="list.wxapp_support == 2">小程序</span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_ACCOUNT_NAME;?> == 2">公众号 </span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_WXAPP_NAME;?> == 2"> 微信小程序 </span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_WEBAPP_NAME;?> == 2"> PC </span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_PHONEAPP_NAME;?> == 2"> APP </span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_XZAPP_NAME;?> == 2"> 熊掌号 </span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_ALIAPP_NAME;?> == 2"> 支付宝小程序 </span>
+						<span ng-if="list.<?php echo MODULE_SUPPORT_SYSTEMWELCOME_NAME;?> == 2"> 系统首页 </span>
 					</div>
 				</div>
 				<div class="mask">
@@ -51,7 +55,7 @@
 					<div class="cut-item">
 						<a href="javascript:;">
 							<div class="detail" ng-repeat="account in list.accounts" ng-if="list.accounts">
-								<div class="text-over text-left" ng-if="account.app_name">
+								<div class="text-over text-left">
 									<span ng-if="account.type_name == account_types.account" class="wi wi-wechat"></span>
 									<span ng-if="account.type_name == account_types.wxapp" class="wi wi-wxapp"></span>
 									<span ng-if="account.type_name == account_types.webapp" class="wi wi-pc"></span>

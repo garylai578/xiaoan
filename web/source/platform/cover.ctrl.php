@@ -10,7 +10,7 @@ load()->model('module');
 $dos = array('module', 'post');
 $do = in_array($do, $dos) ? $do : 'module';
 
-$system_modules = system_modules();
+$system_modules = module_system();
 if (!in_array($_GPC['m'], $system_modules) && $do == 'post') {
 	permission_check_account_user('', true, 'cover');
 }
@@ -82,7 +82,7 @@ if ($do == 'module') {
 		}
 		if (!empty($reply)) {
 			$rid = $reply['rid'];
-			$result = pdo_update('rule', $rule, array('id' => $rid));
+			$result = pdo_update('rule', $rule, array('id' => $rid, 'uniacid' => $_W['uniacid']));
 		} else {
 			$result = pdo_insert('rule', $rule);
 			$rid = pdo_insertid();
@@ -120,7 +120,7 @@ if ($do == 'module') {
 			if (empty($reply['id'])) {
 				pdo_insert('cover_reply', $entry);
 			} else {
-				pdo_update('cover_reply', $entry, array('id' => $reply['id']));
+				pdo_update('cover_reply', $entry, array('id' => $reply['id'], 'uniacid' => $_W['uniacid']));
 			}
 			itoast('封面保存成功！', url('platform/cover', array('m' => $entry['module'])), 'success');
 		} else {

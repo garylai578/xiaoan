@@ -9,7 +9,7 @@ load()->model('module');
 
 $dos = array('module_link_uniacid', 'search_link_account', 'module_unlink_uniacid');
 $do = in_array($do, $dos) ? $do : 'module_link_uniacid';
-
+permission_check_account_user('wxapp_profile_module_link_uniacid');
 $_W['page']['title'] = '数据同步 - 小程序 - 管理';
 
 $wxapp_info = miniapp_fetch($_W['uniacid']);
@@ -30,6 +30,7 @@ if ($do == 'module_link_uniacid') {
 		$module_update[$module['name']] = array('name' => $module['name'], 'version' => $module['version'], 'uniacid' => $uniacid);
 		pdo_update('wxapp_versions', array('modules' => iserializer($module_update)), array('id' => $version_id));
 		uni_passive_link_uniacid($uniacid, $module_name);
+		cache_clean(cache_system_key('module_setting', array('module_name' => $module_name, 'uniacid' => $uniacid)));
 		cache_delete(cache_system_key('miniapp_version', array('version_id' => $version_id)));
 		iajax(0, '关联成功');
 	}
@@ -40,7 +41,7 @@ if ($do == 'module_link_uniacid') {
 				foreach ($link_uniacid_info as $info) {
 					if ($info['settings']['link_uniacid'] == $_W['uniacid'] ||
 						!empty($info['settings']['passive_link_uniacid']) && $info['uniacid'] == $_W['uniacid']) {
-						$module_value['other_link'] = uni_fetch($info['settings']['passive_link_uniacid']);
+						$module_value['other_link'] = uni_fetch(current($info['settings']['passive_link_uniacid']));
 					}
 				}
 			}
@@ -65,6 +66,7 @@ if ($do == 'module_unlink_uniacid') {
 	$version_modules = iserializer($version_modules);
 	$result = pdo_update('wxapp_versions', array('modules' => $version_modules), array('id' => $version_info['id']));
 	if ($result) {
+		cache_clean(cache_system_key('module_setting', array('module_name' => $module_name, 'uniacid' => $module['account']['uniacid'])));
 		cache_delete(cache_system_key('miniapp_version', array('version_id' => $version_id)));
 		iajax(0, '删除成功！', referer());
 	} else {

@@ -196,9 +196,9 @@ function buildframes($framename = ''){
 		return $frames[$framename];
 	}
 
-		$modules = uni_modules(false);
+		$modules = uni_modules();
 	if (defined('FRAME') && FRAME == 'account') {
-		$sysmodules = system_modules();
+		$sysmodules = module_system();
 		$status = permission_account_user_permission_exist($_W['uid'], $_W['uniacid']);
 				if (!$_W['isfounder'] && $status && $_W['role'] != ACCOUNT_MANAGE_NAME_OWNER) {
 			$module_permission = permission_account_user_menu($_W['uid'], $_W['uniacid'], 'modules');
@@ -225,7 +225,7 @@ function buildframes($framename = ''){
 				foreach ($account_module as $module) {
 					if (!in_array($module['module'], $sysmodules)) {
 						$module = module_fetch($module['module']);
-						if (!empty($module) && !empty($modules[$module['name']]) && empty($module['main_module']) && ($module[MODULE_SUPPORT_ACCOUNT_NAME] == 2 || $module['webapp_support'] == 2)) {
+						if (!empty($module) && !empty($modules[$module['name']]) && ($module[MODULE_SUPPORT_ACCOUNT_NAME] == 2 || $module['webapp_support'] == 2)) {
 							$frames[FRAME]['section']['platform_module']['menu']['platform_' . $module['name']] = array(
 								'title' => $module['title'],
 								'icon' =>  $module['logo'],
@@ -269,7 +269,7 @@ function buildframes($framename = ''){
 		$modulename = trim($_GPC['m']);
 	$eid = intval($_GPC['eid']);
 	$version_id = intval($_GPC['version_id']);
-	if ((!empty($modulename) || !empty($eid)) && !in_array($modulename, system_modules())) {
+	if ((!empty($modulename) || !empty($eid)) && !in_array($modulename, module_system())) {
 		if (!empty($eid)) {
 			$entry = pdo_get('modules_bindings', array('eid' => $eid));
 		}
@@ -396,8 +396,9 @@ function buildframes($framename = ''){
 				if(empty($row)) continue;
 				foreach($row as $li) {
 					$frames['account']['section']['platform_module_menu']['menu']['platform_module_menu'.$row['eid']] = array(
-						'title' => "<i class='wi wi-appsetting'></i> {$row['title']}",
+						'title' => $row['title'],
 						'url' => $row['url'] . '&version_id=' . $version_id,
+						'icon' => empty($row['icon']) ? 'wi wi-appsetting' : $row['icon'],
 						'is_display' => 1,
 					);
 				}
@@ -427,6 +428,18 @@ function buildframes($framename = ''){
 				}
 			}
 		}
+		
+			if (!empty($entries['system_welcome']) && $_W['isfounder']) {
+				$frames['account']['section']['platform_module_welcome']['title'] = '';
+				foreach ($entries['system_welcome'] as $key => $row) {
+					if (empty($row)) continue;
+					$frames['account']['section']['platform_module_welcome']['menu']['platform_module_welcome' . $row['eid']] = array (
+						'title' => "<i class='wi wi-appsetting'></i> {$row['title']}",
+						'url' => $row['url'],
+						'is_display' => 1,
+					);
+				}
+			}
 		
 	}
 
@@ -507,9 +520,9 @@ function buildframes($framename = ''){
 					break;
 				}
 				$frames['phoneapp']['section']['platform_module']['menu']['module_menu'.$module['mid']] = array(
-						'title' => "<img src='{$module['logo']}'> {$module['title']}",
-						'url' => url('phoneapp/display/switch', array('module' => $module['name'], 'version_id' => $version_id)),
-						'is_display' => 1,
+					'title' => "<img src='{$module['logo']}'> {$module['title']}",
+					'url' => url('account/display/switch', array('module_name' => $module['name'], 'version_id' => $version_id, 'uniacid' => $_W['uniacid'])),
+					'is_display' => 1,
 				);
 			}
 		} else {
@@ -567,13 +580,6 @@ function frames_top_menu($frames) {
 		);
 	}
 	return $frames;
-}
-
-function system_modules() {
-	return array(
-		'basic', 'news', 'music', 'service', 'userapi', 'recharge', 'images', 'video', 'voice', 'wxcard',
-		'custom', 'chats', 'paycenter', 'keyword', 'special', 'welcome', 'default', 'apply', 'reply', 'core'
-	);
 }
 
 
@@ -688,4 +694,3 @@ EOF;
 	}
 	return '';
 }
-

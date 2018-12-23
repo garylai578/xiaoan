@@ -7,14 +7,13 @@ defined('IN_IA') or exit('Access Denied');
 
 
 if (!($action == 'material' && $do == 'delete') && empty($_GPC['version_id'])) {
-	$account_api = WeAccount::createByUniacid($_W['uniacid']);
+	$account_api = WeAccount::createByUniacid();
 	if (is_error($account_api)) {
 		itoast('', url('account/display'));
 	}
 	$check_manange = $account_api->checkIntoManage();
 	if (is_error($check_manange)) {
-		$account_display_url = $account_api->accountDisplayUrl();
-		itoast('', $account_display_url);
+		itoast('', $account_api->displayUrl);
 	}
 }
 

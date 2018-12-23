@@ -16,7 +16,7 @@ $do = in_array($do , $dos) ? $do : 'chats';
 permission_check_account_user('mc_fans');
 
 if ($do == 'chats') {
-	$account_api = WeAccount::create();
+	$account_api = WeAccount::createByUniacid();
 	$supports = $account_api->getMaterialSupport();
 	$show_chast_content = $supports['chats'];
 
@@ -35,7 +35,7 @@ if ($do == 'send') {
 	$send = $content_formate['send'];
 	$content = $content_formate['content'];
 
-	$account_api = WeAccount::create($_W['acid']);
+	$account_api = WeAccount::createByUniacid();
 	$result = $account_api->sendCustomNotice($send);
 	if (is_error($result)) {
 		iajax(-1, $result['message']);

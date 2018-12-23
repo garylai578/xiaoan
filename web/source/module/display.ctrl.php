@@ -16,13 +16,13 @@ if ($do == 'display') {
 	$user_module = array();
 	if (!$_W['isfounder'] || user_is_vice_founder()) {
 		$account_table = table('account');
-		$userspermission_table = table('userspermission');
+		$userspermission_table = table('users_permission');
 		$user_owned_account = $account_table->userOwnedAccount($_W['uid']);
 
 		if (!empty($user_owned_account) && is_array($user_owned_account)) {
 			foreach ($user_owned_account as $uniacid => $account) {
-				$account_module = uni_modules_list($uniacid, true, $account['type']);
-				$account_user_module = $userspermission_table->userPermission($_W['uid'], $uniacid);
+				$account_module = uni_modules_list($uniacid, $account['type']);
+				$account_user_module = $userspermission_table->getAllUserPermission($_W['uid'], $uniacid);
 								if ($account['type'] == ACCOUNT_TYPE_APP_NORMAL || $account['type'] == ACCOUNT_TYPE_APP_AUTH) {
 					$wxapp_versions = pdo_getall('wxapp_versions', array('uniacid' => $uniacid), '');
 					if (is_array($wxapp_versions) && !empty($wxapp_versions)) {
@@ -49,7 +49,7 @@ if ($do == 'display') {
 		}
 	} else {
 		$user_module = user_modules($_W['uid']);
-		$user_owned_account = table('account')->userOwnedAccount($_W['uid']);
+		$user_owned_account = pdo_getall('account', array('isdeleted' => 0), array(), 'uniacid');
 		foreach($user_owned_account as $account_key => $account) {
 			if (in_array($account['type'], array(ACCOUNT_TYPE_APP_NORMAL, ACCOUNT_TYPE_APP_AUTH, ACCOUNT_TYPE_WXAPP_WORK))) {
 				$versions = miniapp_version_all($account['uniacid']);
@@ -67,7 +67,7 @@ if ($do == 'display') {
 				}
 				$user_owned_account[$account_key]['premission_modules'] = array_unique($user_owned_account[$account_key]['premission_modules']);
 			} else {
-				$account_modules = uni_modules_by_uniacid($account['uniacid'], true);
+				$account_modules = uni_modules_list($account['uniacid'], $account['type']);
 				$user_owned_account[$account_key]['premission_modules'] = array_keys($account_modules);
 			}
 		}
@@ -141,7 +141,7 @@ if ($do == 'switch') {
 	if (empty($uniacid) && !empty($version_id)) {
 		uni_account_save_switch($version_info['uniacid'], WXAPP_TYPE_SIGN);
 		miniapp_update_last_use_version($version_info['uniacid'], $version_id);
-		itoast('', url('account/display/switch', array('uniacid' => $uniacid, 'module' => $module_name, 'version_id' => $version_id, 'type' => ACCOUNT_TYPE_APP_NORMAL)), 'success');
+		itoast('', url('account/display/switch', array('uniacid' => $uniacid, 'module_name' => $module_name, 'version_id' => $version_id, 'type' => ACCOUNT_TYPE_APP_NORMAL)), 'success');
 	}
 	if (!empty($uniacid)) {
 		if (empty($version_id)) {
@@ -152,7 +152,7 @@ if ($do == 'switch') {
 		} else {
 			uni_account_save_switch($version_info['uniacid'], WXAPP_TYPE_SIGN);
 			miniapp_update_last_use_version($version_info['uniacid'], $version_id);
-			itoast('', url('account/display/switch', array('uniacid' => $uniacid, 'module' => $module_name, 'version_id' => $version_id, 'type' => ACCOUNT_TYPE_APP_NORMAL)), 'success');
+			itoast('', url('account/display/switch', array('uniacid' => $uniacid, 'module_name' => $module_name, 'version_id' => $version_id, 'type' => ACCOUNT_TYPE_APP_NORMAL)), 'success');
 		}
 	}
 }

@@ -5,18 +5,16 @@
  */
 defined('IN_IA') or exit('Access Denied');
 
-
-load()->model('webapp');
+load()->model('permission');
 $account_info = permission_user_account_num();
 
 $do = safe_gpc_belong($do, array('create', 'list', 'create_display'), 'list');
-
 if($do == 'create') {
 	if(!checksubmit()) {
 		echo '非法提交';
 		return;
 	}
-	if (!webapp_can_create($_W['uid'])) {
+	if (!permission_user_account_creatable($_W['uid'], WEBAPP_TYPE_SIGN)) {
 		itoast('创建PC个数已满', url('account/display', array('type' => WEBAPP_TYPE_SIGN)));
 	}
 	$data = array(
@@ -41,8 +39,8 @@ if($do == 'create') {
 }
 
 if($do == 'create_display') {
-	if(!webapp_can_create($_W['uid'])) {
-		itoast('', url('account/display', array('type' => WEBAPP_TYPE_SIGN)));
+	if(!permission_user_account_creatable($_W['uid'], WEBAPP_TYPE_SIGN)) {
+		itoast('创建PC个数已满', url('account/display', array('type' => WEBAPP_TYPE_SIGN)));
 	}
 	template('webapp/create');
 }

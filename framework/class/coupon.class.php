@@ -803,8 +803,7 @@ class Card {
 	public $center_title = ''; 	public $center_sub_title = '';
 	public $center_url = '';
 	public $need_push_on_view = false;	public $pay_info = array();
-		public $get_custom_code_mode = "GET_CUSTOM_CODE_MODE_DEPOSIT";
-
+		public $get_custom_code_mode = '';
 	private $types = array('', 'DISCOUNT', 'CASH', 'GROUPON', 'GIFT', 'GENERAL_COUPON', "MEMBER_CARD", "SCENIC_TICKET", "MOVIE_TICKET");
 	private $code_types = array(COUPON_CODE_TYPE_TEXT => 'CODE_TYPE_TEXT', COUPON_CODE_TYPE_QRCODE => 'CODE_TYPE_QRCODE',COUPON_CODE_TYPE_BARCODE => 'CODE_TYPE_BARCODE');
 

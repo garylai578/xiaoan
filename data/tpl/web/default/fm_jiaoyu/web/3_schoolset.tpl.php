@@ -824,6 +824,7 @@
 									<input type="radio" name="is_openht" value="2" <?php  if($reply['is_openht']==2) { ?>checked<?php  } ?> id="houtai2">否
 								</label>
 								<div class="help-block">如果不启用本校后台，已生产独立账号登陆将会提示站点已关闭</div>
+							
 							</div>
 						</div>
 						<div class="form-group">
@@ -907,7 +908,47 @@
 									为您的评价系统手册命名(例如，联系首次、在校表现、成长记录、家园共育、亲子记录)
 								</div>
 							</div>
-						</div>					
+						</div>
+						<?php  if($_W['schooltype']) { ?>
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">课程分享功能</label>
+							<div class="col-sm-2 col-lg-2">
+								<select class="form-control" name="kcshare" id="kcshare">
+									<option value="0" <?php  if($shareset_from['is_share'] == 0) { ?>selected<?php  } ?>>不启用</option>
+									<option value="1" <?php  if($shareset_from['is_share'] == 1) { ?>selected<?php  } ?>>赠送积分</option>
+									<option value="2" <?php  if($shareset_from['is_share'] == 2) { ?>selected<?php  } ?>>赠送余额</option>
+									<option value="3" <?php  if($shareset_from['is_share'] == 3) { ?>selected<?php  } ?>>赠送课时</option>
+								</select>
+								<div class="help-block">启用后用户可分享课程，其他用户购买后可获得相应奖励</div>
+							</div>
+						</div>
+						<div id="share_JF" class="form-group" <?php  if($shareset_from['is_share'] != 1) { ?>style="display:none"<?php  } ?>>
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加积分</label>
+							<div class="input-group">
+									<label class="radio-inline">
+										<input type="text"  class="form-control" name="shareAddJF" value="<?php  echo $shareset_from['addJF'];?>" >
+									</label>
+									<div class="help-block">分享后其他用户购买，给分享源用户增加多少积分</div>
+							</div>		
+						</div>	
+					 	<div id="share_YE" class="form-group" <?php  if($shareset_from['is_share'] != 2) { ?>style="display:none"<?php  } ?>>
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">分享购买增加余额</label>
+							<div class="input-group">
+									<label class="radio-inline">
+										<input type="text"  class="form-control" name="shareAddYE" value="<?php  echo $shareset_from['addYE'];?>" >
+									</label>
+									<div class="help-block">分享后其他用户购买，给分享源用户增加多少余额</div>
+							</div>		
+						</div>
+						<div id="share_KC" class="form-group" <?php  if($shareset_from['is_share'] != 3) { ?>style="display:none"<?php  } ?>>
+							<input type="hidden"  class="form-control" name="shareAddKC" value="0" >
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">增加课时:</label>
+							<div class="input-group">
+								<input type="text"  class="form-control" name="shareAddKS" value="<?php  echo $shareset_from['addKS'];?>" >
+								<div class="help-block">分享后其他用户购买，给分享源用户增加当前课程（分享课程）课时</div>
+							</div>							
+						</div>	
+						<?php  } ?>						
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">班级圈审核</label>
 							<div class="col-sm-9">
@@ -953,7 +994,7 @@
 								</select>
 								<div class="help-block">默认：姓名+手机（手机为：报名录入资料时的号码）</div>
 							</div>
-						</div>
+						</div>					
 					</div>		
 				</div>		
 			</div>					
@@ -1590,6 +1631,28 @@ function changeGrade(gradeId, type, __result) {
 		$('#jfzjbl').hide();
 	});
 
+	
+	$("#kcshare").change(function() {
+		var type = $("#kcshare option:selected").attr('value');
+		if (type == 1){
+			$("#share_JF").show();
+			$("#share_YE").hide();
+			$("#share_KC").hide();
+		}else if (type == 2){
+			$("#share_JF").hide();
+			$("#share_YE").show();
+			$("#share_KC").hide();
+		}else if(type == 3){
+			$("#share_JF").hide();
+			$("#share_YE").hide();
+			$("#share_KC").show();
+		}else if(type == 0){
+			$("#share_JF").hide();
+			$("#share_YE").hide();
+			$("#share_KC").hide();
+		}
+		
+	});
 require(['jquery', 'util', 'bootstrap.switch'], function($, u){
 
 	$(':checkbox[name="is_video[]"]').bootstrapSwitch();

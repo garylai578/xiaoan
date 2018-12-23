@@ -65,15 +65,16 @@ function miniapp_create($account, $type) {
 		pdo_insert('account_aliapp', $data);
 	} elseif (in_array($type, array(ACCOUNT_TYPE_APP_NORMAL, ACCOUNT_TYPE_APP_AUTH))) {
 		$data = array(
-				'acid' => $acid,
-				'token' => isset($account['token']) ? $account['token'] : random(32),
-				'encodingaeskey' => isset($account['encodingaeskey']) ? $account['encodingaeskey'] : random(43),
-				'uniacid' => $uniacid,
-				'name' => $account['name'],
-				'original' => $account['original'],
-				'level' => $account['level'],
-				'key' => $account['key'],
-				'secret' => $account['secret'],
+			'acid' => $acid,
+			'token' => isset($account['token']) ? $account['token'] : random(32),
+			'encodingaeskey' => isset($account['encodingaeskey']) ? $account['encodingaeskey'] : random(43),
+			'auth_refresh_token' => isset($account['auth_refresh_token']) ? $account['auth_refresh_token'] : '',
+			'uniacid' => $uniacid,
+			'name' => $account['name'],
+			'original' => $account['original'],
+			'level' => $account['level'],
+			'key' => $account['key'],
+			'secret' => $account['secret'],
 		);
 		pdo_insert('account_wxapp', $data);
 
@@ -117,13 +118,24 @@ function miniapp_support_wxapp_modules() {
 	$store_table = table('store');
 	$store_table->searchWithEndtime();
 	$buy_wxapp_modules = $store_table->searchAccountBuyGoods($_W['uniacid'], STORE_TYPE_WXAPP_MODULE);
+	$store_table->searchWithEndtime();
+	$buy_group = $store_table->searchAccountBuyGoods($_W['uniacid'], STORE_TYPE_PACKAGE);
+	$buy_group_wxapp_modules = array();
+	if (!empty($buy_group)) {
+		foreach ($buy_group as $id => $group) {
+			$uni_groups = uni_groups(array($id));
+			if (is_array($uni_groups[$id]['wxapp'])) {
+				$buy_group_wxapp_modules = array_merge($buy_group_wxapp_modules, $uni_groups[$id]['wxapp']);
+			}
+		}
+	}
 	$extra_permission = table('account')->getAccountExtraPermission($_W['uniacid']);
 	$extra_modules = empty($extra_permission['modules']) ? array() : $extra_permission['modules'];
 	foreach ($extra_modules as $key => $value) {
 		$extra_modules[$value] = module_fetch($value);
 		unset($extra_modules[$key]);
 	}
-	$wxapp_modules = array_merge($buy_wxapp_modules, $wxapp_modules, $extra_modules);
+	$wxapp_modules = array_merge($buy_wxapp_modules, $buy_group_wxapp_modules, $wxapp_modules, $extra_modules);
 	if (empty($wxapp_modules)) {
 		return array();
 	}
@@ -312,6 +324,7 @@ function miniapp_version($version_id) {
 		return $version_info;
 	}
 
+		load()->classs('wxapp.account');
 	$cachekey = cache_system_key('miniapp_version', array('version_id' => $version_id));
 	$cache = cache_load($cachekey);
 	if (!empty($cache)) {
@@ -340,7 +353,7 @@ function miniapp_version_detail_info($version_info) {
 				$module_info = module_fetch($module['name']);
 				if (!empty($module['uniacid'])) {
 					$link_account = uni_fetch($module['uniacid']);
-					$module_info['account'] = $link_account;
+					$module_info['account'] = $link_account->account;
 				}
 				unset($version_info['modules'][$module['name']]);
 				if (!in_array($module['name'], $uni_modules)) {
@@ -357,6 +370,7 @@ function miniapp_version_detail_info($version_info) {
 			$version_info['cover_entrys'] = !empty($cover_entrys['cover']) ? $cover_entrys['cover'] : array();
 		}
 		$version_info['last_modules'] = iunserializer($version_info['last_modules']);
+		$version_info['tominiprogram'] = iunserializer($version_info['tominiprogram']);
 		if (!empty($version_info['quickmenu'])) {
 			$version_info['quickmenu'] = iunserializer($version_info['quickmenu']);
 		}
@@ -432,7 +446,7 @@ function miniapp_update_daily_visittrend() {
 
 function miniapp_insert_date_visit_trend($date) {
 	global $_W;
-	$account_api = WeAccount::create();
+	$account_api = WeAccount::createByUniacid();
 	$wxapp_stat = $account_api->getDailyVisitTrend($date);
 	if (is_error($wxapp_stat) || empty($wxapp_stat)) {
 		return error(-1, '调用微信接口错误');
@@ -477,21 +491,23 @@ function miniapp_code_generate($version_id, $user_version) {
 
 	$appid = $account_wxapp_info['key'];
 	$siteinfo = array(
-			'name' => $account_wxapp_info['name'],
-			'uniacid' => $account_wxapp_info['uniacid'],
-			'acid' => $account_wxapp_info['acid'],
-			'multiid' => $account_wxapp_info['version']['multiid'],
-			'version' => $user_version,
-			'siteroot' => $siteurl,
-			'design_method' => $account_wxapp_info['version']['design_method'],
+		'name' => $account_wxapp_info['name'],
+		'uniacid' => $account_wxapp_info['uniacid'],
+		'acid' => $account_wxapp_info['acid'],
+		'multiid' => $account_wxapp_info['version']['multiid'],
+		'version' => $user_version,
+		'siteroot' => $siteurl,
+		'design_method' => $account_wxapp_info['version']['design_method'],
+		'tominiprogram' => $version_info['tominiprogram'],
 	);
 
-	$commit_data = array('do' => 'generate',
-			'appid' => $appid,
-			'modules' => $account_wxapp_info['version']['modules'],
-			'siteinfo' => $siteinfo,
-			'tabBar' => json_decode($account_wxapp_info['version']['quickmenu'], true),
-						'wxapp_type' => isset($version_info['type']) ? $version_info['type'] : 0,
+	$commit_data = array(
+		'do' => 'generate',
+		'appid' => $appid,
+		'modules' => $account_wxapp_info['version']['modules'],
+		'siteinfo' => $siteinfo,
+		'tabBar' => json_decode($account_wxapp_info['version']['quickmenu'], true),
+				'wxapp_type' => isset($version_info['type']) ? $version_info['type'] : 0,
 	);
 
 	$do = 'upload2';
@@ -675,6 +691,12 @@ function miniapp_code_save_appjson($version_id, $json) {
 
 function miniapp_code_set_default_appjson($version_id) {
 	$result = pdo_update('wxapp_versions', array('appjson' => '', 'use_default' => 1), array('id' => $version_id));
+	cache_delete(cache_system_key('miniapp_version', array('version_id' => $version_id)));
+	return $result;
+}
+
+function miniapp_version_update($version_id, $data) {
+	$result = table('wxapp_versions')->fill($data)->where('id', $version_id)->save();
 	cache_delete(cache_system_key('miniapp_version', array('version_id' => $version_id)));
 	return $result;
 }

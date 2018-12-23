@@ -3,18 +3,21 @@
 <script>
 	$(function(){
 		$(document).on('input propertychange', '.js-mobile-val', function(){
-				var mobile_value = $(this).val();
-				var register_mode = $("#register_mode").val();
-				if (register_mode == 'mobile' && mobile_value.length != '11') {
-					$('.js-check-mobile').removeClass('send-code');
-				}
-				if (register_mode == 'email' && !/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(mobile_value)) {
-					$('.js-check-mobile').removeClass('send-code');
-				}
-				if (register_mode == 'random' && !(mobile_value.length == '11' || /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(mobile_value))) {
-					$('.js-check-mobile').removeClass('send-code');
-				}
-				$.post("{php echo url('auth/login/mobile_exist')}", {'mobile' : mobile_value, 'find_mode':register_mode}, function(data) {
+			var inputVal = $(this).val();
+			var register_mode = $("#register_mode").val();
+			var isMobile = /^1[34578]\d{9}$/.test(inputVal);
+			var isEmail = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(inputVal);
+			if (register_mode == 'mobile' && !isMobile) {
+				$('.js-check-mobile').removeClass('send-code');
+			}
+			if (register_mode == 'email' && !isEmail) {
+				$('.js-check-mobile').removeClass('send-code');
+			}
+			if (register_mode == 'random' && !(!isMobile || isEmail)) {
+				$('.js-check-mobile').removeClass('send-code');
+			}
+			if (isMobile) {
+				$.post("{php echo url('auth/login/mobile_exist')}", {'mobile' : inputVal, 'find_mode':register_mode}, function(data) {
 					data = $.parseJSON(data);
 					if (data.message.errno == '1') {
 						$('.js-check-mobile').addClass('send-code');
@@ -24,6 +27,7 @@
 						return;
 					}
 				});
+			}
 			});
 		$(document).on('click', '.send-code', function(){
 			var username = $('#sendcode input[name="username"]').val();

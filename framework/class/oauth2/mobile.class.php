@@ -84,13 +84,10 @@ class Mobile extends OAuth2Client {
 			return error(-1, '短信验证码不能为空');
 		}
 
-		$user_table = table('users');
-		$code_info = $user_table->userVerifyCode($mobile, $smscode);
-		if (empty($code_info)) {
-			return error(-1, '短信验证码不正确');
-		}
-		if ($code_info['createtime'] + 120 < TIMESTAMP) {
-			return error(-1, '短信验证码已过期，请重新获取');
+		load()->model('utility');
+		$verify_info = utility_smscode_verify(0, $mobile, $smscode);
+		if (is_error($verify_info)) {
+			return error(-1, $verify_info['message']);
 		}
 
 		if(istrlen($member['password']) < 8) {
@@ -170,7 +167,6 @@ class Mobile extends OAuth2Client {
 		$image_code =trim($_GPC['imagecode']);
 		$sms_code = trim($_GPC['smscode']);
 
-		$user_table = table('users');
 		if (empty($sms_code)) {
 			return error(-1, '短信验证码不能为空');
 		}
@@ -194,12 +190,10 @@ class Mobile extends OAuth2Client {
 			}
 		}
 
-		$code_info = $user_table->userVerifyCode($mobile, $sms_code);
-		if (empty($code_info)) {
-			return error(-1, '短信验证码不正确');
-		}
-		if ($code_info['createtime'] + 120 < TIMESTAMP) {
-			return error(-1, '短信验证码已过期，请重新获取');
+		load()->model('utility');
+		$verify_info = utility_smscode_verify(0, $mobile, $smscode);
+		if (is_error($verify_info)) {
+			return error(-1, $verify_info['message']);
 		}
 	}
 }

@@ -28,7 +28,7 @@ if (checksubmit()) {
 		'groupid' => intval($_GPC['groupid']) ? intval($_GPC['groupid']) : 0,
 		'starttime' => TIMESTAMP,
 		'endtime' => intval(strtotime($_GPC['endtime'])),
-		'owner_uid' => !empty($vice_founder_name) ? $vice_founder_info['uid'] : 0,
+		'owner_uid' => !empty($vice_founder_name) ? $vice_founder_info['uid'] : !user_is_vice_founder($_W['uid']) ? 0 : $_W['uid'],
 	);
 
 	$user_add = user_info_save($user_founder);

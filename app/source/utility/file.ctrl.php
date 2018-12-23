@@ -74,7 +74,7 @@ if ($do == 'upload') {
 				$result['error']['message'] = '上传失败，请重试！';
 				die(json_encode($result));
 			}
-			if (!file_is_image($_FILES['file']['name'])) {
+			if (!file_is_image($_FILES['file']['tmp_name'])) {
 				$result['message'] = '上传失败, 请重试.';
 				die(json_encode($result));
 			}

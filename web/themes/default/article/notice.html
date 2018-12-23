@@ -1,9 +1,5 @@
 {template 'common/header'}
-<div class="we7-page-title">公告管理</div>
-<ul class="we7-page-tab">
-	<li {if $do == 'list'}class="active"{/if}><a href="{php echo url('article/notice/list');}">公告列表</a></li>
-	<li {if $do == 'category' || $do == 'category_post'}class="active"{/if}><a href="{php echo url('article/notice/category');}">公告分类</a></li>
-</ul>
+{template 'article/common'}
 {if $do == 'list'}
 	<form action="" method="get" class="we7-form" role="form">
 		<input type="hidden" name="c" value="article">

@@ -53,9 +53,9 @@
 				<div class="color-gray" ng-bind="item.description"></div>
 			</td>
 			<td class="clearfix">
-				<div class="item col-sm-6" ng-if="item.last_modules">
-					<img ng-src="{{item.last_modules.logo}}" class="icon"/>
-					<div class="name" ng-bind="item.last_modules.title"></div>
+				<div class="item col-sm-6" ng-if="item.module">
+					<img ng-src="{{item.module.logo}}" class="icon"/>
+					<div class="name" ng-bind="item.module.title"></div>
 				</div>
 			</td>
 			<td class="text-center">
@@ -78,7 +78,7 @@
 			</td>
 		</tr>
 		<tr ng-if="!version_exist">
-			<td colspan="3" class="text-center">暂无数据</td>
+			<td colspan="5" class="text-center">暂无数据</td>
 		</tr>
 	</table>
 	<div class="modal fade" id="modal_edit_versioninfo"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">

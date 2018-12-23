@@ -46,7 +46,7 @@ if($do == 'list') {
 		}
 		setcookie('special_reply_type', '', time()-3600);
 	} else {
-		$installedmodulelist = uni_modules(false);
+		$installedmodulelist = uni_modules();
 		foreach ($installedmodulelist as $k => $value) {
 			$installedmodulelist[$k]['official'] = empty($value['issystem']) && (strexists($value['author'], 'WeEngine Team') || strexists($value['author'], '微擎团队'));
 		}

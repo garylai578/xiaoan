@@ -102,6 +102,7 @@ function wechat_build($params, $wechat) {
 		$string1 = '';
 		foreach($package as $key => $v) {
 			if (empty($v)) {
+				unset($package[$key]);
 				continue;
 			}
 			$string1 .= "{$key}={$v}&";
@@ -166,6 +167,7 @@ function wechat_build($params, $wechat) {
 		$string1 = '';
 		foreach($package as $key => $v) {
 			if (empty($v)) {
+				unset($package[$key]);
 				continue;
 			}
 			$string1 .= "{$key}={$v}&";
@@ -309,6 +311,14 @@ function payment_setting() {
 			'mchid' => '',
 		);
 	}
+	
+		if (empty($pay_setting['wechat_facilitator'])) {
+			$pay_setting['wechat_facilitator'] = array(
+				'switch' => false,
+				'mchid' => '',
+				'signkey' => '',
+			);
+		}
 	
 		if (empty($_W['isfounder'])) {
 		$user_account_list = pdo_getall('uni_account_users', array('uid' => $_W['uid']), array(), 'uniacid');

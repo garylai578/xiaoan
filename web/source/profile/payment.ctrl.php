@@ -11,7 +11,7 @@ load()->func('communication');
 
 $dos = array('save_setting', 'display', 'test_alipay', 'get_setting', 'switch', 'change_status');
 $do = in_array($do, $dos) ? $do : 'display';
-permission_check_account_user('profile_pay_setting');
+permission_check_account_user('profile_payment_pay');
 $_W['page']['title'] = '支付参数 - 公众号选项';
 
 if ($do == 'get_setting') {
@@ -46,6 +46,10 @@ if ($do == 'save_setting') {
 	$param = $_GPC['param'];
 	$setting = uni_setting_load('payment', $_W['uniacid']);
 	$pay_setting = $setting['payment'];
+	
+		if ($type == 'wechat_facilitator') {
+			$param['switch'] = $param['switch'] == 'true' ? true : false;
+		}
 	
 	if ($type == 'wechat') {
 		$param['account'] = $_W['acid'];
@@ -105,6 +109,10 @@ MFF/yA==
 	$pay_setting[$type] = $param;
 	$payment = iserializer($pay_setting);
 	uni_setting_save('payment', $payment);
+	
+		if ($type == 'wechat_facilitator') {
+			cache_clean(cache_system_key('proxy_wechatpay_account:'));
+		}
 	
 	iajax(0, '设置成功！', referer());
 }

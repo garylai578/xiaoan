@@ -121,9 +121,7 @@ function material_news_set($data, $attach_id) {
 			return error('-2', '编辑素材不存在');
 		}
 		$wechat_attachment['model'] = 'local';
-		pdo_update('wechat_attachment', $wechat_attachment, array(
-			'id' => $attach_id
-		));
+		pdo_update('wechat_attachment', $wechat_attachment, array('id' => $attach_id, 'uniacid' => $_W['uniacid']));
 		pdo_delete('wechat_news', array('attach_id' => $attach_id, 'uniacid' => $_W['uniacid']));
 		foreach ($post_news as $id => $news) {
 			$news['attach_id'] = $attach_id;
@@ -271,7 +269,7 @@ function material_parse_content($content) {
 				return $thumb;
 			}
 			$thumb = ATTACHMENT_ROOT . $thumb;
-			$account_api = WeAccount::create($_W['acid']);
+			$account_api = WeAccount::createByUniacid();
 			$result = $account_api->uploadNewsThumb($thumb);
 			if (is_error($result)) {
 				return $result;
@@ -285,7 +283,7 @@ function material_parse_content($content) {
 
 function material_local_news_upload($attach_id) {
 	global $_W;
-	$account_api = WeAccount::create($_W['acid']);
+	$account_api = WeAccount::createByUniacid();
 	$material = material_get($attach_id);
 	if (is_error($material)){
 		return error('-1', '获取素材文件失败');
@@ -352,7 +350,7 @@ function material_local_news_upload($attach_id) {
 
 function material_local_upload_by_url($url, $type='images') {
 	global $_W;
-	$account_api = WeAccount::create($_W['acid']);
+	$account_api = WeAccount::createByUniacid();
 	if (! empty($_W['setting']['remote']['type'])) {
 		$remote_file_url = tomedia($url);
 		$filepath = file_remote_attach_fetch($remote_file_url,0,'');
@@ -421,7 +419,7 @@ function material_news_delete($material_id){
 		return error('-2', '素材文件不存在或已删除');
 	}
 	if (!empty($material['media_id'])){
-		$account_api = WeAccount::create($_W['acid']);
+		$account_api = WeAccount::createByUniacid();
 		$result = $account_api->delMaterial($material['media_id']);
 	}
 	if (is_error($result)){
@@ -445,7 +443,7 @@ function material_delete($material_id, $location){
 		return error('-2', '素材文件不存在或已删除');
 	}
 	if ($location == 'wechat' && !empty($material['media_id'])){
-		$account_api = WeAccount::create($_W['acid']);
+		$account_api = WeAccount::createByUniacid();
 		$result = $account_api->delMaterial($material['media_id']);
 	} else {
 						if (!empty($material['uniacid'])) {
@@ -475,7 +473,7 @@ function material_url_check($url) {
 		return true;
 	} else {
 		$pattern ="/^((https|http|tel):\/\/|\.\/index.php)[^\s]+/i";
-		return preg_match($pattern, $url);
+		return preg_match($pattern, trim($url));
 	}
 }
 

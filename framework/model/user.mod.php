@@ -571,6 +571,7 @@ function modules_support_all($modulenames) {
 
 function user_login_forward($forward = '') {
 	global $_W, $_GPC;
+	load()->model('module');
 	$login_forward = trim($forward);
 
 	$login_location = array(
@@ -612,7 +613,7 @@ function user_login_forward($forward = '') {
 		$last_visit_uniacid = intval($last_visit[0]);
 		$last_visit_url = url_params($last_visit[1]);
 		if ($last_visit_url['c'] == 'site' && in_array($last_visit_url['a'], array('entry', 'nav')) ||
-			$last_visit_url['c'] == 'platform' && in_array($last_visit_url['a'], array('cover', 'reply')) && !in_array($last_visit_url['m'], system_modules()) ||
+			$last_visit_url['c'] == 'platform' && in_array($last_visit_url['a'], array('cover', 'reply')) && !in_array($last_visit_url['m'], module_system()) ||
 			$last_visit_url['c'] == 'module' && in_array($last_visit_url['a'], array('manage-account', 'permission', 'display'))) {
 			return $login_location['module'];
 		} else {
@@ -690,10 +691,16 @@ function user_save_group($group_info) {
 			return error(-1, '当前用户组的公众号个数不能超过' . $founder_info['maxaccount'] . '个！');
 		}
 		if ($group_info['maxwxapp'] > $founder_info['maxwxapp']) {
-			return error(-1, '当前用户组的公众号个数不能超过' . $founder_info['maxwxapp'] . '个！');
+			return error(-1, '当前用户组的小程序个数不能超过' . $founder_info['maxwxapp'] . '个！');
 		}
 		if ($group_info['maxwebapp'] > $founder_info['maxwebapp']) {
-			return error(-1, '当前用户组的公众号个数不能超过' . $founder_info['maxwebapp'] . '个！');
+			return error(-1, '当前用户组的PC个数不能超过' . $founder_info['maxwebapp'] . '个！');
+		}
+		if ($group_info['maxphoneapp'] > $founder_info['maxphoneapp']) {
+			return error(-1, '当前用户组的APP个数不能超过' . $founder_info['maxphoneapp'] . '个！');
+		}
+		if ($group_info['maxxzapp'] > $founder_info['maxxzapp']) {
+			return error(-1, '当前用户组的熊掌号个数不能超过' . $founder_info['maxxzapp'] . '个！');
 		}
 		if ($group_info['maxaliapp'] > $founder_info['maxaliapp']) {
 			return error(-1, '当前用户组的支付宝小程序个数不能超过' . $founder_info['maxaliapp'] . '个！');
@@ -867,7 +874,7 @@ function user_list_format($users) {
 function user_info_save($user, $is_founder_group = false) {
 	global $_W;
 	if (!preg_match(REGULAR_USERNAME, $user['username'])) {
-		return error(-1, '必须输入用户名，格式为 3-15 位字符，可以包括汉字、字母（不区分大小写）、数字、下划线和句点。');
+		return error(-1, '必须输入用户名，格式为 3-30 位字符，可以包括汉字、字母（不区分大小写）、数字、下划线和句点。');
 	}
 	if (user_check(array('username' => $user['username']))) {
 		return error(-1, '非常抱歉，此用户名已经被注册，你需要更换注册名称！');
@@ -967,7 +974,7 @@ function user_borrow_oauth_account_list() {
 	$jsoauth_accounts = array();
 	if(!empty($user_have_accounts)) {
 		foreach($user_have_accounts as $account) {
-			if(!empty($account['key']) && !empty($account['secret'])) {
+			if(!empty($account['key']) && (!empty($account['secret']) || $account['type'] == ACCOUNT_TYPE_OFFCIAL_AUTH)) {
 				if (in_array($account['level'], array(ACCOUNT_SERVICE_VERIFY))) {
 					$oauth_accounts[$account['acid']] = $account['name'];
 				}
@@ -1035,6 +1042,23 @@ function user_is_bind() {
 }
 
 
+function user_check_mobile($mobile) {
+	if (empty($mobile)) {
+		return error(-1, '手机号不能为空');
+	}
+	if (!preg_match(REGULAR_MOBILE, $mobile)) {
+		return error(-1, '手机号格式不正确');
+	}
+
+	$user_profile = table('users');
+	$find_mobile = $user_profile->userProfileMobile($mobile);
+	if (empty($find_mobile)) {
+		return error(-1, '手机号不存在');
+	}
+	return $find_mobile;
+}
+
+
 function user_change_welcome_status($uid, $welcome_status) {
 	if (empty($uid)) {
 		return true;
@@ -1064,6 +1088,9 @@ function user_after_login_link() {
 			break;
 		case PLATFORM_DISPLAY_TYPE:
 			$url = url('account/display/platform');
+			break;
+		case MODULE_DISPLAY_TYPE:
+			$url = url('module/display');
 			break;
 		default:
 			$url = '';

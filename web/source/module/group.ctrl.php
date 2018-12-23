@@ -46,7 +46,7 @@ if ($do == 'display') {
 	$pageindex = max(1, intval($_GPC['page']));
 	$pagesize = 10;
 
-	$condition = 'WHERE uniacid = 0';
+	$condition = 'WHERE uniacid = 0 AND uid = 0';
 	$params = array();
 	$name = safe_gpc_string($_GPC['name']);
 	if (!empty($name)) {

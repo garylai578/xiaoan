@@ -11,18 +11,15 @@ load()->classs('uploadedfile');
 
 $dos = array('front_download', 'domainset', 'code_uuid', 'code_gen', 'code_token', 'qrcode', 'checkscan',
 	'commitcode', 'preview', 'getpackage', 'entrychoose', 'set_wxapp_entry',
-	'custom', 'custom_save', 'custom_default', 'custom_convert_img', 'upgrade_module');
+	'custom', 'custom_save', 'custom_default', 'custom_convert_img', 'upgrade_module', 'tominiprogram', 'del_tominiprogram');
 $do = in_array($do, $dos) ? $do : 'front_download';
 
 $_W['page']['title'] = '小程序下载 - 小程序 - 管理';
 
-$version_id = intval($_GPC['version_id']);
 $wxapp_info = miniapp_fetch($_W['uniacid']);
-
 
 $is_module_wxapp = false;
 if (!empty($version_id)) {
-	$version_info = miniapp_version($version_id);
 	$is_single_module_wxapp = $version_info['type'] == WXAPP_CREATE_MODULE; }
 
 
@@ -100,14 +97,14 @@ if ($do == 'domainset') {
 			$file->moveTo(IA_ROOT.'/'.$file->getClientFilename()); 		}
 
 		if ($version_info) {
-			$update = pdo_update('account_wxapp', array('appdomain' => $appurl),
-				array('uniacid' => $uniacid));
-			itoast('更新小程序域名成功'); 		}
+			$update = pdo_update('account_wxapp', array('appdomain' => $appurl), array('uniacid' => $uniacid));
+			itoast('更新成功'); 		}
 	}
 	template('wxapp/version-front-download');
 }
 
 if ($do == 'front_download') {
+	permission_check_account_user('wxapp_profile_front_download');
 	$appurl = $_W['siteroot'].'/app/index.php';
 	$uptype = $_GPC['uptype'];
 	$wxapp_versions_info = miniapp_version($version_id);
@@ -199,6 +196,43 @@ if ($do == 'commitcode') {
 	echo json_encode($data);
 }
 
+if ($do == 'tominiprogram') {
+	$tomini_lists = $version_info['tominiprogram'];
+	if (checksubmit()) {
+		$appid = safe_gpc_string(trim($_GPC['appid']));
+		if (empty($appid)) {
+			itoast('appid不可为空！', referer(), 'error');
+		}
+		if (in_array($appid, $tomini_lists)) {
+			itoast('该appid值已存在！', referer(), 'error');
+		}
+		if (count($tomini_lists) == 10) {
+			itoast('要跳转的小程序不可超过10个！', referer(), 'error');
+		}
+		if (empty($tomini_lists)) {
+			$data = array('tominiprogram' => iserializer(array($appid)));
+		} else {
+			$tomini_lists[] = $appid;
+			$data = array('tominiprogram' => iserializer($tomini_lists));
+		}
+		miniapp_version_update($version_id, $data);
+		itoast('保存成功！', referer(), 'success');
+	}
+
+	template('wxapp/version-front-download');
+}
+
+if ($do == 'del_tominiprogram') {
+	$tomini_lists = $version_info['tominiprogram'];
+	$appid = safe_gpc_string(trim($_GPC['appid']));
+	if (!in_array($appid, $tomini_lists)) {
+		itoast('不存在该appid', referer(), 'error');
+	}
+	$tomini_lists = array_diff($tomini_lists, array($appid));
+	$data = array('tominiprogram' => iserializer($tomini_lists));
+	miniapp_version_update($version_id, $data);
+	itoast('删除成功！', referer(), 'success');
+}
 if ($do == 'getpackage') {
 	if (empty($version_id)) {
 		itoast('参数错误！', '', '');

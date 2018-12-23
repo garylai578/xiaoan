@@ -24,6 +24,30 @@ function ver_compare($version1, $version2) {
 	return version_compare($version1, $version2);
 }
 
+function iget_headers($url, $format = 0) {
+	$result = @get_headers($url, $format);
+	if (empty($result)) {
+		stream_context_set_default(array(
+			'ssl' => array(
+				'verify_peer' => false,
+				'verify_peer_name' => false,
+			),
+		));
+		$result = get_headers($url, $format);
+	}
+	return $result;
+}
+
+function igetimagesize($filename, $imageinfo = array()) {
+	$result = @getimagesize($filename, $imageinfo);
+	if (empty($result)) {
+		$file_content = ihttp_request($filename);
+		$content = $file_content['content'];
+		$result = getimagesize('data://image/jpeg;base64,'. base64_encode($content), $imageinfo);
+	}
+	return $result;
+}
+
 
 function istripslashes($var) {
 	if (is_array($var)) {
@@ -152,6 +176,7 @@ function checkcaptcha($code) {
 	isetcookie('__code', '');
 	return $return;
 }
+
 
 function tablename($table) {
 	if(empty($GLOBALS['_W']['config']['db']['master'])) {
@@ -516,7 +541,10 @@ function tomedia($src, $local_path = false){
 	if ((substr($t, 0, 7) == 'http://') || (substr($t, 0, 8) == 'https://') || (substr($t, 0, 2) == '//')) {
 		return $src;
 	}
-	if ($local_path || empty($_W['setting']['remote']['type']) || file_exists(IA_ROOT . '/' . $_W['config']['upload']['attachdir'] . '/' . $src)) {
+		if ($local_path ||
+		empty($_W['setting']['remote']['type']) && (empty($_W['uniacid']) || !empty($_W['uniacid']) && empty($_W['setting']['remote'][$_W['uniacid']]['type'])) ||
+		file_exists(IA_ROOT . '/' . $_W['config']['upload']['attachdir'] . '/' . $src)) {
+
 		$src = $_W['siteroot'] . $_W['config']['upload']['attachdir'] . '/' . $src;
 	} else {
 		$src = $_W['attachurl_remote'] . $src;
@@ -1045,7 +1073,7 @@ function isimplexml_load_string($string, $class_name = 'SimpleXMLElement', $opti
 	if (preg_match('/(\<\!DOCTYPE|\<\!ENTITY)/i', $string)) {
 		return false;
 	}
-	return simplexml_load_string($string, $class_name, $options, $ns, $is_prefix);
+	$string = preg_replace("/[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f\\x7f]/", '', $string); 	return simplexml_load_string($string, $class_name, $options, $ns, $is_prefix);
 }
 
 function ihtml_entity_decode($str) {

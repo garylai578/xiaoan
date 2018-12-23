@@ -56,6 +56,9 @@
 								</div>
 								<div class="table-div__item name">{$section['title']}</div>
 								<div class="table-div__item display">
+									{if in_array($section_name, array('account', 'wxapp', 'xzapp', 'phoneapp', 'webapp', 'aliapp'))}
+									<span class="switch" ng-init="displayStatus['{$section_name}'] = {php echo $section['is_display'] ? 'true' : 'false'}" ng-click="changeDisplay('{$section_name}')" ng-class="{'switchOn' : displayStatus['{$section_name}'], 'switchOff' : !displayStatus['{$section_name}']}"></span>
+									{/if}
 									<!--<span class="switch switchOn"></span>-->
 								</div>
 								<div class="table-div__item action">
@@ -68,7 +71,13 @@
 								</div>
 							</div>
 							<ul class="three">
-								{loop $section['menu'] $sub_permission_name $sub_menu}
+								{if in_array($section_name, array('account', 'wxapp', 'xzapp', 'phoneapp', 'webapp', 'aliapp'))}
+									{php $section_menu_two = $section['section']}
+								{else}
+									{php $section_menu_two = $section['menu']}
+								{/if}
+								{loop $section_menu_two $sub_permission_name $sub_menu}
+
 								{if $sub_permission_name == 'wxapp_platform_material'}
 									{php continue;}
 								{/if}
@@ -82,33 +91,37 @@
 											{if $sub_permission_name == 'system_setting_menu'}
 											<span class="color-gray">默认开启</span>
 											{else}
+
+											{if !in_array($section_name, array('account', 'wxapp', 'xzapp', 'phoneapp', 'webapp', 'aliapp'))}
 											<span class="switch" ng-init="displayStatus['{$sub_menu['permission_name']}'] = {php echo $sub_menu['is_display'] ? 'true' : 'false'}" ng-click="changeDisplay('{$sub_menu['permission_name']}')" ng-class="{'switchOn' : displayStatus['{$sub_menu['permission_name']}'], 'switchOff' : !displayStatus['{$sub_menu['permission_name']}']}"></span>
+											{/if}
+
 											{/if}
 										</div>
 										<div class="table-div__item action">
 											<div class="link-group">
 												<a href="javascript:;" ng-click="editItemPanel({displayorder: '{$sub_menu['displayorder']}', title : '{$sub_menu['title']}', url : '{$sub_menu['url']}', permissionName : '{$sub_menu['permission_name']}', isSystem : '{$sub_menu['is_system']}', id : '{$sub_menu['id']}', 'group' : '{$sub_menu['group']}', 'icon' : '{$sub_menu['icon']}'})">编辑</a>
 												{if empty($sub_menu['is_system'])}<a href="javascript:;" ng-click="removeSubItem('{$sub_permission_name}')">删除</a>{/if}
+												{if !empty($sub_menu['menu'])}
 												<a href="javascript:;" class="toggle"></a>
+												{/if}
 											</div>
 										</div>
 									</div>
 									<ul class="four">
-										{loop $section['menu'] $sub_permission_name $sub_menu}
-										{if $sub_permission_name == 'wxapp_platform_material'}
-											{php continue;}
-										{/if}
+										{if in_array($section_name, array('account', 'wxapp', 'xzapp', 'phoneapp', 'webapp', 'aliapp'))}
+										{loop $sub_menu['menu'] $sub_menu_permission_name $sub_menu_permission}
 										<li class="menu-item ">
 											<div class="table-div table-div-menu">
 												<div class="table-div__item order">
-													{php echo intval($sub_menu['displayorder'])}
+													{php echo intval($sub_menu_permission['displayorder'])}
 												</div>
-												<div class="table-div__item name">{$sub_menu['title']}</div>
+												<div class="table-div__item name">{$sub_menu_permission['title']}</div>
 												<div class="table-div__item display">
-													{if $sub_permission_name == 'system_setting_menu'}
+													{if $sub_menu_permission_name == 'system_setting_menu'}
 													<span class="color-gray">默认开启</span>
 													{else}
-													<span class="switch" ng-init="displayStatus['{$sub_menu['permission_name']}'] = {php echo $sub_menu['is_display'] ? 'true' : 'false'}" ng-click="changeDisplay('{$sub_menu['permission_name']}')" ng-class="{'switchOn' : displayStatus['{$sub_menu['permission_name']}'], 'switchOff' : !displayStatus['{$sub_menu['permission_name']}']}"></span>
+													<span class="switch" ng-init="displayStatus['{$sub_menu_permission_name}'] = {php echo $sub_menu_permission['is_display'] ? 'true' : 'false'}" ng-click="changeDisplay('{$sub_menu_permission['permission_name']}')" ng-class="{'switchOn' : displayStatus['{$sub_menu_permission_name}'], 'switchOff' : !displayStatus['{$sub_menu_permission_name}']}"></span>
 													{/if}
 												</div>
 												<div class="table-div__item action">
@@ -121,6 +134,7 @@
 											</div>
 										</li>
 										{/loop}
+										{/if}
 									</ul>
 								</li>
 								{/loop}

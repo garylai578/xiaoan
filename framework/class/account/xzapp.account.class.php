@@ -2,13 +2,16 @@
 defined('IN_IA') or exit('Access Denied');
 
 class XzappAccount extends WeAccount {
-	public $tablename = 'account_xzapp';
-	public function __construct($account = array()) {
-		$this->menuFrame = 'account';
-		$this->type = ACCOUNT_TYPE_XZAPP_NORMAL;
-		$this->typeName = '熊掌号';
-		$this->typeSign = XZAPP_TYPE_SIGN;
-		$this->typeTempalte = '-xzapp';
+	protected $tablename = 'account_xzapp';
+	protected $menuFrame = 'account';
+	protected $type = ACCOUNT_TYPE_XZAPP_NORMAL;
+	protected $typeName = '熊掌号';
+	protected $typeSign = XZAPP_TYPE_SIGN;
+	protected $typeTempalte = '-xzapp';
+
+
+	protected function getAccountInfo($acid) {
+		return table('account_xzapp')->getByAcid($acid);
 	}
 
 	public function checkSign() {
@@ -169,11 +172,6 @@ class XzappAccount extends WeAccount {
 		return true;
 	}
 
-	public function fetchAccountInfo() {
-		$account = table('account_xzapp')->getByAcid($this->uniaccount['acid']);
-		return $account;
-	}
-
 	public function getOauthCodeUrl($callback, $state = '') {
 		$this->account['callbackurl'] = $callback;
 		return "https://openapi.baidu.com/oauth/2.0/authorize?response_type=code&client_id={$this->account['key']}&redirect_uri={$callback}&scope=snsapi_base&state={$state}";
@@ -226,10 +224,6 @@ class XzappAccount extends WeAccount {
 		$record['expire'] = TIMESTAMP + $oauth_info['expires_in'] - 200;
 		cache_write($cachekey, $record);
 		return $record;
-	}
-
-	public function accountDisplayUrl() {
-		return url('account/display', array('type' => XZAPP_TYPE_SIGN));
 	}
 
 	public function isTagSupported() {
@@ -711,6 +705,7 @@ class XzappAccount extends WeAccount {
 		if (empty($types[$msgtype])) {
 			return error(-1, '消息类型不合法');
 		}
+		$send_conent = ($types[$msgtype] == 'text') ? array('content' => $media_id) : array('media_id' => $media_id);
 		if ($group == -1) {
 			$data = array(
 				'filter' => array(
@@ -718,18 +713,14 @@ class XzappAccount extends WeAccount {
 					'group_id' => $group
 				),
 				'msgtype' => $types[$msgtype],
-				$types[$msgtype] => array(
-					'media_id' => $media_id
-				)
+				$types[$msgtype] => $send_conent,
 			);
 		} else {
 			$openids = $this->getFansByTag($group);
 			$data = array(
 				'touser' => $openids,
 				'msgtype' => $types[$msgtype],
-				$types[$msgtype] => array(
-					'media_id' => $media_id
-				)
+				$types[$msgtype] => $send_conent,
 			);
 		}
 		$token = $this->getAccessToken();

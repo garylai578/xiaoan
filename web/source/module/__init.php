@@ -10,15 +10,14 @@ if (in_array($action, array('permission', 'default-entry', 'manage-account'))) {
 	if (empty($_GPC['version_id']) && intval($referer['version_id']) > 0) {
 		itoast('', $_W['siteurl'] . '&version_id=' . $referer['version_id']);
 	}
-	$account_api = WeAccount::createByUniacid($_W['uniacid']);
+	$account_api = WeAccount::createByUniacid();
 	if (is_error($account_api)) {
 		itoast('', url('module/display'));
 	}
 	$check_manange = $account_api->checkIntoManage();
 		define('FRAME', 'account');
 	if (is_error($check_manange)) {
-		$account_display_url = $account_api->accountDisplayUrl();
-		itoast('', $account_display_url);
+		itoast('', $account_api->displayUrl);
 	}
 }
 if (in_array($action, array('group', 'manage-system'))) {
@@ -32,5 +31,3 @@ if (in_array($action, array('display'))) {
 $module_all_support = module_support_type();
 $module_support = !empty($module_all_support[$_GPC['support']]) ? $module_all_support[$_GPC['support']]['type'] : ACCOUNT_TYPE_SIGN;
 $module_support_name = $_GPC['support'];
-
-	$_GPC['account_type'] = !empty($_GPC['account_type']) ? $_GPC['account_type'] : ACCOUNT_TYPE_OFFCIAL_NORMAL;

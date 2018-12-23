@@ -251,6 +251,10 @@ if(uni_is_multi_acid()) {
 	$str = "&j={$_W['acid']}";
 }
 $forward = strexists($forward, 'i=') ? $forward : "{$forward}&i={$_W['uniacid']}{$str}";
-$forward = strexists($forward, '&wxref=mp.weixin.qq.com#wechat_redirect') ? $forward : $forward . '&wxref=mp.weixin.qq.com#wechat_redirect';
+if (strpos($forward, '&wxref=mp.weixin.qq.com')) {
+		$forward = str_replace('&wxref=mp.weixin.qq.com', '', $forward) . '&wxref=mp.weixin.qq.com#wechat_redirect';
+} else {
+	$forward .= '&wxref=mp.weixin.qq.com#wechat_redirect';
+}
 header('Location: ' . $forward);
 exit;

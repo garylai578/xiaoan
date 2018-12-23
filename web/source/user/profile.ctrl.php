@@ -82,7 +82,7 @@ if ($do == 'post' && $_W['isajax'] && $_W['ispost']) {
 			);
 			$users_bind_exist = pdo_get('users_bind', array('uid' => $uid, 'third_type' => USER_REGISTER_TYPE_MOBILE));
 			if ($users_bind_exist) {
-				$result_bind = pdo_update('users_bind', $data);
+				$result_bind = pdo_update('users_bind', $data, array('uid' => $uid, 'third_type' => USER_REGISTER_TYPE_MOBILE));
 			} else {
 				$result_bind = pdo_insert('users_bind', $data);
 			}
@@ -95,7 +95,7 @@ if ($do == 'post' && $_W['isajax'] && $_W['ispost']) {
 			if (!in_array($_W['uid'], $founders) && $_W['uid'] != $user['owner_uid']) {
 				iajax(1, '无权限修改，请联系网站创始人！');
 			}
-			$username = trim($_GPC['username']);
+			$username = safe_gpc_string($_GPC['username']);
 			$name_exist = pdo_get('users', array('username' => $username));
 			if (!empty($name_exist)) {
 				iajax(2, '用户名已存在，请更换其他用户名！', '');
@@ -103,17 +103,16 @@ if ($do == 'post' && $_W['isajax'] && $_W['ispost']) {
 			$result = pdo_update('users', array('username' => $username), array('uid' => $uid));
 			break;
 		case 'vice_founder_name':
-			$userinfo = user_single(array('username' => $_GPC['vice_founder_name']));
+			$userinfo = user_single(array('username' => safe_gpc_string($_GPC['vice_founder_name'])));
 			if (empty($userinfo) || $userinfo['founder_groupid'] != ACCOUNT_MANAGE_GROUP_VICE_FOUNDER) {
 				iajax(1, '用户不存在或该用户不是副创始人', '');
 			}
 			$result = pdo_update('users', array('owner_uid' => $userinfo['uid']), array('uid' => $uid));
 			break;
 		case 'remark':
-			$result = pdo_update('users', array('remark' => trim($_GPC['remark'])), array('uid' => $uid));
+			$result = pdo_update('users', array('remark' => safe_gpc_string($_GPC['remark'])), array('uid' => $uid));
 			break;
 		case 'welcome_link':
-
 			$welcome_link = intval($_GPC['welcome_link']);
 			$result = pdo_update('users', array('welcome_link' => $welcome_link), array('uid' => $uid));
 			break;
@@ -166,15 +165,18 @@ if ($do == 'post' && $_W['isajax'] && $_W['ispost']) {
 			}
 			break;
 		case 'reside':
+			$province = safe_gpc_string($_GPC['province']);
+			$city = safe_gpc_string($_GPC['city']);
+			$district = safe_gpc_string($_GPC['district']);
 			if ($users_profile_exist) {
-				$result = pdo_update('users_profile', array('resideprovince' => $_GPC['province'], 'residecity' => $_GPC['city'], 'residedist' => $_GPC['district']), array('uid' => $uid));
+				$result = pdo_update('users_profile', array('resideprovince' => $province, 'residecity' => $city, 'residedist' => $district), array('uid' => $uid));
 			} else {
 				$data = array(
 					'uid' => $uid,
 					'createtime' => TIMESTAMP,
-					'resideprovince' => $_GPC['province'],
-					'residecity' => $_GPC['city'],
-					'residedist' => $_GPC['district']
+					'resideprovince' => $province,
+					'residecity' => $city,
+					'residedist' => $district
 				);
 				$result = pdo_insert('users_profile', $data);
 			}

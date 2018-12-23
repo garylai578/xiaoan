@@ -57,6 +57,8 @@
 			<td>
 				<div class="link-group">
 					
+					<a ng-href="{{list.url}}" ng-if="list.type==1">查看我的订单</a>
+					
 					<a ng-href="{{list.url}}" ng-if="list.type==3">进入工单</a>
 					<a ng-href="{{list.url}}" ng-if="list.type==2">查看公众号</a>
 					<a ng-href="{{list.url}}" ng-if="list.type==5">查看小程序</a>

@@ -247,7 +247,7 @@ function mc_oauth_userinfo($acid = 0) {
 function mc_oauth_account_userinfo($url = '') {
 	global $_W;
 		if (!empty($_SESSION['openid']) && intval($_W['account']['level']) >= 3) {
-		$oauth_account = WeAccount::create();
+		$oauth_account = WeAccount::createByUniacid();
 		$userinfo = $oauth_account->fansQueryInfo($_SESSION['openid']);
 		if (!is_error($userinfo) && !empty($userinfo) && is_array($userinfo) && !empty($userinfo['nickname'])) {
 			$userinfo['nickname'] = stripcslashes($userinfo['nickname']);
@@ -619,7 +619,7 @@ function mc_fans_groups($force_update = false) {
 		$results = iunserializer($results);
 		return $results;
 	}
-	$account_api = WeAccount::create();
+	$account_api = WeAccount::createByUniacid();
 	if (!$account_api->isTagSupported()) {
 		return array();
 	}
@@ -918,7 +918,7 @@ function mc_notice_init() {
 	if($_W['account']['level'] < 3) {
 		return error(1, '公众号没有经过认证，不能使用模板消息和客服消息');
 	}
-	$account = WeAccount::create();
+	$account = WeAccount::createByUniacid($_W['uniacid']);
 	if(is_null($account)) {
 		return error(1, '创建公众号操作对象失败');
 	}
@@ -1422,6 +1422,61 @@ function mc_notice_times_times($openid, $title, $type, $endtime = '', $remark = 
 }
 
 
+function mc_notice_pay_success($openid, $username, $order_sn, $money, $goods_info, $title = '尊敬的客户，您的订单已支付成功', $remark = '', $url = '') {
+	global $_W;
+	$money = sprintf("%.2f", $money);
+	if(empty($money)|| empty($openid)) {
+		return error(-1, '参数错误');
+	}
+	$account = mc_notice_init();
+	if(is_error($account)) {
+		return error(-1, $account['message']);
+	}
+	if($_W['account']['level'] == ACCOUNT_SERVICE_VERIFY && !empty($account->noticetpl['pay_success']['tpl'])) {
+		$data = array(
+			'first' => array(
+				'value' => $title,
+				'color' => '#ff510'
+			),
+			'keyword1' => array(
+				'value' => $username,
+				'color' => '#ff510'
+			),
+			'keyword2' => array(
+				'value' => $order_sn,
+				'color' => '#ff510'
+			),
+			'keyword3' => array(
+				'value' => $money. '元',
+				'color' => '#ff510'
+			),
+			'keyword4' => array(
+				'value' => $goods_info,
+				'color' => '#ff510'
+			),
+			'remark' => array(
+				'value' => $remark ,
+				'color' => '#ff510'
+			),
+		);
+		$status = $account->sendTplNotice($openid, $account->noticetpl['pay_success']['tpl'], $data, $url);
+	}
+	if($_W['account']['level'] == ACCOUNT_SUBSCRIPTION_VERIFY || is_error($status) || empty($account->noticetpl['pay_success']['tpl'])) {
+		$info = "【{$_W['account']['name']}】付款成功通知\n";
+		$info .= "您编号为{$order_sn}的订单已成功支付{$money}。\n";
+		$info .= "商品信息:{$goods_info}。\n";
+		$info .= !empty($remark) ? "备注：{$remark}\n\n" : '';
+		$custom = array(
+			'msgtype' => 'text',
+			'text' => array('content' => urlencode($info)),
+			'touser' => $openid,
+		);
+		$status = $account->sendCustomNotice($custom);
+	}
+	return $status;
+}
+
+
 function mc_notice_consume($openid, $title, $content, $url = '') {
 	global $_W;
 	$account = mc_notice_init();
@@ -1479,7 +1534,7 @@ function mc_init_fans_info($openid, $force_init_member = false){
 	global $_W;
 	static $account_api;
 	if (empty($account_api)) {
-		$account_api = WeAccount::create();
+		$account_api = WeAccount::createByUniacid();
 	}
 	if (is_array($openid)) {
 		$fans_list = $account_api->fansBatchQueryInfo($openid);
@@ -1870,7 +1925,7 @@ function mc_send_content_formate($data) {
 	$send['touser'] = trim($data['openid']);
 	$send['msgtype'] = $type;
 	if ($type == 'text') {
-		$send['text'] = array('content' => urlencode($content));
+		$send['text'] = array('content' => urlencode(emoji_unicode_decode($content)));
 	} elseif ($type == 'image') {
 		$send['image'] = array('media_id' => $content);
 		$material = material_get($content);

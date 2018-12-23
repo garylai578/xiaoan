@@ -24,6 +24,8 @@ class Versions extends \We7Table {
 		'type',
 		'entry_id',
 		'last_modules',
+		'upload_time',
+		'tominiprogram',
 	);
 	protected $default = array(
 		'uniacid' => '',
@@ -41,6 +43,8 @@ class Versions extends \We7Table {
 		'type' => 0,
 		'entry_id' => 0,
 		'last_modules' => '',
+		'upload_time' => 0,
+		'tominiprogram' => '',
 	);
 
 	
