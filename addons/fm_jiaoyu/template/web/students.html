@@ -311,6 +311,8 @@ require(['bootstrap'],function($){
 						<span class="label label-success">走读</span>
 						{elseif $item['s_type'] == 2}
 						<span class="label label-primary">住校</span>
+						{elseif $item['s_type'] == 3}
+						<span class="label label-primary">半走读</span>
 						{/if}
                     </td>	
 					<td>
@@ -659,6 +661,8 @@ $(function(){
                         <label class="radio-inline"><input type="radio" name="s_type" value="1" {if empty($item) || $item['s_type'] == 1}checked="true"{/if} /> 走读</label>
                         &nbsp;&nbsp;&nbsp;
                         <label class="radio-inline"><input type="radio" name="s_type" value="2" {if !empty($item) && $item['s_type'] == 2}checked="true"{/if} /> 住校</label>
+						&nbsp;&nbsp;&nbsp;
+                        <label class="radio-inline"><input type="radio" name="s_type" value="3" {if !empty($item) && $item['s_type'] == 3}checked="true"{/if} /> 半走读</label>
                         <span class="help-block"></span>
                     </div>
                 </div>
