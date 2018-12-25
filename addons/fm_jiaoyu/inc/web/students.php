@@ -415,6 +415,25 @@
 				$this->exportexcel($arr, array('学生', '绑定码', '报名预留手机号', '学号', '班级'), '学生绑定信息表');
 				exit();
 			}
+            //////////导出学生头像/////////////////
+            if($_GPC['out_studentImg'] == 'out_studentImg'){
+                $lists = pdo_fetchall("SELECT id, numberid, s_name, bj_id, icon FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ORDER BY icon DESC");
+                $ii   = 0;
+                foreach($lists as $index => $row){
+                    $arr[$ii]['id'] = $row['id'];
+                    $arr[$ii]['numberid'] = $row['numberid'];
+                    $bj                = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = '{$row['bj_id']}'");
+                    $arr[$ii]['s_name'] = trim($row['s_name']);
+                    $arr[$ii]['banji']  = $bj['sname'];
+                    if(!empty($row['icon']))
+                        $arr[$ii]['icon'] = "http://jy.xingheoa.com/".$row['icon'];
+                    else
+                        $arr[$ii]['icon'] = "";
+                    $ii++;
+                }
+                $this->exportexcel($arr, array('id', '学号', '姓名', '班级', '头像'), '学生头像信息表');
+                exit();
+            }
 			////////////////////////////////
 			$category = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = :weid AND schoolid = :schoolid ORDER BY sid ASC, ssort DESC", array(':weid' => $weid, ':schoolid' => $schoolid), 'sid');
 			$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition ORDER BY id DESC LIMIT " . ($pindex - 1) * $psize . ',' . $psize);
