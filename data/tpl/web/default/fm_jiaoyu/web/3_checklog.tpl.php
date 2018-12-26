@@ -145,7 +145,12 @@
 								</td>
 								<td><?php  echo $item['bj_name'];?></td>
 								<td>
-									<span class="label label-danger"><?php  echo $item['type'];?></span>	
+									<?php  if($item['type']=="请假离校" || $item['type']=="请假进校" || $item['type']=="请假") { ?>
+									<span class="label label-danger" onmouseover='overShow("<?php  echo $item['id'];?>", "<?php  echo $leaveMsg[$item['sid']];?>",event)' onmouseout='outHide("<?php  echo $item['id'];?>", event)' ><?php  echo $item['type'];?></span>
+									<div id="showDiv_<?php  echo $item['id'];?>" style="position: absolute; background-color: white; border: 1px solid black;"></div>
+									<?php  } else { ?>
+									<span class="label label-danger"><?php  echo $item['type'];?></span>
+									<?php  } ?>
 								</td>
 								<td> 
 									<span class="label label-success">
@@ -265,6 +270,21 @@ $(function(){
 <script type="text/javascript">
 		$(document).ready(function() {
 $('.gallery-link').magnificPopup({type:'image'});
-		}); 
+		});
+
+        function overShow(id, msg,e) {
+            var evn = window.event||e;
+            var showDiv = document.getElementById('showDiv_'+id);
+            showDiv.style.left = evn.clientX;
+            showDiv.style.top = evn.clientY;
+            showDiv.style.display = 'block';
+            showDiv.innerHTML = msg;
+        }
+
+        function outHide(id) {
+            var showDiv = document.getElementById('showDiv_'+id);
+            showDiv.style.display = 'none';
+            showDiv.innerHTML = '';
+        }
 	</script>
 <?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('public/footer', TEMPLATE_INCLUDEPATH)) : (include template('public/footer', TEMPLATE_INCLUDEPATH));?>

@@ -1,8 +1,11 @@
 <?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 0) ? (include $this->template('common/header', TEMPLATE_INCLUDEPATH)) : (include template('common/header', TEMPLATE_INCLUDEPATH));?>
 	<div class="we7-page-title">二维码管理</div>
 	<ul class="we7-page-tab">
-		<li class="active"><a href="<?php  echo url('platform/qr/list');?>">二维码列表</a></li>
-		<li><a href="<?php  echo url('platform/qr/display');?>"> 二维码扫描统计</a></li>
+		<?php  if(is_array($active_sub_permission)) { foreach($active_sub_permission as $active_menu) { ?>
+		<?php  if(permission_check_account_user($active_menu['permission_name'], false) && (empty($active_menu['is_display']) || is_array($active_menu['is_display']) && in_array($_W['account']['type'], $active_menu['is_display']))) { ?>
+		<li <?php  if($do == $active_menu['active']) { ?>class="active"<?php  } ?>><a href="<?php  echo $active_menu['url'];?>"><?php  echo $active_menu['title'];?></a></li>
+		<?php  } ?>
+		<?php  } } ?>
 	</ul>
 	<div class="we7-padding-bottom clearfix">
 		<form action="./index.php" method="get" role="form" >

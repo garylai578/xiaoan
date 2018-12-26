@@ -2,10 +2,11 @@
 <div id="wechat_menu">
 	<div class="we7-page-title hide">自定义菜单</div>
 	<ul class="we7-page-tab">
-		<li <?php  if($type == MENU_CURRENTSELF) { ?>class="active" <?php  } ?>><a href="<?php  echo url('platform/menu/post');?>">默认菜单</a></li>
-		<?php  if(!in_array($_W['account']['type'], array(ACCOUNT_TYPE_XZAPP_NORMAL, ACCOUNT_TYPE_XZAPP_AUTH))) { ?>
-		<li <?php  if($type == MENU_CONDITIONAL) { ?>class="active"<?php  } ?>><a href="<?php  echo url('platform/menu', array('type' => MENU_CONDITIONAL));?>">个性化菜单</a></li>
+		<?php  if(is_array($active_sub_permission)) { foreach($active_sub_permission as $active_menu) { ?>
+		<?php  if(permission_check_account_user($active_menu['permission_name'], false) && (empty($active_menu['is_display']) || is_array($active_menu['is_display']) && in_array($_W['account']['type'], $active_menu['is_display']))) { ?>
+		<li <?php  if($do == $active_menu['active']) { ?>class="active"<?php  } ?>><a href="<?php  echo $active_menu['url'];?>"><?php  echo $active_menu['title'];?></a></li>
 		<?php  } ?>
+		<?php  } } ?>
 	</ul>
 	<?php  if($do == 'display') { ?>
 	<div class="clearfix" ng-controller="menuDisplay" id="menuDisplay">
@@ -349,6 +350,15 @@
 													</div>
 												</li>
 											</ul>
+
+											<div class="we7-select-msg we7-padding-vertical-max" ng-show="context.activeItem.type == 'scancode_push' || context.activeItem.type == 'scancode_waitmsg' || context.activeItem.type == 'pic_photo_or_album' || context.activeItem.type == 'pic_weixin' || context.activeItem.type == 'location_select' || context.activeItem.type == 'pic_sysphoto'">
+												<ul class="tab-navs">
+													<li class="tab-nav tab-cardmsg" ng-click="context.select_mediaid('keyword', '1');">
+														<a href="javascript:void(0);">&nbsp;<i class="icon-msg-sender "></i><span class="msg-tab-title">触发关键字</span></a>
+													</li>
+												</ul>
+											</div>
+
 										</div>
 									</div>
 									<div class="panel we7-panel" style="width: 100%;" ng-show="context.activeItem.type == 'click' && context.activeItem.forceHide == 0">

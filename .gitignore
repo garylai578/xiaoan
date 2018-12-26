@@ -1,4 +1,6 @@
 
 addons/fm_jiaoyu/public/upload/
-attachment/images/fm_jiaoyu/
-attachment/images/bjq/
+attachment/images/
+data/patch/
+data/tpl/
+data/logs/

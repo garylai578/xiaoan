@@ -35,7 +35,8 @@ require(['bootstrap'],function($){
 					<a class="btn btn-primary qx_702" href="<?php  echo $this->createWebUrl('students', array('op' => 'makecode', 'schoolid' => $schoolid))?>" onclick="return confirm('此操作不可恢复，确认？');return false;">批量生成绑定码</a>	
 					<?php  if($_W['isfounder'] || $_W['role'] == 'owner') { ?><a class="btn btn-success" href="<?php  echo $this->createWebUrl('students', array('op' => 'deleteallstudents', 'schoolid' => $schoolid))?>" onclick="return confirm('您确定删除本校所有学生信息吗？此操作不可恢复，确认删除？');return false;">清空所有学生</a><?php  } ?>
 					<a class="btn btn-primary qx_702" href="<?php  echo $this->createWebUrl('students', array('op' => 'fixavatar', 'schoolid' => $schoolid))?>" >修复头像</a>
-					
+					<button class="btn btn-success qx_704" name="out_putcode" value="out_putcode"><i class="fa fa-download"></i>导出绑定信息</button>
+					<button class="btn btn-primary qx_702" name="out_studentImg" value="out_studentImg"><i class="fa fa-download"></i>导出学生头像</button>
 				</div>
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-2 col-md-2 col-lg-1 control-label" style="width: 100px;">关键字</label>
@@ -78,11 +79,10 @@ require(['bootstrap'],function($){
                         </select>
                     </div>
 					<?php  } ?>
-                    <div class="col-sm-2 col-lg-2">
-                        <button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
-						<button class="btn btn-success qx_704" name="out_putcode" value="out_putcode"><i class="fa fa-download"></i>导出绑定信息</button>
-                    </div>		
-                </div>
+					<div class="col-sm-2 col-lg-2">
+						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					</div>
+				</div>
             </form>
              <form style="padding-top: 20px;" action="./index.php" method="get" class="form-horizontal" target="_blank" id="qrFrom" role="form">
                 <input type="hidden" name="c" value="site" />
@@ -311,6 +311,8 @@ require(['bootstrap'],function($){
 						<span class="label label-success">走读</span>
 						<?php  } else if($item['s_type'] == 2) { ?>
 						<span class="label label-primary">住校</span>
+						<?php  } else if($item['s_type'] == 3) { ?>
+						<span class="label label-primary">半走读</span>
 						<?php  } ?>
                     </td>	
 					<td>
@@ -659,6 +661,8 @@ $(function(){
                         <label class="radio-inline"><input type="radio" name="s_type" value="1" <?php  if(empty($item) || $item['s_type'] == 1) { ?>checked="true"<?php  } ?> /> 走读</label>
                         &nbsp;&nbsp;&nbsp;
                         <label class="radio-inline"><input type="radio" name="s_type" value="2" <?php  if(!empty($item) && $item['s_type'] == 2) { ?>checked="true"<?php  } ?> /> 住校</label>
+						&nbsp;&nbsp;&nbsp;
+                        <label class="radio-inline"><input type="radio" name="s_type" value="3" <?php  if(!empty($item) && $item['s_type'] == 3) { ?>checked="true"<?php  } ?> /> 半走读</label>
                         <span class="help-block"></span>
                     </div>
                 </div>
