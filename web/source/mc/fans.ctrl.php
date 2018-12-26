@@ -22,11 +22,8 @@ if ($do == 'display') {
 	$search_mod = intval($_GPC['search_mod']) == '' ? 1 : intval($_GPC['search_mod']);
 	$pagesize = 10;
 
-	$param = array(
-		':uniacid' => $_W['uniacid'],
-		':acid' => $_W['acid']
-		);
-	$condition = " WHERE f.`uniacid` = :uniacid AND f.`acid` = :acid";
+	$param = array(':uniacid' => $_W['uniacid']);
+	$condition = " WHERE f.`uniacid` = :uniacid";
 	$tag = intval($_GPC['tag']) ? intval($_GPC['tag']) : 0;
 	if (!empty($tag)) {
 		$param[':tagid'] = $tag;

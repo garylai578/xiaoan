@@ -8,13 +8,13 @@
 			var isMobile = /^1[34578]\d{9}$/.test(inputVal);
 			var isEmail = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(inputVal);
 			if (register_mode == 'mobile' && !isMobile) {
-				$('.js-check-mobile').removeClass('send-code');
+				$('.js-check-mobile').addClass('send-code');
 			}
 			if (register_mode == 'email' && !isEmail) {
-				$('.js-check-mobile').removeClass('send-code');
+				$('.js-check-mobile').addClass('send-code');
 			}
 			if (register_mode == 'random' && !(!isMobile || isEmail)) {
-				$('.js-check-mobile').removeClass('send-code');
+				$('.js-check-mobile').addClass('send-code');
 			}
 			if (isMobile) {
 				$.post("{php echo url('auth/login/mobile_exist')}", {'mobile' : inputVal, 'find_mode':register_mode}, function(data) {

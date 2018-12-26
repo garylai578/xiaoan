@@ -743,14 +743,7 @@ function file_allowed_media($type) {
 
 function file_is_image($url) {
 	global $_W;
-	if (!parse_path($url)) {
-		return false;
-	}
 	$allowed_media = file_allowed_media('image');
-	$path_extension = pathinfo($url, PATHINFO_EXTENSION);
-	if (!in_array($path_extension, $allowed_media)) {
-		//return false;
-	}
 
 	if (substr($url, 0, 2) == '//') {
 		$url = 'http:' . $url;

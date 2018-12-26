@@ -237,6 +237,11 @@ if ($do == 'getpackage') {
 	if (empty($version_id)) {
 		itoast('参数错误！', '', '');
 	}
+	$account_wxapp_info = miniapp_fetch($version_info['uniacid'], $version_id);
+	if (empty($account_wxapp_info)) {
+		itoast('版本不存在！', referer(), 'error');
+	}
+
 	$siteurl = $_W['siteroot'].'app/index.php';
 	if (!empty($account_wxapp_info['appdomain'])) {
 		$siteurl = $account_wxapp_info['appdomain'];

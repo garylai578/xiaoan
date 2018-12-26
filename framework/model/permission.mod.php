@@ -375,7 +375,7 @@ function permission_check_account_user($permission_name, $show_message = true, $
 	if (!isset($users_permission)) {
 		$users_permission = permission_account_user('system');
 	}
-	if ($users_permission[0] != 'all' && !in_array($permission_name, $users_permission)) {
+	if ($users_permission[0] != 'all' && !in_array($permission_name, $users_permission) && !in_array(FRAME . '*', $users_permission)) {
 		if (in_array($permission_name, permission_first_sub_permission()) && !empty($show_message)) {
 			load()->model('system');
 			$permission_string = explode('_', $permission_name);

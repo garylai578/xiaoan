@@ -76,15 +76,14 @@ if ($do == 'post') {
 				'qrcode' => file_is_image( $_GPC['qrcode']) ?  $_GPC['qrcode'] : '',
 			);
 			$uniacid = miniapp_create($account_wxapp_data, ACCOUNT_TYPE_APP_NORMAL);
-
-			$unisettings['creditnames'] = array('credit1' => array('title' => '积分', 'enabled' => 1), 'credit2' => array('title' => '余额', 'enabled' => 1));
-			$unisettings['creditnames'] = iserializer($unisettings['creditnames']);
-			$unisettings['uniacid'] = $uniacid;
-			pdo_insert('uni_settings', array('uniacid' => $uniacid));
-
 			if (is_error($uniacid)) {
 				iajax(3, '添加小程序信息失败', url('wxapp/post'));
 			}
+			$unisettings['creditnames'] = array('credit1' => array('title' => '积分', 'enabled' => 1), 'credit2' => array('title' => '余额', 'enabled' => 1));
+			$unisettings['creditnames'] = iserializer($unisettings['creditnames']);
+			$unisettings['uniacid'] = $uniacid;
+			pdo_insert('uni_settings', $unisettings);
+
 		} else {
 			$wxapp_info = miniapp_fetch($uniacid);
 			if (empty($wxapp_info)) {

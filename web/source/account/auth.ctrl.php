@@ -169,7 +169,8 @@ if ($do == 'forward') {
 		exit('fail');
 	}
 	if (!empty($ticket_xml->ComponentVerifyTicket) && $ticket_xml->InfoType == 'component_verify_ticket') {
-		cache_write(cache_system_key('account_ticket'), strval($ticket_xml->ComponentVerifyTicket));
+		$ticket = strval($ticket_xml->ComponentVerifyTicket);
+		setting_save($ticket, 'account_ticket');
 	}
 	exit('success');
 } elseif ($do == 'test') {

@@ -105,7 +105,7 @@ class WeAccount extends ArrayObject {
 		if (!empty(self::$accountObj[$uniaccount['uniacid']])) {
 			return self::$accountObj[$uniaccount['uniacid']];
 		}
-		if(!empty($uniaccount) && isset($uniaccount['type'])) {
+		if(!empty($uniaccount) && isset($uniaccount['type']) || !empty($uniaccount['isdeleted'])) {
 			return self::includes($uniaccount);
 		} else {
 			return error('-1', '帐号不存在或是已经被删除');

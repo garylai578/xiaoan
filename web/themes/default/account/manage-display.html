@@ -99,7 +99,7 @@
 		<td>
 			<p ng-bind="list.end"></p>
 		</td>
-		<td><p ng-bind="list.sms"></p></td>
+		<td><p ng-bind="list.sms_num"></p></td>
 		<td class="vertical-middle table-manage-td">
 			<div class="link-group">
 				<a ng-href="{{links.switch}}uniacid={{list.uniacid}}&type={{list.type}}">进入公众号</a>

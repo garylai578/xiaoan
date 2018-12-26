@@ -1,7 +1,8 @@
 {template 'common/header'}
 {template 'profile/common'}
-{if $do == 'oauth'}
-
+{if $_W['account']['level'] == ACCOUNT_SERVICE_VERIFY}
+<div class="alert alert-info">服务号-认证 认证媒体/政府订阅号无需配置</div>
+{else}
 <div id="js-profile-passport" ng-controller="oauthCtrl" ng-cloak>
 	<table class="table we7-table table-hover table-form">
 		<col width="180px " />
@@ -117,6 +118,7 @@
 		</div>
 	</div>
 </div>
+
 <script>
 	angular.module('profileApp').value('config', {
 		'oauthAccount' : "{$oauth['account']}",

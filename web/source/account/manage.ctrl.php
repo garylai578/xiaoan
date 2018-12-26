@@ -60,6 +60,7 @@ if ($do == 'display') {
 	}
 	foreach($list as &$account) {
 		$account = uni_fetch($account['uniacid']);
+		$account['sms_num'] = !empty($account['setting']['notify']) ? $account['setting']['notify']['sms']['balance'] : 0;
 		$account['end'] = $account['endtime'] == 0 ? '永久' : date('Y-m-d', $account['endtime']);
 		$account['role'] = permission_account_user_role($_W['uid'], $account['uniacid']);
 		$account['versions'] = miniapp_get_some_lastversions($account['uniacid']);

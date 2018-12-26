@@ -456,6 +456,9 @@ function material_delete($material_id, $location){
 		}
 		if (!empty($_W['setting']['remote']['type'])) {
 			$result = file_remote_delete($material['attachment']);
+						if (file_exists(IA_ROOT . '/' . $_W['config']['upload']['attachdir'] . '/' . $material['attachment'])) {
+				$result = file_delete($material['attachment']);
+			}
 		} else {
 			$result = file_delete($material['attachment']);
 		}

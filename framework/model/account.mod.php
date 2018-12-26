@@ -478,6 +478,14 @@ function uni_templates() {
 				$packageids[] = $extend_packageid;
 			}
 		}
+
+		$uni_extend = pdo_get('uni_group', array('uniacid' => $_W['uniacid']));
+		if (!empty($uni_extend)) {
+			foreach ($uni_extend as $uni_extend_packageid => $row) {
+				$packageids[] = $uni_extend_packageid;
+			}
+		}
+
 		if(is_array($packageids)) {
 			if (in_array('-1', $packageids)) {
 				$templates = pdo_fetchall("SELECT * FROM " . tablename('site_templates') . " ORDER BY id ASC", array(), 'id');
@@ -1077,6 +1085,12 @@ function uni_account_global_oauth() {
 	load()->model('setting');
 	$oauth = setting_load('global_oauth');
 	$oauth = !empty($oauth['global_oauth']) ? $oauth['global_oauth'] : array();
+	if (!empty($oauth['oauth']['account'])) {
+		$account_exist = uni_fetch($oauth['oauth']['account']);
+		if (empty($account_exist) || is_error($account_exist)) {
+			$oauth['oauth']['account'] = 0;
+		}
+	}
 	return $oauth;
 }
 

@@ -114,7 +114,7 @@ $_W['oauth_account'] = $_W['account']['oauth'] = array(
 	'support_jssdk' => $_W['account']->supportJssdk,
 );
 $unisetting = uni_setting_load();
-if (empty($unisetting['oauth']) && $_W['account']->typeSign == 'account') {
+if (empty($unisetting['oauth']) && $_W['account']->typeSign == 'account' && $_W['account']['level'] != ACCOUNT_SERVICE_VERIFY) {
 	$global_oauth = uni_account_global_oauth();
 	$unisetting['oauth'] = (array)$global_oauth['oauth'];
 }
