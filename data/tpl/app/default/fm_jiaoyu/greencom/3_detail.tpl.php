@@ -136,7 +136,7 @@
 		<div class="title" style="line-height:27px;font-size:15px;vertical-align: middle;text-align: center;">
 			<span class="line1" style="vertical-align: 10%;"></span>  
 			<span style="white-space:pre;">  </span>
-			<span style="">推荐课程</span>
+			<span style=""><?php  echo $language['detail_star_kc'];?></span>
 			<span style="white-space:pre;">  </span><span class="line1" style="vertical-align: 10%;"></span>  
 			</div>
 		
@@ -151,7 +151,7 @@
 		<ul id="bheight">
 		 
 			<li style="height: 160px;">
-				<a href="<?php  echo $this->createMobileUrl('kcinfo', array('schoolid' => $schoolid, 'id' => $banner['id']), true)?>" ><img src="<?php  if(!empty($banner['thumb'])) { ?><?php  echo tomedia($banner['thumb']);?><?php  } else { ?><?php  echo tomedia($school['logo'])?><?php  } ?>" alt="<?php  echo $banner['bannername'];?>"  width='100%'  />
+				<a href="<?php  echo $this->createMobileUrl('kcinfo', array('schoolid' => $schoolid, 'id' => $banner['id']), true)?>" ><img src="<?php  if(!empty($banner['bigimg'])) { ?><?php  echo tomedia($banner['bigimg']);?><?php  } else { ?><?php  echo tomedia($school['logo'])?><?php  } ?>" alt="<?php  echo $banner['bannername'];?>"  width='100%'  />
 				</a>
 				<span class="title" style="color:#fff;padding: unset; height: 25px;font-size: 15px;"><?php  echo $banner['name'];?></span>
 				<span class="title" style="color: #fbff4c;width: 100%;float: right;text-align: right;padding-left:190px;padding-right: 25px; height: 25px;font-size: 15px;">
@@ -174,7 +174,7 @@
 <?php  if($list_jpk) { ?>
 <div class="newsList">
 	<div class="top">
-		<div class="title">精品课程</div>
+		<div class="title"><?php  echo $language['detail_jp_kc'];?></div>
 		<div class="more">
 			<a href="<?php  echo $this->createMobileUrl('kc', array( 'schoolid' => $schoolid), true)?>">更多</a>			
 		</div>
@@ -218,7 +218,7 @@
 <?php  if($list1) { ?>
 <div class="newsList">
 	<div class="top">
-		<div class="title">校园公告</div>
+		<div class="title"><?php  echo $language['detail_new_xygg'];?></div>
 		<div class="more">
 			<a href="<?php  echo $this->createMobileUrl('newslist', array('op' => 'article', 'schoolid' => $schoolid), true)?>">更多</a>			
 		</div>
@@ -245,7 +245,7 @@
 <?php  if($list2) { ?>
 <div class="newsList">
 	<div class="top">
-		<div class="title">校园新闻</div>
+		<div class="title"><?php  echo $language['detail_new_xyxw'];?></div>
 		<div class="more">
 			<a href="<?php  echo $this->createMobileUrl('newslist', array('op' => 'news', 'schoolid' => $schoolid), true)?>">更多</a>	
 		</div>
@@ -273,7 +273,7 @@
 <?php  if($list3) { ?>
 <div class="newsList">
 	<div class="top">
-		<div class="title">精美文选</div>
+		<div class="title"><?php  echo $language['detail_new_jmwx'];?></div>
 		<div class="more">
 			<a href="<?php  echo $this->createMobileUrl('newslist', array('op' => 'wenzhang', 'schoolid' => $schoolid), true)?>">更多</a>			
 		</div>
@@ -304,41 +304,6 @@
 setTimeout(function() {
 	if(window.__wxjs_environment === 'miniprogram'){
 		$("#speaker").css("background-color","#333");
-		<!-- XBack = {};   -->
-  
-		<!-- (function(XBack) {   -->
-			<!-- XBack.STATE = 'x - back';   -->
-			<!-- XBack.element;   -->
-		  
-			<!-- XBack.onPopState = function(event) {   -->
-				<!-- event.state === XBack.STATE && XBack.fire();   -->
-				<!-- XBack.record(XBack.STATE); //初始化事件时，push一下   -->
-			<!-- };   -->
-		  
-			<!-- XBack.record = function(state) {   -->
-				<!-- history.pushState(state, null, location.href);   -->
-			<!-- };   -->
-		  
-			<!-- XBack.fire = function() {   -->
-				<!-- var event = document.createEvent('Events');   -->
-				<!-- event.initEvent(XBack.STATE, false, false);   -->
-				<!-- XBack.element.dispatchEvent(event);   -->
-			<!-- };   -->
-		  
-			<!-- XBack.listen = function(listener) {   -->
-				<!-- XBack.element.addEventListener(XBack.STATE, listener, false);   -->
-			<!-- };   -->
-		  
-			<!-- XBack.init = function() {   -->
-				<!-- XBack.element = document.createElement('span');   -->
-				<!-- window.addEventListener('popstate', XBack.onPopState);   -->
-				<!-- XBack.record(XBack.STATE);   -->
-			<!-- };   -->
-		  
-		<!-- })(XBack); // 引入这段js文件   -->
-		  
-		<!-- XBack.init();   -->
-		<!-- XBack.listen(function() {});   -->
 	}
 }, 100);
 function addclick(id){

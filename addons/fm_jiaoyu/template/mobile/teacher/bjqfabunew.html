@@ -31,11 +31,12 @@
 <div id="titlebar" class="header mainColor">
 	<div class="l"><a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
 	<div class="m">
-		<span style="font-size: 18px">发布班级圈</span>   
+		<span style="font-size: 18px">{if $school['bjqstyle'] =='new'}发布班级圈{else}发布校园动态{/if}</span>   
 	</div>
 </div>    
 <div id="titlebars" class="top_head_blank"></div>
 <div class="feedback_box">
+	{if $school['bjqstyle'] =='new'}
     <div class="blank"></div>
 	<div class="feedback_title_box">
         <select class="feedback_title" id="bj_id">
@@ -76,7 +77,8 @@
 				{/if}			
 			{/if}		
         </select>
-    </div>	
+    </div>
+	{/if}
     <div class="blank"></div>
     <div class="feedback_content_box">
         <!-- 日志内容 -->

@@ -18,7 +18,7 @@
 					<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
 				</div>
 				<div class="m">
-					<span>我的报名记录</span>
+					<span>{$language['signuplist_title']}</span>
 				</div>
 			</div>
 			<div id="titlebar_bg" class="_header"></div>
@@ -27,7 +27,7 @@
 					<div class="bangdingBox">
 						<div class="headerBox3">
 							<div class="headerinfo3">
-								<span class="t">{$row['name']}的申请记录</span>
+								<span class="t">{$row['name']}{$language['signuplist_bmsq_jl']}</span>
 								<span class="r">{php echo date('Y-m-d H:m', $row['createtime'])}</span>
 							</div>	
 						</div>					
@@ -49,7 +49,7 @@
 								{/if}
 								{/if}
 								<li>
-									<span class="l">学生姓名：</span>
+									<span class="l">{$language['signuplist_bmsq_stuname']}：</span>
 									<span class="r">{$row['name']}</span>
 								</li>
 								<li>
@@ -62,13 +62,13 @@
 								</li>
 								{if !empty($row['njname'])}
 								<li>
-									<span class="l">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;级：</span>
+									<span class="l">{$language['signuplist_bmsq_nj']}：</span>
 									<span class="r">{$row['njname']}</span>
 								</li>
 								{/if}
 								{if !empty($row['bj_id'])}
 								<li>
-									<span class="l">班&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;级：</span>
+									<span class="l">{$language['signuplist_bmsq_bj']}：</span>
 									<span class="r">{$row['bjname']}</span>
 								</li>
 								{/if}

@@ -56,7 +56,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
                     <img src="<?php echo MODULE_URL;?>public/mobile/img/parents_accountinfo.png">
                 </div>
                 <div class="icon_text">
-                    聊天设置<span id="msg_word"><?php  if($it['is_allowmsg'] == 2) { ?>接收聊天信息<?php  } else { ?>不接收聊天信息<?php  } ?>&nbsp;</span><input <?php  if($it['is_allowmsg'] == 2) { ?>checked<?php  } ?> id="is_personal" class="weui_switch" type="checkbox" onclick="change_msg();"/>
+                    <?php  echo $language['useredit_ltsz'];?><span id="msg_word"><?php  if($it['is_allowmsg'] == 2) { ?>接收聊天信息<?php  } else { ?>不接收聊天信息<?php  } ?>&nbsp;</span><input <?php  if($it['is_allowmsg'] == 2) { ?>checked<?php  } ?> id="is_personal" class="weui_switch" type="checkbox" onclick="change_msg();"/>
                 </div>
             </a>
         </li>		
@@ -67,7 +67,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
                     <img src="<?php echo MODULE_URL;?>public/mobile/img/parents_myHome.png">
                 </div>
                 <div class="icon_text">
-                    我的家庭<div class="right_arrow_icon"></div>
+                    <?php  echo $language['useredit_wdjt'];?><div class="right_arrow_icon"></div>
                 </div>
             </a>
         </li>
@@ -78,7 +78,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
                     <img src="<?php echo MODULE_URL;?>public/mobile/img/parents_qxbd.png">
                 </div>
                 <div class="icon_text">
-                    取消微信绑定<div class="right_arrow_icon"></div>
+                     <?php  echo $language['useredit_qxwxbd'];?><div class="right_arrow_icon"></div>
                 </div>
             </a>
         </li>
@@ -88,11 +88,10 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 <div class="user_info" id="user_info" style="display:none;">
    <div style="border-radius: 5%;">
 		<ul>
-			<p>联系方式</p>
+			<p>请完善您的联系方式</p>
 			<li class="user_name">
 			真实姓名
 				<input type="text" placeholder="请输入您的姓名" name ="name" id="name" value="<?php  if(!empty($userinfo['name'])) { ?><?php  echo $userinfo['name'];?><?php  } ?>">
-				
 			</li>
 			<li class="user_name">
 			  手机号

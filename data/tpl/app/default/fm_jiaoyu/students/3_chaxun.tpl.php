@@ -41,23 +41,18 @@ z-index: 2;}
 </head>
 <body>
 <div class="All">
-	<div id="titlebar" class="header mainColor">
-		<div class="l"><a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
-		<div class="m"><a><span style="font-size: 18px">成绩情况</span></a></div>
-		<div class="r"></div>
-	</div>
 	<li class="mains" id="titlebar_bg" style="display: block;">
 		<div class="notifyTopBox">
 			<div class="notifyTopLeft">
 				<img src="<?php  if(empty($student['icon'])) { ?><?php  echo tomedia($school['spic'])?><?php  } else { ?><?php  echo tomedia($student['icon'])?><?php  } ?>" class="teacherImgError" />
 			</div>
 			<div class="notifyTopRight">
-				<p class="notifyCreateTimes"><label>名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;字：</label><?php  echo $student['s_name'];?></p>
-				<p class="notifyCreateTimes"><label>年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;级：</label><?php  echo $mynj['sname'];?></p>
-				<p class="notifyCreateTimes"><label>班&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;级：</label><span><?php  echo $mybj['sname'];?></span></p>				
+				<p class="notifyCreateTimes"><label><?php  echo $language['chaxun_xsxm'];?>：</label><?php  echo $student['s_name'];?></p>
+				<p class="notifyCreateTimes"><label><?php  echo $language['chaxun_wdnj'];?>：</label><?php  echo $mynj['sname'];?></p>
+				<p class="notifyCreateTimes"><label><?php  echo $language['chaxun_wdbj'];?>：</label><span><?php  echo $mybj['sname'];?></span></p>				
 			</div>
 		</div>
-		<div class="main_texts" style="line-height: 20px; overflow: hidden;">共计成绩记录：<?php  echo $cjcount;?>个</div>
+		<div class="main_texts" style="line-height: 20px; overflow: hidden;">共计记录：<?php  echo $cjcount;?>个</div>
 	</li>	
 	<main>
 		<section>
@@ -102,14 +97,8 @@ z-index: 2;}
 <script src="<?php echo MODULE_URL;?>public/mobile/js/highcharts.js?v=0622"></script>
 <script src="<?php echo MODULE_URL;?>public/mobile/js/idangerous.swiper.min.js?v=0622"></script>
 <script type="text/javascript">
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").css("margin-top","10px");
-		document.title="成绩分析";
-	}
-}, 100);
-
+$("#titlebar_bg").css("margin-top","10px");
+document.title="<?php  echo $language['chaxun_title'];?>";
 </script>
 <script>
 $(document).ready(function() {
@@ -234,7 +223,7 @@ if(qi_id == 0){
 			url: "<?php  echo $this->createMobileUrl('comajax',array('op'=>'GetAllKm'))?>",
 			type: "post",
 			dataType: "json",
-			data: {qh_id: qi_id,sid:"<?php  echo $it['sid'];?>",schoolid:"<?php  echo $schoolid;?>"},
+			data: {qh_id: qi_id,sid:"<?php  echo $it['sid'];?>",bj_id:"<?php  echo $student['bj_id'];?>",nj_id:"<?php  echo $student['xq_id'];?>",schoolid:"<?php  echo $schoolid;?>"},
 			success: function (data) {
 				var datas = eval(data);
 				var question_datas = [datas.question_data];
@@ -316,7 +305,7 @@ function getData() {
 		url: "<?php  echo $this->createMobileUrl('comajax',array('op'=>'GetKmInfo'))?>",
 		type: "post",
 		dataType: "json",
-		data: { schoolid:"<?php  echo $schoolid;?>",sid:"<?php  echo $it['sid'];?>",bj_id:"<?php  echo $student['bj_id'];?>",km_id:km_id,qh_id:qi_id },
+		data: { schoolid:"<?php  echo $schoolid;?>",sid:"<?php  echo $it['sid'];?>",bj_id:"<?php  echo $student['bj_id'];?>",nj_id:"<?php  echo $student['xq_id'];?>",km_id:km_id,qh_id:qi_id },
 		success: function (data) {
 			ajax_stop_loading();
 			var datas = eval(data);
@@ -324,6 +313,7 @@ function getData() {
 				var question_datas = [datas.question_data];
 			}else{
 				var question_datas = datas.question_data;
+				
 			}
 			var all_km_name = datas.all_km_name;
 				if(question_datas[0]){

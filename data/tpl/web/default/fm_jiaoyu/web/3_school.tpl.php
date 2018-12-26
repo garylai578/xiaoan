@@ -50,7 +50,10 @@
 				</div>
 				<div class="pull-right col-sm-5">
 					<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
+					<?php  if($set['school_max'] == 0 || $set['school_max'] > $allxx || $_W['isfounder']) { ?>
 					<a class="btn btn-primary" href="<?php  echo $this->createWebUrl('school', array('op' => 'post'))?>"><i class="fa fa-plus"></i> 添加学校</a>
+					<?php  } ?>
+					<?php  if($_W['isfounder']) { ?><a class="btn btn-primary" href="javascript::;" data-toggle="tooltip" data-placement="top" onclick="xxxz();"><i class="fa fa-anchor"></i> 学校限制</a><?php  } ?>
 				</div>					
 			</div>
 		</form>		
@@ -102,7 +105,7 @@ function changeGrade(cityId, type, __result) {
 					<th style="width:7%;">学校数据</th>
 					<th style="width:5%;">学校类型</th>
 					<th style="width:5%;">状态</th>
-					<th style="width:12%;text-align: right;">管理/编辑/删除</th>
+					<th style="width:15%;text-align: right;">管理/编辑/删除</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -137,6 +140,7 @@ function changeGrade(cityId, type, __result) {
 					</td>
 					<td style="max-width:60px;text-align: right;">
 						<a class="btn btn-default btn-sm" href="<?php  echo $this->createWebUrl('school', array('id' => $item['id'], 'schoolid' =>  $item['id'], 'op' => 'post'))?>" title="编辑"><i class="fa fa-pencil"></i></a>
+						<a href="javascript::;"  data-toggle="tooltip" data-placement="top" onclick="copytip('<?php  echo $item['id'];?>');" class="btn btn-default btn-sm" title="复制学校" data-toggle="tooltip" data-placement="top" >复制</a>
 						<?php  if($_W['isfounder'] || $_W['role'] == 'owner') { ?>
 						<a class="btn btn-default btn-sm" onclick="return confirm('确认删除吗？');return false;" href="<?php  echo $this->createWebUrl('school', array('id' => $item['id'], 'schoolid' =>  $item['id'], 'op' => 'delete'))?>" title="删除"><i class="fa fa-times"></i></a>
 						<?php  } ?>
@@ -158,6 +162,113 @@ function changeGrade(cityId, type, __result) {
 		<?php  echo $pager;?>
 	</div>
 </div>
+<input type="hidden" id="sid" value="">
+<div class="modal fade" style="min-width: 583px!important;" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content" style="border-radius: 20px;">
+			<div class="modal-header">
+				<h4 class="modal-title" style="text-align:center;color:#333;font-size: 17px;">选择复制内容</h4>
+			</div>
+			<div class="modal-body" style="width: 100%;">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">项目</label>
+					<div class="col-sm-9 col-xs-6">
+						<div class="input-group text-info" style="width: 50%;float: left;">
+							<label for="beasic" class="checkbox-inline">
+								<input id="beasic" class="cehckd" type="checkbox" dataname="beasic" disabled checked value="beasic"/>基础设置
+							</label></br>
+							<label for="template" class="checkbox-inline">
+								<input id="template" class="cehckd" type="checkbox" dataname="template" value="template"/>前端模版
+							</label></br>
+						</div>
+						<div class="input-group text-info" style="width: 50%;float: left;">
+							<label for="classfiy" class="checkbox-inline">
+								<input id="classfiy" class="cehckd" type="checkbox" dataname="classfiy" value="classfiy"/>分类设置(年级、班级等)
+							</label></br>
+							<label for="banner" class="checkbox-inline">
+								<input id="banner" class="cehckd" type="checkbox" dataname="banner" value="banner"/>幻灯片
+							</label></br>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer" style="border-radius: 6px;">
+				<input type="submit" onclick="tijiao()" class="btn btn-success" value="确定选择">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+<input type="hidden" id="weid" value="<?php  echo $weid;?>">
+<div class="modal fade" style="min-width: 583px!important;" id="Modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content" style="border-radius: 20px;">
+			<div class="modal-header">
+				<h4 class="modal-title" style="text-align:center;color:#333;font-size: 17px;">本公众号限制添加学校数量</h4>
+			</div>
+			<div class="modal-body" style="width: 100%;">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">数量</label>
+					<div class="col-sm-9 col-xs-6">
+						<div class="input-group" style="width: 50%;float: left;">
+							<input class="form-control" id="xznumbers" type="text" value="<?php  if($set['school_max']) { ?><?php  echo $set['school_max'];?><?php  } else { ?><?php  echo $set['school_max'];?><?php  } ?>"/>
+						</div>
+						<div class="help-block">0则不限</div>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer" style="border-radius: 6px;">
+				<input type="submit" onclick="xztj()" class="btn btn-success" value="确定">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+function xxxz(){
+	$('#Modal3').modal('toggle');
+}
+function xztj(){
+	var weid = $('#weid').val();
+	var xznumbers = $('#xznumbers').val();
+	$.ajax({
+		url: "<?php  echo $this->createWebUrl('school', array('op'=>'xznub'))?>",
+		type: "post",
+		dataType: "json",
+		data: {
+			weid: weid,
+			xznumbers:xznumbers
+		},
+		success: function (data) {
+			if (data.result) {
+				$('#xznumbers').val(xznumbers);
+				alert(data.msg);
+			}else{
+				alert(data.msg);
+			}
+		}		
+	});
+	$('#Modal3').modal('toggle');
+}
+function copytip(id){
+	$('#Modal2').modal('toggle');
+	$('#sid').val(id);
+}
+
+function tijiao(){
+	var all_select_id = '';
+	$(".cehckd").each(function(i, dom) {
+		if($(this).is(':checked')){
+			all_select_id += $(this).val() + ',';
+		}
+	});
+	var all_select_id = all_select_id;
+	var sid = $('#sid').val();
+	//获取班次
+	window.open("<?php  echo $this->createWebUrl('school',array('op'=>'copy'))?>"+'&sid='+sid+'&options='+all_select_id);  
+	$('#Modal2').modal('toggle');
+}
+</script>
 <?php  if($_W['isfounder'] && getoauthurl() != 'b.yuntuijia.com') { ?>
 	<div class="panel panel-default">
 		<div class="panel-heading">给开发者建议或留言</div>

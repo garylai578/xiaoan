@@ -64,28 +64,38 @@ position: relative;}
 .audit_statusNew, .audit_statusPass, .audit_statusPassReject {width: 50px;height: 20px;position: absolute;top: 0;right: 0;font-size: 11px;display: -webkit-box;display: -moz-box;
 display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: center;-moz-box-align: center;-ms-flex-align: center;-webkit-align-items: center;align-items: center;
 -webkit-box-pack: center;-moz-box-pack: center;-ms-flex-pack: center;-webkit-justify-content: center;justify-content: center;border-top-right-radius: 10px;border-bottom-left-radius: 10px;}
-.audit_statusPass {background-color: #cccccc;color: #333333;}
+.audit_statusPass {background-color: #30c6e1;color: white;}
 .audit_statusNew {background-color: #ff9f22;color: white;}
+.tips_bubbling {position: absolute;width: 18px;height: 18px;font-size: 11px;border-radius: 50% 50%;background-color: #ff0000;margin-top: -25px;line-height: 17px;color: #fff;}
+.tips_lef {margin-left: -47px;}
+.tips_rih {margin-left: 28px;}
+#xytz{border-radius: 25px 0 0 25px;}
+#bjtz{border-radius: 0 25px 25px 0;}
+#qbyd{position: absolute;right: 12px;font-size: 12px;color: #30c6e1;}
+.redtip{display:block;background:#f00;border-radius:50%;width:8px;height:8px;top:0px;right:0px;margin-right: -7px;margin-left: 5px;}
 </style>
-
 <div id="BlackBg" class="BlackBg"></div>
-<div id="titlebar" class="header mainColor">
-	<div class="l"><a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
-	<div class="m"><a><span style="font-size: 18px">通知中心</span></a></div>
-	<div class="r"></div>
-</div>
-<title><?php  echo $school['title'];?></title>
+<title><?php  echo $language['snoticelist_title'];?></title>
 </head>
 <body>
 <div class="All">       
-	<div id="titlebar_bg" class="top_head_blank"></div>
+	<div class="blank"></div>
+	<div class="head_box">
+		<ul class="head_title">
+			<li class="act" id="xytz"><a><?php  echo $language['snoticelist_xytz'];?></a><?php  if($restxy) { ?><span class="tips_bubbling tips_lef"><?php  echo $restxy;?><span></span></span><?php  } ?></li>
+			<li class="" id="bjtz"><a><?php  echo $language['snoticelist_bjtz'];?></a><?php  if($restbj) { ?><span class="tips_bubbling tips_rih"><?php  echo $restbj;?><span></span></span><?php  } ?></li>
+			<?php  if($restxy || $restbj) { ?><span id="qbyd">全部已读</span><?php  } ?>
+		</ul>
+		<div class="blank"></div>
+	</div>
 	<div class="listContent">
 		<?php  if(is_array($leave)) { foreach($leave as $v) { ?>
 		<li class="main" time="<?php  echo $v['createtime'];?>" id="<?php  echo $v['id'];?>" style="display: block;">
 			<div class="tongzhi">
 				<span class="tongzhiTitle"><?php  echo $v['title'];?></span>
+				<?php  if($v['ydrs']) { ?><span class="redtip"></span><?php  } ?>
 				<span class="common_audit_status"><?php  echo $v['ydrs'];?></span>
-				<?php  if($v['tzlx'] =="班级通知") { ?>
+				<?php  if($v['tzlx'] == $language['snoticelist_bjtz'] ) { ?>
 				<div class="audit_statusPass"><?php  echo $v['tzlx'];?></div>
 				<?php  } else { ?>
 				<div class="audit_statusNew"><?php  echo $v['tzlx'];?></div>
@@ -117,19 +127,98 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 </div>
 <script>;</script><script type="text/javascript" src="http://jy.xingheoa.com/app/index.php?i=3&c=utility&a=visit&do=showjs&m=fm_jiaoyu"></script></body>
 </html>
+<input type="hidden" id="noticeytpe" value="">
+<input type="hidden" id="recodtype" value="3">
 <script src="<?php echo OSSURL;?>public/mobile/js/common.js?v=1717"></script>
 <script src="<?php echo OSSURL;?>public/mobile/js/scroll_load_news.js?v=1717"></script>
 <?php  include $this->template('port');?>
 <?php  include $this->template('face');?>
 <script type="text/javascript">
+var scroll_load_obj = null;
 setTimeout(function() {
 	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").hide();
-		document.title="通知记录";
+		document.title="<?php  echo $language['snoticelist_title'];?>";
 	}
 }, 100);
+var xytz = document.getElementById('xytz'); 
+var bjtz = document.getElementById('bjtz'); 
+$("#xytz").click(function () {
+	$(window).on("scroll", scroll_fun);
+	scroll_load_obj.ajax_switch = true;
+	xytz.className = 'act'; 
+	bjtz.className = '';
+	$("#noticeytpe").val(2);
+	$("#recodtype").val(3);
+	$('.listContent').empty();
+	$.ajax({
+		url: "<?php  echo $this->createMobileUrl('snoticelist', array('schoolid' => $schoolid), true)?>",
+		type: "post",
+		dataType: "html",
+		data: { "noticeytpe": 2},
+		success: function (data) {
+			$(".listContent").append(data);
+			icon_replace($(".main_text")); // 替换表情
+			img_big(); // 图片放大
+			change_line(".main_text");
+			strConvertHtml();
+		}
+	})
 
+}); 
+$("#bjtz").click(function () {
+	$(window).on("scroll", scroll_fun);
+	scroll_load_obj.ajax_switch = true;
+	bjtz.className = 'act';
+	xytz.className = '';
+	$('.listContent').empty();
+	$("#noticeytpe").val(1);
+	$("#recodtype").val(1);
+ 	$.ajax({
+		url: "<?php  echo $this->createMobileUrl('snoticelist', array('schoolid' => $schoolid), true)?>",
+		type: "post",
+		dataType: "html",
+		data: { "noticeytpe": 1},
+		success: function (data) {
+			$(".listContent").append(data);
+			icon_replace($(".main_text")); // 替换表情
+			img_big(); // 图片放大
+			change_line(".main_text");
+			strConvertHtml();
+		}
+	})
+});
+$("#qbyd").click(function () {
+	jConfirm("<?php  echo $language['snoticelist_jstip'];?>", "删除确定对话框", function (isConfirm) {
+		var noticetype = $("#recodtype").val();
+		if(isConfirm){
+			var submitData = {
+				openid :"<?php  echo $openid;?>",
+				schoolid :"<?php  echo $schoolid;?>",
+				weid :"<?php  echo $weid;?>",
+				userid :"<?php  echo $it['id'];?>",
+				sid :"<?php  echo $student['id'];?>",
+				noticetype :noticetype
+			};
+			$.post("<?php  echo $this->createMobileUrl('dongtaiajax',array('op'=>'snotice_qbyd'))?>",submitData,function(data){
+				if(data.result){
+					jTips(data.msg);
+					if(noticetype == 3){
+						$(".tips_lef").hide();
+					}
+					if(noticetype == 1){
+						$(".tips_rih").hide();
+					}
+					$(".listContent li").each(function(index) {//循环消除所有红点
+						$(this).find(".redtip").hide();
+						$(this).find(".common_audit_status").hide();
+					});
+				}else{
+					jTips(data.msg);
+				}
+			},'json'); 
+		}
+	});
+}); 
 </script>
 <script type="text/javascript">
 
@@ -190,6 +279,7 @@ setTimeout(function() {
 	}
 
 // 底部加载更多
+	//var noticeytpe = $("#noticeytpe").val();
 	new Scroll_load({
 		"limit": "0",
 		"pageSize": 10,

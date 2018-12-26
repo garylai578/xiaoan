@@ -53,18 +53,37 @@ font-weight:bold;
             </div>
             <div class="panel-body">
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">排序</label>
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>排序</label>
                     <div class="col-sm-9">
                         <input type="text" name="ssort" class="form-control" value="{$score['ssort']}" />
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">成绩期号名称</label>
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"><span style="color:red">*</span>成绩期号名称</label>
                     <div class="col-sm-9">
                         <input type="text" name="catename" class="form-control" value="{$score['sname']}" />
                     </div>
                 </div>
 				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label"> <span style="color:red">*</span> 期号类型</label>
+                    <div class="col-sm-2 col-lg-2">
+						<select style="margin-right:15px;" name="scoretype" id="scoretype" class="form-control">
+							<option value="score" {if $score['type'] == 'score'} selected="selected"{/if}>成绩期号</option>
+							<option value="xq_score" {if $score['type'] == 'xq_score'} selected="selected"{/if}>学期期号</option>
+						</select>
+                    </div>
+                </div>				
+				<div class="form-group xq_score_type" {if $score['type'] == 'xq_score'}style="display:block"{else}style="display:none"{/if}>
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label">起止日期</label>
+						<div class="col-sm-9 col-xs-9 col-md-4">
+							<div class="input-group clockpicker" style="margin-bottom: 15px">
+								{php echo tpl_form_field_date('start', $score['sd_start'])}
+								<span class="input-group-addon" style="padding-left:10px">至</span>
+								{php echo tpl_form_field_date('end', $score['sd_end'])}
+							</div>
+						</div>
+					</div>
+				<div class="form-group score_type" {if (empty($score['type']) || $score['type'] == 'score')  }style="display:block"{else}style="display:none"{/if} >
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
                     <div class="col-sm-9">
                         <label for="isshow3" class="radio-inline"><input type="radio" name="qhtype" value="2" id="isshow3" {if !empty($score) && $score['qhtype'] == 2}checked="true"{/if} /> 指定班级</label>
@@ -73,7 +92,7 @@ font-weight:bold;
                         <span class="help-block">指定班级或者设定为全校用</span>
                     </div>
                 </div>
-				<div id="credit-status1" {if empty($score['qhtype']) || $score['qhtype'] == 2}style="display:block"{else}style="display:none"{/if}>
+				<div id="credit-status1" class="score_type" {if empty($score['qhtype']) || $score['qhtype'] == 2}style="display:block"{else}style="display:none"{/if}>
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label">选择班级</label>
 						<div class="col-sm-9 col-xs-6">
@@ -109,6 +128,20 @@ font-weight:bold;
 	$('#isshow4').click(function(){
 		$('#credit-status1').hide();
 	});
+	
+	
+	$("#scoretype").change(function(){
+        var type = $(this).val();
+		if(type == 'score'){
+			$(".score_type").show();
+			$(".xq_score_type").hide();
+		}else if(type == 'xq_score'){
+			$(".score_type").hide();
+			$(".xq_score_type").show();
+		}
+    });
+
+	
 </script>
 {elseif $operation == 'display'}
 <div class="main">
@@ -126,6 +159,8 @@ font-weight:bold;
                     <tr>
 					    <th style="width:100px;">序号</th>
                         <th>成绩期号名称</th>
+						<th style="width:10%;">期号类型</th>
+						<th style="width:14%;text-align:center">备注</th>
                         <th class="qx_e_d" style="text-align:right;">编辑/删除</th>
                     </tr>
                     </thead>
@@ -134,6 +169,27 @@ font-weight:bold;
                     <tr>
 					    <td><div class="type-parent">{$row['sid']}</div></td>
                         <td><div class="type-parent">{$row['sname']}&nbsp;&nbsp;</div></td>
+						{if $row['type'] == 'score'}
+						<td><div class="type-parent"><span class="label label-success">成绩期号</span></div></td>
+						<td style="text-align:center">
+							<div class="type-parent">
+							{if $row['qhtype'] == 1}
+								<span class="label label-primary">全校可用</span>
+							{else}
+								<span class="label label-info">指定班级</span>
+							{/if}
+							</div>
+						</td>
+						{elseif $row['type'] == 'xq_score' }
+						<td><div class="type-parent"><span class="label label-info">学期期号</span></div></td>
+						<td  style="text-align:center">
+							<div class="type-parent">
+								<span class="label label-info">{php echo date("Y-m-d",$row['sd_start'])}</span> 至 
+								<span class="label label-info">{php echo date("Y-m-d",$row['sd_end'])}</span>
+							</div>
+						</td>
+						{/if}
+						
                         <td style="text-align:right;" class="qx_e_d"><a class="btn btn-default btn-sm qx_edit" href="{php echo $this->createWebUrl('score', array('op' => 'post', 'sid' => $row['sid'], 'schoolid' => $schoolid))}" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;<a class="btn btn-default btn-sm qx_delete" href="{php echo $this->createWebUrl('score', array('op' => 'delete', 'sid' => $row['sid'], 'schoolid' => $schoolid))}" onclick="return confirm('确认删除此分类吗？');return false;" title="删除"><i class="fa fa-times"></i></a></td>
                     </tr>
                     {/loop}

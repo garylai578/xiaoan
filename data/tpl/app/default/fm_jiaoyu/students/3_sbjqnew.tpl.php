@@ -14,16 +14,19 @@
 <body>
 <?php  include $this->template('bjqcss');?>
 <header class="header">
-    <div class="headerContent"><?php  echo $students['s_name'];?>的班级圈</div>
+    <div class="headerContent"><?php  if($school['bjqstyle'] =='new') { ?><?php  echo $students['s_name'];?><?php  echo $language['sbjq_title'];?><?php  } else { ?>校园动态<?php  } ?></div>
+    <?php  if($school['bjqstyle'] =='new') { ?>
     <div class="hederRightBox">
         <a class="choice_baby">
             <img src="<?php echo OSSURL;?>public/mobile/img/selectMean.png" class="img-responsive">
         </a>
     </div>
+	<?php  } ?>
 </header>
+<?php  if($school['bjqstyle'] =='new') { ?>
 <div class="slide_left_menu_bg">
     <div class="slide_left_menu">
-        <div class="slide_left_menu_til">绑定列表</div>
+        <div class="slide_left_menu_til"><?php  echo $language['sbjq_bdlb'];?></div>
         <ul class="slide_left_menu_ul">
 		<?php  if(is_array($user)) { foreach($user as $row) { ?>
 			<li <?php  if($it['id'] == $row['id']) { ?>class="act"<?php  } ?> userid="<?php  echo $row['id'];?>" schoolid="<?php  echo $row['schoolid'];?>">
@@ -33,6 +36,7 @@
         </ul>
     </div>
 </div>
+<?php  } ?>
 <div id="container" class="scroller" >
 <div style="top:100px;height:100px; line-height:160px;text-align:center; width:100%;">
 	<span id="gif"><img style="width:25px;" src="<?php echo OSSURL;?>public/mobile/img/gh_xh_wating.gif"/>&nbsp;努力加载中...</span>
@@ -55,9 +59,10 @@
 	</div>
 
 </div>
+<?php  if($school['bjqstyle'] =='new') { ?>
 <?php  if($bjset['is_bjzx'] ==1) { ?>
 <div class="myCrowns">
-	<p>班级之星</p>
+	<p><?php  echo $language['sbjq_bjstar'];?></p>
 	<div class="_myCrowns">
 		<div class="crowns">
 			<div class="mydiv">
@@ -99,6 +104,7 @@
 </div>
 <?php  } else { ?>
 <div class="top_height_blank50"></div>
+<?php  } ?>
 <?php  } ?>
 <!--
 <a class="new_info_tips3">
@@ -178,7 +184,6 @@
 				<?php  if(is_array($item['zname'])) { foreach($item['zname'] as $row1) { ?>
 					<span style="color:#2B779C;" class="praiseContent" user_id="<?php  echo $row1['uid'];?>"><?php  echo $row1['zname'];?></span> 
 				<?php  } } ?>
-				
             </div>
 			<?php  } else { ?>
             <div class="praiseBox"></div>			
@@ -205,7 +210,7 @@
 </ul>
 <?php  } ?>
 </div>
-<a href="<?php  echo $this->createMobileUrl('sbjqfabu', array('schoolid' => $schoolid), true)?>" class="F_div" style="z-index: 2;right: 20px; margin-bottom: 90px; display: block"><div class="F_div_text">发布</div></a>
+<a href="<?php  echo $this->createMobileUrl('sbjqfabu', array('schoolid' => $schoolid), true)?>" class="F_div" style="z-index: 2;right: 20px; margin-bottom: 90px; display: block"><div class="F_div_text"><?php  echo $language['sbjq_fabu'];?></div></a>
 <div class="top_height_blank50"></div>
 <?php  include $this->template('port');?>
 <div class="bottom_comment_box3 hidden" style="padding: 0 0 0 8px; border: 1px solid #dedee0; box-sizing: border-box; padding-right: 90px; height: 30px; line-height: 30px;">

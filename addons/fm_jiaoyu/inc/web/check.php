@@ -15,6 +15,7 @@
 		load()->func('tpl');
 		$operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
 		$tid_global = $_W['tid'];
+		$schooltype = $_W['schooltype'];
 		if(!empty($_W['setting']['remote']['type'])){
 			$urls = $_W['attachurl'];
 		}else{
@@ -36,6 +37,7 @@
 			if (!(IsHasQx($tid_global,1002402,1,$schoolid))){
 				$this->imessage('非法访问，您无权操作该页面','','error');	
 			}
+			$allroom = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'addr' And schoolid = {$schoolid} ORDER BY ssort DESC");
 			$class = pdo_fetchall("SELECT sid as id, sname as classes, schoolid as sid, ssort as score, tid FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'theclass' And schoolid = {$schoolid} ORDER BY ssort DESC");
 			$qh = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'score' And schoolid = {$schoolid} ORDER BY ssort DESC");
 			$id     = intval($_GPC['id']);
@@ -51,6 +53,7 @@
 					'twmac'      => empty($_GPC['twmac'])? -1 : trim($_GPC['twmac']),
 					'createtime' => time(),
 					'bj_id'		 =>intval($_GPC['bj_id']),
+					'js_id'		 =>intval($_GPC['js_id']),
 					'is_bobao'   =>intval($_GPC['is_bobao']),
 					'is_master'  =>intval($_GPC['is_master'])					
 				);

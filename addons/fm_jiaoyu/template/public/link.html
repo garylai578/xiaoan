@@ -113,6 +113,9 @@ function showJiaoyuDialog(urlid,type,dosid) {
 			alertHtml += "<div class=\"btn btn-default\" onclick=\"clicklinks('shrecord','" + urlid + "');\" title=\"家政家教预约记录\">家政家教预约记录</div>";
 			alertHtml += "<div class=\"btn btn-default\" onclick=\"clicklinks('sgoodslist','" + urlid + "');\" title=\"商城\">商城</div>";
 			alertHtml += "<div class=\"btn btn-default\" onclick=\"clicklinks('chongzhi','" + urlid + "');\" title=\"充值\">充值</div>";
+			{if is_showpf()}
+			alertHtml += "<div class=\"btn btn-default\" onclick=\"clicklinks('smyscore','" + urlid + "');\" title=\"我的评分\">我的评分</div>";
+			{/if}
 			
 		}	
 	$('#Jiaoyu').find(".link-browser").append(alertHtml);

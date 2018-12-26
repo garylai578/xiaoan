@@ -67,7 +67,18 @@ class Mloader
 		}
 	}
 }
-
+function get_language($schoolid){
+	global $_W;
+	$item = pdo_fetch("SELECT lanset FROM " . tablename('wx_school_language') . " WHERE weid = '{$_W['uniacid']}' And schoolid = '{$schoolid}' And is_on = 1 ");
+	if($item){
+		$lanconfig = json_decode($item['lanset'],true);
+	}else{
+		$filename = MODULE_ROOT . '/model/lan.config.php';
+		require $filename;
+		$lanconfig = $config;
+	}
+	$_W['lanconfig'] = $lanconfig;
+}
 function get_week($time){
 	if(date('w',$time) == 0 ){
 		$day = '星期日';
@@ -177,7 +188,57 @@ function readschootyep(){
 		return false;
 	}
 }
-
+function upload_file($file, $type, $name = ''){
+	global $_W;
+	if (empty($file['name'])) {
+		return error(-1, '上传失败, 请选择要上传的文件！');
+	}
+	if ($file['error'] != 0) {
+		return error(-1, '上传失败, 请重试.');
+	}
+	load()->func('file');
+	$pathinfo = pathinfo($file['name']);
+	$ext = strtolower($pathinfo['extension']);
+	$basename = strtolower($pathinfo['basename']);
+	if ($name != '') {
+		$basename = $name;
+	}
+	$path = "public/upload/{$type}s/{$_W['uniacid']}/";
+	mkdirs(MODULE_ROOT . '/' . $path);
+	if (!strexists($basename, $ext)) {
+		$basename .= '.' . $ext;
+	}
+	if (!file_move($file['tmp_name'], MODULE_ROOT . '/' . $path . $basename)) {
+		return error(-1, '保存上传文件失败');
+	}
+	return $path . $basename;
+}
+function read_excel($filename){
+	include_once IA_ROOT . '/framework/library/phpexcel/PHPExcel.php';
+	$filename = MODULE_ROOT . '/' . $filename;
+	if (!file_exists($filename)) {
+		return error(-1, '文件不存在或已经删除');
+	}
+	$ext = pathinfo($filename, PATHINFO_EXTENSION);
+	if ($ext == 'xlsx') {
+		$objReader = PHPExcel_IOFactory::createReader('Excel2007');
+	} else {
+		$objReader = PHPExcel_IOFactory::createReader('Excel5');
+	}
+	$objReader->setReadDataOnly(true);
+	$objPHPExcel = $objReader->load($filename);
+	$objWorksheet = $objPHPExcel->getActiveSheet();
+	$highestRow = $objWorksheet->getHighestRow();
+	$highestColumn = $objWorksheet->getHighestColumn();
+	$highestColumnIndex = PHPExcel_Cell::columnIndexFromString($highestColumn);
+	$excelData = array();
+	for ($row = 1; $row <= $highestRow; $row++) {
+		for ($col = 0; $col < $highestColumnIndex; $col++) {
+			$excelData[$row][] = (string) $objWorksheet->getCellByColumnAndRow($col, $row)->getValue();
+		}
+	}
+	return $excelData;
+}
 function register_jssdks($debug = false){
 	
 	global $_W;
@@ -592,6 +653,8 @@ function getoauthurl(){
 }
 
 function getpard($pard){
+	global $_W;
+	$config = $_W['lanconfig']['guanxi'];
 	if($pard == 0){
 		$jsr  = "";
 	}
@@ -599,10 +662,10 @@ function getpard($pard){
 		$jsr  = "";
 	}
 	if($pard == 2){
-		$jsr  = "妈妈";
+		$jsr  = $config['guanxi_pard2'];
 	}
 	if($pard == 3){
-		$jsr  = "爸爸";
+		$jsr  = $config['guanxi_pard3'];
 	}
 	if($pard == 4){
 		$jsr  = "爷爷";
@@ -623,23 +686,40 @@ function getpard($pard){
 		$jsr  = "阿姨";
 	}
 	if($pard == 10){
-		$jsr  = "其他家长";
+		$jsr  = $config['guanxi_pard5'];
 	}
 	if($pard == 11){
 		$jsr  = "-老师代签";
 	}
     return $jsr;
 }
-
+function getallpardset(){
+	global $_W;
+	$config = $_W['lanconfig']['guanxi'];
+	$data = array();
+	$data[1]  = $config['guanxi_pard4'];
+	$data[2]  = $config['guanxi_pard2'];
+	$data[3]  = $config['guanxi_pard3'];
+	$data[4]  = "爷爷";
+	$data[5]  = "奶奶";
+	$data[6]  = "外公";
+	$data[7]  = "外婆";
+	$data[8]  = "叔叔";
+	$data[9]  = "阿姨";
+	$data[10]  = $config['guanxi_pard5'];
+    return $data;
+}
 function getpardforkqj($pard){
+	global $_W;
+	$config = $_W['lanconfig']['guanxi'];
 	if($pard == 1){
-		$jsr  = "学生";
+		$jsr  = $config['guanxi_pard4'];
 	}
 	if($pard == 2){
-		$jsr  = "妈妈";
+		$jsr  = $config['guanxi_pard2'];
 	}
 	if($pard == 3){
-		$jsr  = "爸爸";
+		$jsr  = $config['guanxi_pard3'];
 	}
 	if($pard == 4){
 		$jsr  = "爷爷";
@@ -660,7 +740,7 @@ function getpardforkqj($pard){
 		$jsr  = "阿姨";
 	}
 	if($pard == 10){
-		$jsr  = "家长";
+		$jsr  = $config['guanxi_pard5'];
 	}
     return $jsr;
 }
@@ -679,17 +759,19 @@ function get_teacher($pard){
 }
 
 function get_guanxi($pard){ //获取用户绑定时候选定关系称谓
+	global $_W;
+	$config = $_W['lanconfig']['guanxi'];
 	if($pard == 2){
-		$jsr  = "妈妈";
+		$jsr  = $config['guanxi_pard2'];
 	}
 	if($pard == 3){
-		$jsr  = "爸爸";
+		$jsr  = $config['guanxi_pard3'];
 	}
 	if($pard == 4){
-		$jsr  = "";
+		$jsr  = $config['guanxi_pard4'];
 	}
 	if($pard == 5){
-		$jsr  = "家长";
+		$jsr  = $config['guanxi_pard5'];
 	}	
     return $jsr;
 }
@@ -1177,11 +1259,11 @@ function GetNjzr($tid){
 function is_njzr($tid){
 	global $_GPC;
 	$temp = pdo_fetch("SELECT sid FROM ".tablename('wx_school_classify')." WHERE  type ='semester' And tid ='{$tid}'  ");
-
-	if(!empty($temp))
+	if(!empty($temp) && $tid == 'founder' && $tid == 'owner'){
 		return $temp;
-	else
-		return 0;
+	}else{
+		return false;
+	}	
 }
 
 function getallnj($tid){ //获取当前年级主任所有管辖年级
@@ -1340,7 +1422,7 @@ function checkverstypeforhtml(){
 		exit;				
 	}
 }
-
+ 
 function is_showgkk(){
 	global $_W;
 	$oauthurl = getoauthurl();
@@ -1392,11 +1474,9 @@ function get_myallclass_this_school($weid,$openid,$schoolid){ //查询绑定学�
 }
 
 //获取权限对应分组
-function GetFzByQx ($qx,$type,$schoolid)
-{
+function GetFzByQx ($qx,$type,$schoolid){
 	$qxid = 0;
-	switch ( $qx )
-	{
+	switch ( $qx )	{
 		//s审核教师请假
 		case 'shjsqj':
 			$qxid = 2001002;
@@ -1405,14 +1485,16 @@ function GetFzByQx ($qx,$type,$schoolid)
 			$qxid = $qx;
 			break;
 	}  
-	$fzlist =  pdo_fetchall("SELECT fzid FROM " . tablename('wx_school_fzqx') . " where qxid={$qxid} And type={$type} and schoolid = {$schoolid}");
-	$fzstr = '';
-	foreach( $fzlist as $key => $value )
-	{
-		$fzstr .=$value['fzid'].",";
+	$fzlist =  pdo_fetchall("SELECT fzid FROM " . tablename('wx_school_fzqx') . " where qxid='{$qxid}' And type='{$type}' and schoolid = '{$schoolid}'");
+	if($fzlist){
+		$fzstr = '';
+		foreach( $fzlist as $key => $value )
+		{
+			$fzstr .=$value['fzid'].",";
+		}
+		$fzstr = trim($fzstr,",");
+		return $fzstr;
 	}
-	$fzstr = trim($fzstr,",");
-	return $fzstr;
 }
 
 function IsHasQx($tid,$qx,$type,$schoolid)
@@ -1933,8 +2015,8 @@ function UnsetArrayByKey(&$arr, $key){
 }
 
 function GetNotOverStr($schoolid,$weid){
-		$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
-		$nj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
+		$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename('wx_school_classify') . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':is_over'=>"2"));
+		$nj = pdo_fetchall("SELECT sid,sname FROM " . tablename('wx_school_classify') . " where weid = :weid AND schoolid = :schoolid And type = :type and is_over!=:is_over ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid,':is_over'=>"2"));
 		$bj_str_temp = '0,';
 		foreach($bj as $key_b=>$value_b){
 			$bj_str_temp .=$value_b['sid'].",";
@@ -1950,3 +2032,179 @@ function GetNotOverStr($schoolid,$weid){
 		
 		return $back;
 }
+
+//是否养老公寓
+function is_showyl(){
+	global $_W;
+	$oauthurl = getoauthurl();
+
+	if( $oauthurl == "www.xiaobobo.club" )
+	//if ( $oauthurl == "manger.daren007.com" )
+		return 1;
+	else
+		return 0;
+}
+
+
+//GLP
+function is_showpf(){
+	global $_W;
+	$oauthurl = getoauthurl();
+	if( $oauthurl == "zw.nyxiaowei.com" )
+	//if ( $oauthurl == "manger.daren007.com" )
+		return 1;
+	else
+		return 0;
+}
+function GetRviewByQhAndNj($qhid,$njid,$schoolid){
+	global $_W;
+	$qhinfo = pdo_fetch("SELECT is_review,addedinfo,qhtype,qh_bjlist FROM " . tablename('wx_school_classify') . " where sid = '{$qhid}' And type='score' and schoolid = '{$schoolid}' ");
+	if($qhinfo['is_review'] == 1){
+		if($qhinfo['qhtype'] == 2){
+			$this_bjlist = explode(",",$qhinfo['qh_bjlist']);
+		}
+		$this_addinfo = json_decode($qhinfo['addedinfo'],true);
+		$subarr = explode(',', $this_addinfo['sub_arr']);
+		$bjlist = pdo_fetchall("SELECT sname,sid FROM " . tablename('wx_school_classify') . " where type='theclass' and schoolid = '{$schoolid}' and parentid ='{$njid}' ");
+		$back_data = array();
+		$bj_score = array();
+		$bj_allscore = array();
+		foreach($bjlist as $key_b => $value_b){
+			if($qhinfo['qhtype'] == 1 || ( $qhinfo['qhtype'] == 2 && in_array($value_b['sid'],$this_bjlist) )){
+				$this_bj_allscore = 0 ;
+				$studentcount = pdo_fetchcolumn("SELECT count(distinct id) FROM " . tablename('wx_school_students') . " where bj_id = '{$value_b['sid']}' And schoolid = '{$schoolid}' ");
+				$reviewcount = ceil($studentcount * $this_addinfo['review_per'] / 100); //考察人数
+				$back_data[$value_b['sid']] = array();
+				$back_data[$value_b['sid']]['sname'] = $value_b['sname']; 
+				$back_data[$value_b['sid']]['bjid'] =$value_b['sid'];
+				$rowcount = count($subarr) + 1 ;				
+				foreach($subarr as $row){
+					//当前科目平均分
+					$kminfo = pdo_fetch("SELECT sname FROM " . tablename('wx_school_classify') . " where sid = '{$row}' And type='subject' and schoolid = '{$schoolid}' ");
+					$avg_score_b =  pdo_fetchcolumn("SELECT AVG(my_score) FROM " . tablename('wx_school_score') . " where bj_id = '{$value_b['sid']}' and qh_id = '{$qhid}' And schoolid = '{$schoolid}' and km_id = '{$row}' ORDER BY my_score DESC LIMIT 0 , {$reviewcount} ");
+					$avg_score = round($avg_score_b, 2);
+					$passNum =  pdo_fetchcolumn("SELECT count(distinct sid) FROM " . tablename('wx_school_score') . " where bj_id = '{$value_b['sid']}' and qh_id = '{$qhid}' And schoolid = '{$schoolid}' and km_id = {$row} and my_score>={$avg_score} ORDER BY my_score DESC  ");
+					$avg_per =round($passNum / $reviewcount * 100 , 2);
+					$back_data[$value_b['sid']]['data'][$row]['avg_score'] = $avg_score;
+					$back_data[$value_b['sid']]['data'][$row]['passNum'] = $passNum;
+					$back_data[$value_b['sid']]['data'][$row]['reviewcount'] = $reviewcount;
+					$back_data[$value_b['sid']]['data'][$row]['avg_per'] = $avg_per;
+					$back_data[$value_b['sid']]['data'][$row]['km_name'] = $kminfo['sname'];
+					$back_data[$value_b['sid']]['data'][$row]['final_score'] = $avg_score + $avg_per ;
+					$bj_score[$row][] = $avg_score + $avg_per ;
+					$this_bj_allscore += $avg_score + $avg_per ;
+				}
+				$back_data[$value_b['sid']]['allscore']['score'] = $this_bj_allscore;
+				$bj_allscore[] = $this_bj_allscore;
+			}
+		}
+		
+
+		foreach($bj_score as $key_b=>$row_b){
+			rsort($bj_score[$key_b]);
+			foreach($back_data as $key_bj=> $value_bj){
+				$this_bj_score =  $value_bj['data'][$key_b]['final_score'];
+				 $b= array_search($this_bj_score, $bj_score[$key_b]);
+				$back_data[$key_bj]['data'][$key_b]['rank']= $b + 1 ;
+			}
+		}
+		
+		array_multisort($bj_allscore, SORT_DESC, $back_data);
+
+		rsort($bj_allscore);
+		foreach($back_data as $key_bj=> $value_bj){
+			$this_score_t =  $value_bj['allscore']['score'];
+			 $b= array_search($this_score_t, $bj_allscore);
+			$back_data[$key_bj]['allscore']['rank_all']= $b + 1 ;
+		}
+		$result['status'] = true;
+		$result['data'] = $back_data;
+		$result['rowcount'] = $rowcount;
+	}else{
+		$result['status'] = false;
+	}
+	return  $result;
+}
+
+
+function GetDatesetWithBj($schoolid,$weid){
+	global $_W;
+	$nowdate = date("Y-n-j",time());
+	$nowyear = date("Y",time());
+	$nowweek = date("w",time()); 
+	$bjlist = pdo_fetchall("SELECT sid,datesetid,sname  FROM " . tablename('wx_school_classify') . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and type='theclass' ");
+	$result = array();
+	foreach($bjlist as $key=>$isfz){
+		$result[$isfz['sid']]['sname'] = $isfz['sname'];
+		$todaytype = 0;
+		$todaytimeset = array(
+			array(
+				'start'=>'00:00',
+				'end'  =>'23:59'
+			),
+		); 
+		if(!empty($isfz['datesetid'])){
+			$checkdateset      =  pdo_fetch("SELECT * FROM " . tablename('wx_school_checkdateset') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  id = '{$isfz['datesetid']}'");
+			$checkdateset_holi =  pdo_fetch("SELECT * FROM " . tablename('wx_school_checkdatedetail') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  checkdatesetid = '{$isfz['datesetid']}' and year = '{$nowyear}' ");
+			
+			$checktime         =  pdo_fetchall("SELECT * FROM " . tablename('wx_school_checktimeset') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  checkdatesetid = '{$isfz['datesetid']}' and date = '{$nowdate}' ORDER BY id ASC ");
+			if(!empty($checktime)){
+				if($checktime[0]['type'] == 6){
+					//1放假2上课
+					$todaytype = 1;
+				}elseif($checktime[0]['type'] == 5){
+					$todaytype    = 2;
+					$todaytimeset = $checktime; 
+				}
+			}else{
+				if(($nowdate >= $checkdateset_holi['win_start'] && $nowdate <=$checkdateset_holi['win_end']) || ($nowdate >= $checkdateset_holi['sum_start'] && $nowdate <=$checkdateset_holi['sum_end'])){
+					$todaytype = 1;
+				}else{
+					$timeset_work = pdo_fetchall("SELECT start,end FROM " . tablename('wx_school_checktimeset') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  checkdatesetid = '{$isfz['datesetid']}' and type=1 ORDER BY id ASC ");
+					//星期五
+					if($nowweek == 5){
+						$todaytype = 2;
+						if($checkdateset['friday'] == 1){
+							$timeset_fri = pdo_fetchall("SELECT start,end FROM " . tablename('wx_school_checktimeset') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  checkdatesetid = '{$isfz['datesetid']}' and type=2 ORDER BY id ASC ");
+							$todaytimeset = $timeset_fri;
+						}else{
+							$todaytimeset = $timeset_work;
+						}
+					//星期六
+					}elseif($nowweek == 6){
+						if($checkdateset['saturday'] == 1){
+							$timeset_sat = pdo_fetchall("SELECT start,end FROM " . tablename('wx_school_checktimeset') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  checkdatesetid = '{$isfz['datesetid']}' and type=3 ORDER BY id ASC ");
+							$todaytype = 2;
+							$todaytimeset = $timeset_sat;
+						}else{
+							$todaytype = 1;
+						}
+					
+					//星期天
+					}elseif($nowweek == 0){
+						if($checkdateset['sunday'] == 1){
+							$timeset_sun = pdo_fetchall("SELECT start,end FROM " . tablename('wx_school_checktimeset') . " WHERE weid = '{$weid}' And schoolid = {$schoolid} and  checkdatesetid = '{$isfz['datesetid']}' and type=4 ORDER BY id ASC ");
+							$todaytype    = 2;
+							$todaytimeset = $timeset_sun;
+						}else{
+							$todaytype    = 1;
+						}
+					//工作日	
+					}else{
+						$todaytype    = 2;
+						$todaytimeset = $timeset_work;
+					}
+				}
+			}
+			
+		}
+		$result[$isfz['sid']]['timeset']['todaytype'] = $todaytype;
+		$result[$isfz['sid']]['timeset']['todaytimeset'] = $todaytimeset;
+	}
+	return $result;
+}
+
+ 
+ 
+
+

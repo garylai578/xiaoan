@@ -2,8 +2,9 @@
 		<li class="main" time="<?php  echo $v['createtime'];?>" id="<?php  echo $v['id'];?>" style="display: block;">
 			<div class="tongzhi">
 				<span class="tongzhiTitle"><?php  echo $v['title'];?></span>
+				<?php  if($v['ydrs']) { ?><span class="redtip"></span><?php  } ?>
 				<span class="common_audit_status"><?php  echo $v['ydrs'];?></span>
-				<?php  if($v['tzlx'] =="班级通知") { ?>
+				<?php  if($v['tzlx'] ==$language['snoticelist_bjtz']) { ?>
 				<div class="audit_statusPass"><?php  echo $v['tzlx'];?></div>
 				<?php  } else { ?>
 				<div class="audit_statusNew"><?php  echo $v['tzlx'];?></div>

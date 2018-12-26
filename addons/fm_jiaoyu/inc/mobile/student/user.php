@@ -11,8 +11,14 @@
 		$userss = intval($_GPC['userid']);
 		$act = "wd";
         //查询是否用户登录
+		if(empty($schoolid)){
+			$itess = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where weid = '{$weid}' And openid = '{$openid}' And tid = 0 ");
+			if(!empty($itess)){
+				$userss = $itess['id'];
+			}
+		}
 		if(!empty($userss)){
-			$ite = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where :schoolid = schoolid And weid = :weid AND id=:id ", array(':schoolid' => $schoolid,':weid' => $weid, ':id' => $userss));
+			$ite = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where  id = :id ", array(':id' => $userss));
 			if(!empty($ite)){
 				$_SESSION['user'] = $ite['id'];
 				$schoolid = $ite['schoolid'];
@@ -54,7 +60,12 @@
 			exit;
 		}
         if($user != false){
-			$students = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where weid = :weid AND id=:id AND schoolid=:schoolid ", array(':weid' => $weid, ':id' => $it['sid'], ':schoolid' => $schoolid));			
+			$students = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where weid = :weid AND id=:id AND schoolid=:schoolid ", array(':weid' => $weid, ':id' => $it['sid'], ':schoolid' => $schoolid));	
+			$now_time = time();
+			$student_buzhu = pdo_fetch("SELECT * FROM " . tablename($this->table_buzhulog) . " where weid ='{$weid}' AND sid = '{$it['sid']}' and starttime <= '{$nowtime}' and endtime >= '{$nowtime}' ");		
+			$all_yue =$students['chongzhi'] +  $student_buzhu['now_yue'];
+
+			
 			$rest = check_unpay($it['sid']);
 			$resttz = pdo_fetchcolumn("SELECT count(*) FROM ".tablename($this->table_record)." WHERE sid = '{$it['sid']}' And (type = 1 Or type = 3) And readtime < 1 And userid = '{$it['id']}' ");
 			$restzy = pdo_fetchcolumn("SELECT count(*) FROM ".tablename($this->table_record)." WHERE sid = '{$it['sid']}' And type = 2 And readtime = '0' And userid = '{$it['id']}' ");

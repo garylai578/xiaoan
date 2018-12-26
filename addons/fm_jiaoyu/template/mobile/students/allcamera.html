@@ -45,21 +45,10 @@
 </style>
 <title>{$school['title']}</title>
 </head>
-<body>
-<div class="header mainColor">
-	<div class="l" id="titlebar">
-		<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
-	</div>
-	<div class="m">
-		<a id="Changesf">
-			<span style="font-size: 18px">{$student['s_name']}</span>
-			{if $bdsun > 1}<i></i>{/if}
-		</a>
-	</div>
-</div>  
+<body> 
 <div>
 {if $mybj['video'] || $list}
-	<ul class="baby_video_list" style="margin-top:60px;">
+	<ul class="baby_video_list" style="margin-top:10px;">
 	{if $mybj['video']}
 		<li>
 			<a href="{php echo $this->createMobileUrl('camera', array('schoolid' => $schoolid, 'userid' =>$it['id'],'op' => 'mybj'), true)}">
@@ -149,16 +138,6 @@
 	</div>
 </div>
 </div>
-<script type="text/javascript">
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").hide();
-		document.title="{$student['s_name']}";
-	}
-}, 100);
-
-</script>
 <script>
 WeixinJSHideAllNonBaseMenuItem();
 /**微信隐藏工具条**/

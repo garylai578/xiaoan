@@ -35,7 +35,7 @@
 	</div>
 	<div class="m">
 		<a id="Changesf">
-			<span style="font-size: 18px">食谱</span>
+			<span style="font-size: 18px"><?php  echo $language['cooklist_bzsp'];?></span>
 		</a>
 	</div>
 </div>

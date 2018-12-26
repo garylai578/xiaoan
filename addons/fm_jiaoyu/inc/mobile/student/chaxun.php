@@ -27,8 +27,8 @@
 		));	
 		$sid = 	$it['sid'];	
 	}
-	$mynj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $student['xq_id']));
-	$mybj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $student['bj_id']));
+	$mynj = pdo_fetch("SELECT sname,sid FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $student['xq_id']));
+	$mybj = pdo_fetch("SELECT sname,sid FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $student['bj_id']));
 	if(!empty($sid)){
 		$myallqh = get_myqh($student['bj_id'],$schoolid);
 		$list = pdo_fetchall("SELECT id FROM " . tablename($this->table_score) . " where schoolid = :schoolid And weid = :weid And sid = :sid", array(

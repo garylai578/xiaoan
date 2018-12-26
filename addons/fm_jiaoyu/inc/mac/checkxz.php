@@ -5,7 +5,7 @@
 
 	global $_GPC, $_W;
 	
-	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','checknew', 'checkold','all','banpai','allcard','getleave') ) ? $_GPC ['op'] : 'default';
+	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','checknew', 'checkold','all','banpai','allcard','getleave','onlineflow','offlineflow','cardinfo') ) ? $_GPC ['op'] : 'default';
 	$weid = $_GPC['i'];
 	$schoolid = $_GPC['schoolid'];
 	$macid = empty($_GPC['macid']) ? $_GPC['terminalId']:$_GPC['macid'];
@@ -37,6 +37,7 @@
 		$urls = $_W['siteroot'].'attachment/';
 	}
 	if ($operation == 'all') {
+		//$allclasstimeset = GetDatesetWithBj($school['id'],$weid);
 		if(!empty($ckmac)){
 			$classes = pdo_fetchall("SELECT sid as classId,type, sname as className  FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And (type = 'theclass' OR type = 'jsfz') And schoolid = {$school['id']} ORDER BY sid DESC");
 			$result = array(
@@ -58,6 +59,9 @@
 				}
 				$class = pdo_fetchall($sql);
 				foreach($class as $key =>$row) {
+					if($cls['type'] != 'jsfz'){
+					//$class[$key]['timeset'] = $allclasstimeset[$row['bj_id']]['timeset'];
+					}
 					//$class[$key]['signId'] = "";
 					$card = pdo_fetchall("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE {$colid} = '{$row['childId']}' ORDER BY id DESC");
 					$num = count($card);
@@ -70,6 +74,7 @@
 					}else{
 						$class[$key]['rfid'] = $card['0']['idcard'];
 					}
+					$class[$key]['rfid'] = ltrim($class[$key]['rfid'],"#");
 				}
 				if($cls['type'] == 'jsfz'){
 					$teachers['users'] = array_merge($teachers['users'],$class);
@@ -151,13 +156,17 @@
 			$result['data']['classInfo'] = $class;
 			$result['data']['posturl']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=checknew&m=fm_jiaoyu');
 			$result['data']['oldposturl']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=checkold&m=fm_jiaoyu');
-			$result['data']['leaveurl']   = urlencode( $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=getleave&m=fm_jiaoyu');
-			$result['data']['outTimeUrl']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=classinfo&m=fm_jiaoyu');
+			$result['data']['leaveurl']   = urlencode( $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=getleave&m=fm_jiaoyu');
+			$result['data']['outTimeUrl']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=classinfo&m=fm_jiaoyu');
+			$result['data']['offlineflow']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=offlineflow&m=fm_jiaoyu');
+			$result['data']['onlineflow']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=onlineflow&m=fm_jiaoyu');
+			$result['data']['cardinfo']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=cardinfo&m=fm_jiaoyu');
+			$result['data']['banpai']   = urlencode($_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkxz&op=banpai&m=fm_jiaoyu');
 			$result['data']['schoolInfo']= array(
-					'name' => $school['title'],
-					'schoolId' => $school['id'],
-					'logo' => $urls.$school['logo'],
-					'tel' => $school['tel']
+				'name' => $school['title'],
+				'schoolId' => $school['id'],
+				'logo' => $urls.$school['logo'],
+				'tel' => $school['tel']
 			);
 			$result['data']['userInfo'] = array(
 					'email' => "admin@sina.com",
@@ -180,23 +189,23 @@
 			$result['data']['finger'] = 2;
 			if($macid == '8c:18:d9:cd:e5:0d'){
 				$result['data']['TerminalInfo'] = array(
-						'fenqq' => 'ttyS2',
-						'zhiw' => "ttyS3",
-						'card' => "ttyS1",
-						'shext' => '',
-						'by1' => '',
-						'by2' => '',
-						'by3' => ''
+					'fenqq' => 'ttyS2',
+					'zhiw' => "ttyS3",
+					'card' => "ttyS1",
+					'shext' => '',
+					'by1' => '',
+					'by2' => '',
+					'by3' => ''
 				);
 			}else{
 				$result['data']['TerminalInfo'] = array(
-						'fenqq' => 'ttyS4',
-						'zhiw' => "ttyS3",
-						'card' => "ttyS2",
-						'shext' => '',
-						'by1' => '',
-						'by2' => '',
-						'by3' => ''
+					'fenqq' => 'ttyS4',
+					'zhiw' => "ttyS3",
+					'card' => "ttyS2",
+					'shext' => '',
+					'by1' => '',
+					'by2' => '',
+					'by3' => ''
 				);				
 			}
 
@@ -222,6 +231,9 @@
 		$endtime = $starttime + 86399;
 		$condition = " AND createtime > '{$starttime}' AND createtime < '{$endtime}'";		
 		$classid = $ckmac['bj_id'];
+		if($school['issale'] == 1){
+			$classid = $ckmac['js_id'];
+		}
 		$theclass = pdo_fetch("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$classid}'");	
 		/*基本信息*/
 		$banner = unserialize($ckmac['banner']);
@@ -232,57 +244,84 @@
 		$result['mac_id'] = $macid;
 		$result['model_type'] = $ckmac['model_type'];		
 		/*班级*/
-		$result['class_img'] = empty($banner['class_img'])?tomedia($school['thumb']):tomedia($banner['class_img']);
-		$result['class_name'] = $theclass['sname'];
-		$result['class_course'] = getkcbiao($school['id'],$nowtime,$classid);
-		$classroom = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$theclass['js_id']}'");
-		$result['class_room_name'] = empty($classroom) ? $theclass['sname'] : $classroom['sname'];//未绑定教室使用班级名称
-		$grade = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$theclass['parentid']}'");	
-		$result['grade_name'] = $grade['sname'];
-		$master = pdo_fetch("SELECT tname,mobile,thumb FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And id = '{$theclass['tid']}'");	
-		$result['master_img'] = !empty($master['thumb'])?tomedia($school['tpic']):tomedia($master['thumb']);
-		$result['master_name'] = $master['tname'];
-		$result['master_phone'] = $master['mobile'];
-		$stu_num =  pdo_fetchcolumn("select COUNT(*) FROM ".tablename($this->table_students)." WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND bj_id = '{$classid}'");
-		$result['stu_num'] = $stu_num;
-		$stu_leave_num =  pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_leave) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And tid = 0 And bj_id = '{$classid}' And isliuyan = 0 And status = 1 And endtime1 > '{$endtime}' ");
-		$result['stu_leave_num'] = $stu_leave_num;
-		$checkmub = pdo_fetchcolumn("SELECT  COUNT(distinct sid) FROM " . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}'  And bj_id = '{$classid}' And isconfirm = 1 $condition ");
-		$result['stu_absent_num'] = $stu_num - $checkmub;
-		$result['class_honor'] = array();
-		$class_honor = array('http://kstms.com/img/rongyu.png','http://kstms.com/img/rongyu.png');
-		$result['class_honor'] = $class_honor;
-		$student_honor = array();
-		if($theclass['is_bjzx'] == 1 && !empty($theclass['star'])){
-			$star = unserialize($theclass['star']);
-			$student_honor[0] = array(
-				'stu_id' => 1,
-				'stu_name' => $star['name1'],
-				'stu_img' => !empty($star['icon1'])?tomedia($star['icon1']):tomedia($school['spic']),
-				'stu_label' => "班级之星"
-			);
-			$student_honor[1] = array(
-				'stu_id' => 2,
-				'stu_name' => $star['name2'],
-				'stu_img' => !empty($star['icon2'])?tomedia($star['icon2']):tomedia($school['spic']),
-				'stu_label' => "班级之星"
-			); 
-			$student_honor[2] = array(
-				'stu_id' => 3,
-				'stu_name' => $star['name3'],
-				'stu_img' => !empty($star['icon3'])?tomedia($star['icon3']):tomedia($school['spic']),
-				'stu_label' => "班级之星"
-			);
-			$student_honor[3] = array(
-				'stu_id' => 4,
-				'stu_name' => $star['name4'],
-				'stu_img' => !empty($star['icon4'])?tomedia($star['icon4']):tomedia($school['spic']),
-				'stu_label' => "班级之星"
-			);
+		if($school['issale'] == 1){
+			$result['classtype'] = 2;
+			$result['class_img'] = empty($banner['class_img'])?tomedia($school['thumb']):tomedia($banner['class_img']);
+			mload()->model('kc');
+			$nowkc_ks = Getnearks($classid,$starttime,$endtime);
+			$nowkc = $nowkc_ks['nowkc'][0];//当前课程
+			$nowks = $nowkc_ks['nowks'][0];//当前课时
+			$result['class_name'] = $nowkc['name'];//正在上课的课程名称或即将开始
+			$result['class_course'] = getksbiao($school['id'],$classid,$starttime,$endtime);//未做
+			$result['class_room_name'] = $theclass['sname'];//使用教室名称
+			$grade = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$nowkc['xq_id']}'");	
+			$result['grade_name'] = $grade['sname'];
+			$master = pdo_fetch("SELECT tname,mobile,thumb FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And id = '{$nowks['tid']}'");	
+			$result['master_img'] = !empty($master['thumb'])?tomedia($school['tpic']):tomedia($master['thumb']);
+			$result['master_name'] = $master['tname'];
+			$result['master_phone'] = $master['mobile'];
+			$kc_stuinfo = GetStuInfoByKs($school['id'],$nowks['id']);
+			$result['stu_num'] = $kc_stuinfo['allstu'];
+			$result['stu_leave_num'] = $kc_stuinfo['leavestu'];
+			$result['stu_absent_num'] = $kc_stuinfo['allstu'] - $kc_stuinfo['signstu'];
+			$result['class_honor'] = array();
+			$class_honor = array('http://kstms.com/img/rongyu.png','http://kstms.com/img/rongyu.png');
+			$result['class_honor'] = $class_honor;
+			$result['student_honor'] = array();
 		}else{
-			$student_honor = ''; //班级之星
+			$result['classtype'] = 1;
+			$result['class_img'] = empty($banner['class_img'])?tomedia($school['thumb']):tomedia($banner['class_img']);
+			$result['class_name'] = $theclass['sname'];
+			$result['class_course'] = getkcbiao($school['id'],$nowtime,$classid);
+			$classroom = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$theclass['js_id']}'");
+			$result['class_room_name'] = empty($classroom) ? $theclass['sname'] : $classroom['sname'];//未绑定教室使用班级名称
+			$grade = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$theclass['parentid']}'");	
+			$result['grade_name'] = $grade['sname'];
+			$master = pdo_fetch("SELECT tname,mobile,thumb FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And id = '{$theclass['tid']}'");	
+			$result['master_img'] = !empty($master['thumb'])?tomedia($school['tpic']):tomedia($master['thumb']);
+			$result['master_name'] = $master['tname'];
+			$result['master_phone'] = $master['mobile'];
+			$stu_num =  pdo_fetchcolumn("select COUNT(*) FROM ".tablename($this->table_students)." WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND bj_id = '{$classid}'");
+			$result['stu_num'] = $stu_num;
+			$stu_leave_num =  pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_leave) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And tid = 0 And bj_id = '{$classid}' And isliuyan = 0 And status = 1 And endtime1 > '{$endtime}' ");
+			$result['stu_leave_num'] = $stu_leave_num;
+			$checkmub = pdo_fetchcolumn("SELECT  COUNT(distinct sid) FROM " . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}'  And bj_id = '{$classid}' And isconfirm = 1 $condition ");
+			$result['stu_absent_num'] = $stu_num - $checkmub;
+			$result['class_honor'] = array();
+			$class_honor = array('http://kstms.com/img/rongyu.png','http://kstms.com/img/rongyu.png');
+			$result['class_honor'] = $class_honor;
+			$student_honor = array();
+			if($theclass['is_bjzx'] == 1 && !empty($theclass['star'])){
+				$star = unserialize($theclass['star']);
+				$student_honor[0] = array(
+					'stu_id' => 1,
+					'stu_name' => $star['name1'],
+					'stu_img' => !empty($star['icon1'])?tomedia($star['icon1']):tomedia($school['spic']),
+					'stu_label' => "班级之星"
+				);
+				$student_honor[1] = array(
+					'stu_id' => 2,
+					'stu_name' => $star['name2'],
+					'stu_img' => !empty($star['icon2'])?tomedia($star['icon2']):tomedia($school['spic']),
+					'stu_label' => "班级之星"
+				); 
+				$student_honor[2] = array(
+					'stu_id' => 3,
+					'stu_name' => $star['name3'],
+					'stu_img' => !empty($star['icon3'])?tomedia($star['icon3']):tomedia($school['spic']),
+					'stu_label' => "班级之星"
+				);
+				$student_honor[3] = array(
+					'stu_id' => 4,
+					'stu_name' => $star['name4'],
+					'stu_img' => !empty($star['icon4'])?tomedia($star['icon4']):tomedia($school['spic']),
+					'stu_label' => "班级之星"
+				);
+			}else{
+				$student_honor = ''; //班级之星
+			}
+			$result['student_honor'] = $student_honor;
 		}
-		$result['student_honor'] = $student_honor;
 		$notice = pdo_fetch("SELECT * FROM " . tablename($this->table_notice) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And (type = 1 Or type = 2) ORDER BY createtime DESC ");
 		$noticeteacher = pdo_fetch("SELECT tname FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And id = '{$notice['tid']}'");	
 		$result['notice_dpt'] = $noticeteacher['tname'];
@@ -388,6 +427,18 @@
 				}
 				
 			}
+			
+			if(!empty($ckmac['apid'])){
+				$todaytype = 0;
+				$todaytimeset = array(
+					array(
+						'start'=>'00:00',
+						'end'  =>'23:59'
+					),
+				);
+			}
+			
+			
 			$result['data']['todaytype'] = $todaytype;
 			$result['data']['todaytimeset'] = $todaytimeset;
 			if(!empty($ckmac)){
@@ -529,75 +580,233 @@
 				}
 				if(!empty($ckuser['sid'])){
 					$bj = pdo_fetch("SELECT bj_id FROM " . tablename($this->table_students) . " WHERE id = :id ", array(':id' =>$ckuser['sid']));
-					if($school['is_cardpay'] == 1){					
-						if($ckuser['severend'] > $times){
-							$data = array(
-							'weid' => $weid,
-							'schoolid' => $schoolid,
-							'macid' => $ckmac['id'],
-							'cardid' => $_GPC ['signId'],
-							'sid' => $ckuser['sid'],
-							'bj_id' => $bj['bj_id'],
-							'type' => $type,
-							'pic' => $pic,
-							'pic2' => $pic2,
-							'lon' => $_GPC['lon'],
-							'lat' => $_GPC['lat'],							
-							'temperature' => $_GPC ['signTemp'],
-							'leixing' => $leixing,
-							'pard' => $ckuser['pard'],
-							'createtime' => $signTime
-							);
+					if(!empty($ckmac['apid'])){
+						$nowdate = date("Y-n-j",$signTime);
+						$nowweek = date("w",$signTime);
+						
+						$student = pdo_fetch("SELECT bj_id,roomid FROM " . tablename($this->table_students) . " WHERE  schoolid = '{$schoolid}' and id = '{$ckuser['sid']}' ");
+						$stu_class = pdo_fetch("SELECT datesetid FROM " . tablename($this->table_classify) . " WHERE  schoolid = '{$schoolid}' and sid = '{$student['bj_id']}' ");
+						$checktime  =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$stu_class['datesetid']}' and date = '{$nowdate}' ");
+
+						if(!empty($checktime)){
+							if($checktime['type'] == 6){
+								$todaytype = 1;//放假
+							}elseif($checktime['type'] == 5){
+								$todaytype = 2;//上课
+							}
+						}else{
+							if($nowweek != 6 && $nowweek != 0){
+								$todaytype = 2;//上课
+							}else{
+								$todaytype = 1;//放假
+							}
+						}
+
+						if(!empty($student['roomid'])){
+							$roominfo =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  id = '{$student['roomid']}' ");
+
+							if($roominfo['noon_start'] != $roominfo['noon_end']){
+								$noon_start = $roominfo['noon_start'];
+								$noon_end = $roominfo['noon_end'];
+							}else{
+								$noon_start ='00:00';
+								$noon_end = '23:59';
+							}
+							if($roominfo['night_start'] != $roominfo['night_end']){
+								$night_start = $roominfo['night_start'];
+								$night_end = $roominfo['night_end'];
+							}else{
+								$night_start ='00:00';
+								$night_end = '23:59';
+							}
+						}else{
+							$noon_start  = '00:00';
+							$noon_end 	 = '23:59';
+							$night_start = '00:00';
+							$night_end 	 = '23:59';
+						}
+						
+						
+						//放假期间，不经过时段判断
+						if($todaytype == 1){
+							$isCanCheck = 1 ;
+						//上课期间，经过时段判断						
+						}elseif($todaytype == 2){
+							if(($nowtime >= $noon_start && $nowtime <= $noon_end) || ($nowtime >= $night_start && $nowtime <= $night_end)){
+								$isCanCheck = 1 ;
+							}else{
+								$isCanCheck = 0 ;
+							}
+						}
+						if($roominfo['apid'] != $ckmac['apid']){
+							$isCanCheck = 0 ;
+						}
+					}else{
+						$isCanCheck = 1 ;
+					}
+					if($isCanCheck == 1){
+						if($school['is_cardpay'] == 1){					
+							if($ckuser['severend'] > $times){
+								if(!empty($ckmac['apid'])){
+									if(!empty($roominfo)){
+										$this_roomid = $roominfo['id'];
+										$this_apid = $ckmac['apid'];
+									}else{
+										$this_roomid = 0 ;
+										$this_apid = 0 ;
+									}
+									if($leixing == 1){
+										$ap_type = 1;
+									}elseif($leixing == 2){
+										$ap_type = 2;
+									}else{
+										$ap_type = 0 ;
+									}
+									$data = array(
+										'weid'        => $weid,
+										'schoolid'    => $schoolid,
+										'macid'       => $ckmac['id'],
+										'cardid'      => $_GPC['signId'],
+										'sid'         => $ckuser['sid'],
+										'bj_id'       => $bj['bj_id'],
+										'lon'         => $_GPC['lon'],
+										'lat'         => $_GPC['lat'],							
+										'pic'         => $pic,
+										'pic2'        => $pic2,
+										'sc_ap'		  => 1,
+										'ap_type' 	  => $ap_type,
+										'roomid' 	  => $this_roomid,
+										'apid'		  => $this_apid,
+										'createtime'  => $signTime
+									);
+									
+								}else{
+									$data = array(
+										'weid' => $weid,
+										'schoolid' => $schoolid,
+										'macid' => $ckmac['id'],
+										'cardid' => $_GPC ['signId'],
+										'sid' => $ckuser['sid'],
+										'bj_id' => $bj['bj_id'],
+										'type' => $type,
+										'pic' => $pic,
+										'pic2' => $pic2,
+										'lon' => $_GPC['lon'],
+										'lat' => $_GPC['lat'],							
+										'temperature' => $_GPC ['signTemp'],
+										'leixing' => $leixing,
+										'pard' => $ckuser['pard'],
+										'createtime' => $signTime
+									);
+									
+								}
+
+								pdo_insert($this->table_checklog, $data);
+								$checkid = pdo_insertid();							
+								if($school['send_overtime'] >= 1){
+									$overtime = $school['send_overtime']*60;
+									$timecha = $times - $signTime;
+									if($overtime >= $timecha){									
+										if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
+									}else{
+										$result['info'] = "延迟发送之数据将不推送刷卡提示";
+									}
+								}else{
+									if(is_showyl()){
+										$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+									}else{
+										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									}
+								}
+							}else{
+								$result['info'] = "本卡已失效,请联系学校管理员";
+							}
+							$fstype = true;	
+						}else{
+							if(!empty($ckmac['apid'])){
+								if(!empty($roominfo)){
+									$this_roomid = $roominfo['id'];
+									$this_apid = $ckmac['apid'];
+								}else{
+									$this_roomid = 0 ;
+									$this_apid = 0 ;
+								}
+								if($leixing == 1){
+									$ap_type = 1;
+								}elseif($leixing == 2){
+									$ap_type = 2;
+								}else{
+									$ap_type = 0 ;
+								}
+								$data = array(
+									'weid'        => $weid,
+									'schoolid'    => $schoolid,
+									'macid'       => $ckmac['id'],
+									'cardid'      => $_GPC['signId'],
+									'sid'         => $ckuser['sid'],
+									'bj_id'       => $bj['bj_id'],
+									'lon'         => $_GPC['lon'],
+									'lat'         => $_GPC['lat'],							
+									'pic'         => $pic,
+									'pic2'        => $pic2,
+									'sc_ap'		  => 1,
+									'ap_type' 	  => $ap_type,
+									'roomid' 	  => $this_roomid,
+									'apid'		  => $this_apid,
+									'createtime'  => $signTime
+								);
+								
+							}else{
+								$data = array(
+									'weid' => $weid,
+									'schoolid' => $schoolid,
+									'macid' => $ckmac['id'],
+									'cardid' => $_GPC ['signId'],
+									'sid' => $ckuser['sid'],
+									'bj_id' => $bj['bj_id'],
+									'type' => $type,
+									'pic' => $pic,
+									'pic2' => $pic2,
+									'lon' => $_GPC['lon'],
+									'lat' => $_GPC['lat'],							
+									'temperature' => $_GPC ['signTemp'],
+									'leixing' => $leixing,
+									'pard' => $ckuser['pard'],
+									'createtime' => $signTime
+								);	
+							}
+							
 							pdo_insert($this->table_checklog, $data);
-							$checkid = pdo_insertid();							
+							$checkid = pdo_insertid();
 							if($school['send_overtime'] >= 1){
 								$overtime = $school['send_overtime']*60;
 								$timecha = $times - $signTime;
 								if($overtime >= $timecha){									
-									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									if(is_showyl()){
+										$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+									}else{
+										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									}
 								}else{
 									$result['info'] = "延迟发送之数据将不推送刷卡提示";
 								}
 							}else{
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								if(is_showyl()){
+									$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+								}else{
+									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								}
 							}
-						}else{
-							$result['info'] = "本卡已失效,请联系学校管理员";
-						}
-						$fstype = true;	
+							$fstype = true;
+						}	
 					}else{
-						$data = array(
-						'weid' => $weid,
-						'schoolid' => $schoolid,
-						'macid' => $ckmac['id'],
-						'cardid' => $_GPC ['signId'],
-						'sid' => $ckuser['sid'],
-						'bj_id' => $bj['bj_id'],
-						'type' => $type,
-						'pic' => $pic,
-						'pic2' => $pic2,
-						'lon' => $_GPC['lon'],
-						'lat' => $_GPC['lat'],
-						'temperature' => $_GPC ['signTemp'],
-						'leixing' => $leixing,
-						'pard' => $ckuser['pard'],
-						'createtime' => $signTime
-						);
-						pdo_insert($this->table_checklog, $data);
-						$checkid = pdo_insertid();
-						if($school['send_overtime'] >= 1){
-							$overtime = $school['send_overtime']*60;
-							$timecha = $times - $signTime;
-							if($overtime >= $timecha){									
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
-							}else{
-								$result['info'] = "延迟发送之数据将不推送刷卡提示";
-							}
-						}else{
-							$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
-						}
-						$fstype = true;
+						$result['info'] = "禁止放行";
 					}
+
 				}
 				if(!empty($ckuser['tid'])){
 					$data = array(
@@ -727,12 +936,20 @@
 										$overtime = $school['send_overtime']*60;
 										$timecha = $times - $signTime;
 										if($overtime >= $timecha){									
-											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+											if(is_showyl()){
+												$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+											}else{
+												$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+											}
 										}else{
 											$result['info'] = "延迟发送之数据将不推送刷卡提示";
 										}
 									}else{
-										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
 									}
 								}else{
 									$result['info'] = "本卡已失效,请联系学校管理员";
@@ -762,12 +979,20 @@
 									$overtime = $school['send_overtime']*60;
 									$timecha = $times - $signTime;
 									if($overtime >= $timecha){									
-										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
 									}else{
 										$result['info'] = "延迟发送之数据将不推送刷卡提示";
 									}
 								}else{
-									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									if(is_showyl()){
+										$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+									}else{
+										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									}
 								}
 								$fstype = true;
 							}
@@ -884,12 +1109,20 @@
 											$overtime = $school['send_overtime']*60;
 											$timecha = $times - $signTime;
 											if($overtime >= $timecha){									
-												$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+												if(is_showyl()){
+													$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+												}else{
+													$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+												}
 											}else{
 												$result['info'] = "延迟发送之数据将不推送刷卡提示";
 											}
 										}else{
-											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+											if(is_showyl()){
+												$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+											}else{
+												$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+											}
 										}
 									}else{
 										$result['info'] = "本卡已失效,请联系学校管理员";
@@ -919,12 +1152,20 @@
 										$overtime = $school['send_overtime']*60;
 										$timecha = $times - $signTime;
 										if($overtime >= $timecha){									
-											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+											if(is_showyl()){
+												$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+											}else{
+												$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+											}
 										}else{
 											$result['info'] = "延迟发送之数据将不推送刷卡提示";
 										}
 									}else{
-										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
 									}
 									$fstype = true;
 								}
@@ -1018,12 +1259,20 @@
 								$overtime = $school['send_overtime']*60;
 								$timecha = $times - $signTime;
 								if($overtime >= $timecha){									
-									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									if(is_showyl()){
+										$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+									}else{
+										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									}
 								}else{
 									$result['info'] = "延迟发送之数据将不推送刷卡提示";
 								}
 							}else{
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								if(is_showyl()){
+									$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+								}else{
+									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								}
 							}
 							$fstype = true;
 						}					
@@ -1049,12 +1298,20 @@
 							$overtime = $school['send_overtime']*60;
 							$timecha = $times - $signTime;
 							if($overtime >= $timecha){									
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								if(is_showyl()){
+									$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+								}else{
+									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								}
 							}else{
 								$result['info'] = "延迟发送之数据将不推送刷卡提示";
 							}
 						}else{
-							$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+							if(is_showyl()){
+								$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'], $checkid,$ckmac['id']);
+							}else{
+								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+							}
 						}
 						$fstype = true;
 					}
@@ -1165,4 +1422,228 @@
 		echo json_encode($result);
 		exit;
     }
+	
+	
+	if ($operation == 'onlineflow'){	
+		$lastId = $_GPC['lastOnlineFlowRecordId'];
+		$flowlist = pdo_fetchall("SELECT id,sid,yue_type,cost,cost_type FROM " . tablename($this->table_yuecostlog) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and id >'{$lastId}' and on_offline = 1 ORDER BY ID ASC");
+		$result['code'] = 1000;
+		$result['msg']    = "success";
+		if(!empty($flowlist)){
+			$data['flowlist']   =$flowlist;	
+		}else{
+			$data['flowlist']   = array();
+		}
+		
+		include '3DES.php';	
+		$plaintext = json_encode($data);
+		$key_3DES = "r0uScmDuH5FLO37AJV2FN72J";// 加密所需的密钥
+		$iv_3DES = "1eX24DCe";// 初始化向量
+		$ciphertext = TDEA::encrypt($plaintext, $key_3DES, $iv_3DES);//加密
+		$result['data'] = $ciphertext; 
+		echo json_encode($result);
+		exit;
+    } 
+	
+	if ($operation == 'offlineflow'){
+	 	$time = time();
+		include '3DES.php';	
+		$key_3DES = "r0uScmDuH5FLO37AJV2FN72J";// 加密所需的密钥
+		$iv_3DES = "1eX24DCe";// 初始化向量
+		
+		$data_h = htmlspecialchars_decode($_GPC['data']);
+		$plaintext2 = TDEA::decrypt($data_h, $key_3DES, $iv_3DES);//解密
+		$data = json_decode($plaintext2,true);
+		foreach($data as $row){
+			$sid = $row['userno'];
+			$cardid = $row['cardid'];
+			$thisMacId = $row['macid'];
+			$cost = $row['paymoney'];
+			$payTime = intval($row['paytime']/1000);
+			$payKind = $row['paykind']; 
+			$flowid = $row['fid'];
+			$studentyue = pdo_fetch("SELECT id,chongzhi FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and id = '{$sid}' ");
+			if(!empty($studentyue)){ 
+				if($payKind == 15 || $payKind == 16){
+						$nowyue = $studentyue['chongzhi'];
+					if($school['is_buzhu'] != 0){
+					
+						$studentbuzhu = pdo_fetch("SELECT id,now_yue FROM " . tablename($this->table_buzhulog) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and sid = '{$sid}' and starttime<='{$payTime}' and endtime >='{$payTime}' ");
+						$nowbuzhu = $studentbuzhu['now_yue']?$studentbuzhu['now_yue']:0;
+						$allyue = $nowbuzhu + $nowyue;
+						//补助
+						if($cost <= $nowbuzhu){
+							$this_this = 1;
+							$after_buzhu = $nowbuzhu - $cost ;
+							$buzhu_data = array(
+								'now_yue' => $after_buzhu,
+							);
+							pdo_update($this->table_buzhulog,$buzhu_data,array('id'=>$studentbuzhu['id']));
+							//消费记录
+							$yuelog = array(
+								'schoolid' 		=> $schoolid,
+								'weid'	   		=> $weid,
+								'sid'	   		=> $sid,
+								'yue_type' 		=> 1,
+								'cost' 	   		=> $cost,
+								'costtime' 		=> $payTime,
+								'cost_type'		=> 2,
+								'macid'			=> $thisMacId,
+								'on_offline' 	=> 2,
+								'createtime' => time(),
+							); 
+						pdo_insert($this->table_yuecostlog,$yuelog);
+						//补助和余额
+						}elseif($cost>$nowbuzhu && $nowbuzhu != 0  && $allyue >= $cost){
+							$this_this = 2;
+							$after_buzhu = 0 ;
+							$cost_yue = $cost - $nowbuzhu ;
+							$after_yue = $nowyue - $cost_yue;
+							$buzhu_data = array(
+								'now_yue' => $after_buzhu,
+							);
+							pdo_update($this->table_buzhulog,$buzhu_data,array('id'=>$studentbuzhu['id']));
+							//消费记录
+							$yuelog = array(
+								'schoolid' 		=> $schoolid,
+								'weid'	   		=> $weid,
+								'sid'	   		=> $sid,
+								'yue_type' 		=> 1,
+								'cost' 	   		=> $nowbuzhu,
+								'costtime' 		=> $payTime,
+								'cost_type'		=> 2,
+								'macid'			=> $thisMacId,
+								'on_offline' 	=> 2,
+								'createtime' => time(),
+							); 
+							pdo_insert($this->table_yuecostlog,$yuelog);
+							$yue_data = array(
+								'chongzhi' =>$after_yue, 
+							);
+							pdo_update($this->table_students,$yue_data,array('id'=>$studentyue['id']));
+							//消费记录
+							$yuelog_yue = array(
+								'schoolid' 		=> $schoolid,
+								'weid'	   		=> $weid,
+								'sid'	   		=> $sid,
+								'yue_type' 		=> 2,
+								'cost' 	   		=> $cost_yue,
+								'costtime' 		=> $payTime,
+								'cost_type'		=> 2,
+								'macid'			=> $thisMacId,
+								'on_offline' 	=> 2,
+								'createtime' => time(),
+							); 
+							pdo_insert($this->table_yuecostlog,$yuelog_yue);
+						//余额
+						}elseif($nowbuzhu == 0 && $cost <= $nowyue){
+							$this_this = 3;
+							$after_yue = $nowyue - $cost;
+							$yue_data = array(
+								'chongzhi' =>$after_yue, 
+							);
+							pdo_update($this->table_students,$yue_data,array('id'=>$studentyue['id']));
+							//消费记录
+							$yuelog_yue = array(
+								'schoolid' 		=> $schoolid,
+								'weid'	   		=> $weid,
+								'sid'	   		=> $sid,
+								'yue_type' 		=> 2,
+								'cost' 	   		=> $cost,
+								'costtime' 		=> $payTime,
+								'cost_type'		=> 2,
+								'macid'			=> $thisMacId,
+								'on_offline' 	=> 2,
+								'createtime' => time(),
+							); 
+							pdo_insert($this->table_yuecostlog,$yuelog_yue);
+						}
+					}else{
+						$this_this = 3;
+						$after_yue = $nowyue - $cost;
+						$yue_data = array(
+							'chongzhi' =>$after_yue, 
+						);
+						pdo_update($this->table_students,$yue_data,array('id'=>$studentyue['id']));
+						//消费记录
+						$yuelog_yue = array(
+							'schoolid' 		=> $schoolid,
+							'weid'	   		=> $weid,
+							'sid'	   		=> $sid,
+							'yue_type' 		=> 2,
+							'cost' 	   		=> $cost,
+							'costtime' 		=> $payTime,
+							'cost_type'		=> 2,
+							'macid'			=> $thisMacId,
+							'on_offline' 	=> 2,
+							'createtime' => time(),
+						); 
+						pdo_insert($this->table_yuecostlog,$yuelog_yue);
+					}
+					$this->sendMobileOfflinexf($sid,$cost,$thisMacId,$payTime,$schoolid,$weid,1);
+				}
+			}
+		}
+		$result['code'] = 1000;
+		$result['msg']    = "success";
+
+		echo json_encode($result);
+		exit;
+    }
+	
+	if ($operation == 'cardinfo'){
+		//$data = json_decode($_GPC['data']);
+		$lastMaxId = $_GPC['id'];
+		$studentlist = pdo_fetchall("SELECT id,s_name,chongzhi,bj_id  FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and id >'{$lastMaxId}' LIMIT 0,200 ");
+		$nowtimestart = strtotime(date("Y-m-d",time()));
+		$nowtimeend = $nowtimestart + 86399;
+		$studentinfo = array();
+		foreach($studentlist as $key=>$value){
+			$cardinfo =  pdo_fetch("SELECT id,idcard,severend FROM " . tablename($this->table_idcard) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and sid ='{$value['id']}' and pard = 1  ");
+			if($school['is_buzhu'] != 0){
+				$student_buzhu =  pdo_fetch("SELECT id,now_yue,starttime,endtime FROM " . tablename($this->table_buzhulog) . " WHERE weid = '{$weid}' And schoolid = '{$schoolid}' and sid = '{$value['id']}' and starttime<='{$nowtimestart}' and endtime >='{$nowtimeend}' ");
+				$studentinfo[$key]['classid'] =  $value['bj_id']; //学生班级id
+				$studentinfo[$key]['userName'] = $value['s_name']; //学生姓名
+				$studentinfo[$key]['UserNO'] = $value['id']; //学生id
+				$studentinfo[$key]['allMoney'] = $value['chongzhi'] + $student_buzhu['now_yue']; //总余额
+				$studentinfo[$key]['Cash'] = $value['chongzhi'];   //现金余额
+				$studentinfo[$key]['Subsidy'] = $student_buzhu['now_yue']; //补助余额
+				$studentinfo[$key]['subsidyStart'] = $student_buzhu['starttime']*1000; //补助有效期开始时间
+				$studentinfo[$key]['subsidyEnd'] = $student_buzhu['endtime']*1000; //补助有效期结束时间
+				$studentinfo[$key]['cardID'] = $cardinfo['idcard']; //消费id卡号
+				$studentinfo[$key]['limitDate'] = $cardinfo['severend']*1000; //有效期结束时间
+				
+			}else{
+				$studentinfo[$key]['classid'] =  $value['bj_id']; //学生班级id
+				$studentinfo[$key]['userName'] = $value['s_name']; //学生姓名
+				$studentinfo[$key]['UserNO'] = $value['id']; //学生id
+				$studentinfo[$key]['allMoney'] = $value['chongzhi']; //总余额
+				$studentinfo[$key]['Cash'] = $value['chongzhi'];   //现金余额
+				$studentinfo[$key]['Subsidy'] = 0; //补助余额
+				$studentinfo[$key]['subsidyStart'] = 0; //补助有效期开始时间
+				$studentinfo[$key]['subsidyEnd'] = 0; //补助有效期结束时间
+				$studentinfo[$key]['cardID'] = $cardinfo['idcard']; //消费id卡号
+				$studentinfo[$key]['limitDate'] = $cardinfo['severend']*1000; //有效期结束时间
+				
+			}
+			
+		}
+		
+
+ 
+		include '3DES.php';	
+		$plaintext = json_encode($studentinfo);
+		$key_3DES = "r0uScmDuH5FLO37AJV2FN72J";// 加密所需的密钥
+		$iv_3DES = "1eX24DCe";// 初始化向量
+		$ciphertext = TDEA::encrypt($plaintext, $key_3DES, $iv_3DES);//加密
+		
+		
+		$result['code'] = 1000;
+		$result['msg']    = "success";
+		$result['data'] = $ciphertext; 
+		echo json_encode($result);
+		exit;
+	}
+
+	
 ?>

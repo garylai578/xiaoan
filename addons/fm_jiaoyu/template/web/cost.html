@@ -228,7 +228,33 @@ require(['jquery', 'util', 'bootstrap.switch'], function($, u){
                 </div>
 				{else}
 					<input type="hidden" name="payweid" value="{$item['payweid']}">	
-				{/if}	
+				{/if}
+				{if $logo['is_printer'] ==1}
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">打印订单</label>
+					<label class="radio-inline">
+						<input type="radio" name="is_print" value="1" {if $item['is_print']==1}checked="true"{/if} id="credit4">是
+					</label>
+					<label class="radio-inline">
+						<input type="radio" name="is_print" value="2" {if $item['is_print']==2 || empty($item['is_print'])}checked="true"{/if} id="credit5">否
+					</label>
+					<div class="help-block"></div>
+                </div>
+				<div id="credit-status4" {if $item['is_print'] == 1}style="display:block"{else}style="display:none"{/if}>
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">打印机</label>
+						<div class="col-sm-9 col-xs-6">
+							<div class="input-group text-info">
+								{loop $printers $uni}
+								{php $is = $this->uniarr($nowprints,$uni['id']);}
+										<label for="uni_{$uni['id']}" class="checkbox-inline"><input id="uni_{$uni['id']}" type="checkbox" name="printarr[]" value="{$uni['id']}"{if ($is)}checked="checked"{/if}> {$uni['name']}（{$printer_name[$uni['type']]['text']}）</label>
+								{/loop}
+							</div>
+							<div class="help-block">选择本类缴费项目打印设备</div>
+						</div>
+					</div>	
+				</div>
+				{/if}
 				<div class="form-group">
 					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">选择班级</label>
 					<div class="col-sm-9 col-xs-6">
@@ -344,11 +370,12 @@ require(['jquery', 'util', 'bootstrap.switch'], function($, u){
 	$('#credit2').click(function(){
 		$('#credit-status2').hide();
 	});	
-</script>
-<script type="text/javascript">
-    <!--
-    var category = {php echo json_encode($children)};
-    //-->
+	$('#credit4').click(function(){
+		$('#credit-status4').show();
+	});
+	$('#credit5').click(function(){
+		$('#credit-status4').hide();
+	});
 </script>
 {/if}
 {template 'public/footer'}

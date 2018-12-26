@@ -91,11 +91,15 @@
 		$star = unserialize($bjset['star']);
 		$thistime = strtotime($_GPC['limit']);
 		$lasttime = strtotime($_GPC['lasttime']);
+		$condition = '';
+		if($school['bjqstyle'] =='new'){
+			$condition .= " And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}') ";
+		}
 		if($thistime || $lasttime){
 			//下拉后的内容 （lee 0721）
 			if($thistime){
-				$condition = " AND createtime < '{$thistime}'";
-				$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And (isopen = 0 Or uid = '{$it['uid']}') And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $condition ORDER BY createtime DESC LIMIT 0,10");
+				$condition .= " AND createtime < '{$thistime}'";
+				$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And (isopen = 0 Or uid = '{$it['uid']}') $condition ORDER BY createtime DESC LIMIT 0,10");
 				foreach ($list1 as $index => $v) {
 					if (!empty($v['sherid'])) {
 						$list1[$index]['picurl'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid = '{$v['sherid']}'  ORDER BY id ASC" );
@@ -106,12 +110,11 @@
 						$list1[$index]['num']= count($list1[$index]['znames']); //（lee 0721）
 						
 						$list1[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid ={$v['sherid']}  ORDER BY createtime ASC" );
-						$list1[$index]['isdianz'] = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where :schoolid = schoolid And :weid = weid  And :uid = uid And :sherid = sherid", array(
-						  ':weid' => $weid,
-						  ':schoolid' => $schoolid,
-						  ':uid' => $it['uid'],
-						  ':sherid' => $v['id']
-						   ));
+						$list1[$index]['isdianz'] = false;
+						$isdianz = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where schoolid = '{$schoolid}' And sherid = '{$v['id']}' And ( userid = '{$it['id']}' Or uid = '{$it['uid']}')");
+						if($isdianz){
+							$list1[$index]['isdianz'] = true;
+						}
 					} 
 					$members = pdo_fetch("SELECT avatar FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ORDER BY uid ASC", array(':uniacid' => $weid, ':uid' => $v['uid']));
 					$list1[$index]['avatar'] = $members['avatar'];
@@ -119,8 +122,8 @@
 				}
 			}
 			if($lasttime){
-				$condition = " AND createtime > '{$lasttime}'";
-				$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And (isopen = 0 Or uid = '{$it['uid']}') And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $condition ORDER BY createtime DESC LIMIT 0,10");
+				$condition .= " AND createtime > '{$lasttime}'";
+				$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And (isopen = 0 Or uid = '{$it['uid']}') $condition ORDER BY createtime DESC LIMIT 0,10");
 				foreach ($list1 as $index => $v) {
 					if (!empty($v['sherid'])) {
 						$list1[$index]['picurl'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid = '{$v['sherid']}'  ORDER BY id ASC" );
@@ -131,12 +134,11 @@
 						$list1[$index]['num']= count($list1[$index]['znames']); //（lee 0721）
 						
 						$list1[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid ={$v['sherid']}  ORDER BY createtime ASC" );
-						$list1[$index]['isdianz'] = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where :schoolid = schoolid And :weid = weid  And :uid = uid And :sherid = sherid", array(
-						  ':weid' => $weid,
-						  ':schoolid' => $schoolid,
-						  ':uid' => $it['uid'],
-						  ':sherid' => $v['id']
-						   ));
+						$list1[$index]['isdianz'] = false;
+						$isdianz = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where schoolid = '{$schoolid}' And sherid = '{$v['id']}' And ( userid = '{$it['id']}' Or uid = '{$it['uid']}')");
+						if($isdianz){
+							$list1[$index]['isdianz'] = true;
+						}
 					} 
 					$members = pdo_fetch("SELECT avatar FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ORDER BY uid ASC", array(':uniacid' => $weid, ':uid' => $v['uid']));
 					$list1[$index]['avatar'] = $members['avatar'];
@@ -147,22 +149,18 @@
 		}else{
 			//一开始的内容 （lee 0721）
 			if(!empty($it)){
-				if($school['bjqstyle'] =='old'){
-					$tj = " ORDER BY createtime DESC";
-				}
-				if($school['bjqstyle'] =='new'){
-					$tj = " ORDER BY createtime DESC LIMIT 0,10";
-				}
-				$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And (isopen = 0 Or uid = '{$it['uid']}') And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}') $tj ");
-			
+				$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And (isopen = 0 Or uid = '{$it['uid']}') $condition ORDER BY createtime DESC LIMIT 0,10 ");
 				foreach ($list as $index => $row) {
 					 if (!empty($row['sherid'])) {
 						$list[$index]['picurl'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid = '{$row['sherid']}'  ORDER BY id ASC" );
 						$list[$index]['zname'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_dianzan) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid = '{$row['sherid']}'  ORDER BY createtime ASC" );
-
-					$list[$index]['num']= count($list[$index]['zname']);
-						
+						$list[$index]['num']= count($list[$index]['zname']);
 						$list[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid = '{$row['sherid']}'  ORDER BY createtime ASC" );
+						$list[$index]['isdianz'] = false;
+						$isdianz = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where schoolid = '{$schoolid}' And sherid = '{$row['id']}' And ( userid = '{$it['id']}' Or uid = '{$it['uid']}')");
+						if($isdianz){
+							$list[$index]['isdianz'] = true;
+						}
 					}
 					$member = pdo_fetch("SELECT avatar FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ", array(':uniacid' => $weid, ':uid' => $row['uid']));
 					$list[$index]['avatar'] = $member['avatar'];	
@@ -172,12 +170,7 @@
 			 	//检查用户是否付费开通了班级圈功能	 （lee 0721）		
 				$this->checkpay($schoolid, $students['id'], $it['id'], $it['uid']);
 				$this->checkobjiect($schoolid, $students['id'], $obid);
-				if($school['bjqstyle'] =='old'){
-					include $this->template(''.$school['style2'].'/sbjq');
-				}
-				if($school['bjqstyle'] =='new'){
-					include $this->template(''.$school['style2'].'/sbjqnew');
-				}
+				include $this->template(''.$school['style2'].'/sbjqnew');
 			}
 		}   
 		    

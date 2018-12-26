@@ -12,12 +12,12 @@
 		//var_dump($openid);
 		$myAllStudent = get_myallclass_this_school($weid,$openid,$schoolid);
 		$xueqi = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type ORDER BY ssort DESC", array(':weid' => $weid, ':type' => 'semester', ':schoolid' => $schoolid));
-$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid));
+		$bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type ORDER BY CONVERT(sname USING gbk) ASC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid));
 		$userid = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where :schoolid = schoolid And :weid = weid And :openid = openid And :tid = tid", array(':weid' => $weid, ':schoolid' => $schoolid, ':openid' => $openid, ':tid' => 0), 'id');
 		$its = pdo_fetch("SELECT * FROM " . tablename($this->table_user) . " where weid = :weid AND id=:id ", array(':weid' => $weid, ':id' => $_SESSION['user']));		
 		$userinfo = iunserializer($its['userinfo']);
 		$student = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where weid = :weid AND schoolid=:schoolid AND id=:id", array(':weid' => $weid, ':schoolid' => $schoolid, ':id' => $its['sid']));
-		$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where weid = :weid AND id=:id", array(':weid' => $weid, ':id' => $schoolid));
+		$school = pdo_fetch("SELECT style1,tpic,spic,logo,content,title,address,tel  FROM " . tablename($this->table_index) . " where weid = :weid AND id=:id", array(':weid' => $weid, ':id' => $schoolid));
         $list = pdo_fetchall("SELECT * FROM " . tablename($this->table_kcbiao) . " WHERE weid = :weid AND schoolid =:schoolid AND kcid = :kcid  ORDER BY date ASC", array(':weid' => $weid, ':schoolid' => $schoolid, ':kcid' => $id));
        
       	foreach( $list as $key => $value )
@@ -46,7 +46,7 @@ $bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) .
 		}
 		$nj_str = trim($nj_str_temp,",");
 		$others = pdo_fetchall("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE id != :id And weid=:weid And schoolid=:schoolid  And end > :timeEnd  and FIND_IN_SET(bj_id,:bj_str) and FIND_IN_SET(xq_id,:nj_str) ORDER BY  RAND() LIMIT 0,5 ", array(':id' => $id,':weid'=>$weid,':schoolid'=>$schoolid,':timeEnd'=>time(),':bj_str'=>$bj_str,':nj_str'=>$nj_str));
-		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
+		$yb = pdo_fetchcolumn("select count(distinct sid) FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
 		$addr = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = :sid ", array(':sid' => $item['adrr']));
 		$item['yb'] = $yb + $item['yibao'];
 		$item['address'] = $addr['sname'];
@@ -58,11 +58,21 @@ $bj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) .
 			$tid_array[$key]['tname']  = $teacher['tname'];
 			$tid_array[$key]['tid']   = $teacher['id'];
 			$tid_array[$key]['thumb'] = $teacher['thumb'];
-		};
+		}
+		if($item['is_dm'] ==1){
+			$dm = array();
+			$yblist = pdo_fetchall("select distinct sid FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
+			foreach( $yblist as $key => $row ){
+				$stuinfo = pdo_fetch("SELECT s_name,icon FROM " . tablename($this->table_students) . " where id=:id", array(':id' => $row['sid']));
+				$dm[$key]['text']  = $stuinfo['s_name'].',刚刚报名了';
+				$dm[$key]['icon'] = !empty($stuinfo['icon'])?tomedia($stuinfo['icon']):tomedia($school['spic']);
+			}
+			$dmlist = json_encode($dm);
+		}
         $teacher = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " where weid = :weid AND schoolid=:schoolid AND id=:id", array(':weid' => $weid, ':schoolid' => $schoolid, ':id' => $item['tid']));
 		$title = $item['title'];
         $category = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid =  :weid AND schoolid =:schoolid ORDER BY sid ASC, ssort DESC", array(':weid' => $weid, ':schoolid' => $schoolid), 'sid');
-		$yb = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
+		$yb = pdo_fetchcolumn("select count(distinct sid) FROM ".tablename($this->table_order)." WHERE kcid = '".$id."' And status = 2 ");
 		$rest = $item['minge'] - $yb;
 		
 		$isfull =false;

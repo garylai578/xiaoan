@@ -8,7 +8,6 @@
         $weid = $_W['uniacid'];
 		$schoolid = intval($_GPC['schoolid']);
 		$openid = $_W['openid'];
-        
         //查询是否用户登录
 
 		$njlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 'semester' and is_over != 2 ORDER BY ssort DESC");

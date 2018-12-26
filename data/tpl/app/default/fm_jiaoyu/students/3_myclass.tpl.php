@@ -130,14 +130,9 @@ top: 10px;}
 </style>
 <?php  include $this->template('port');?>
 <title><?php  echo $school['title'];?></title>
-<div class="header mainColor" id="titlebar">
-	<div  class="l"><a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
-	<div class="m"><a><span style="font-size: 18px">已报课程</span></a></div>
-</div>
 </head>
 <body>
 <div class="All">       
-	<div id="BlackBg" class="top_head_blank"></div>	
 	<div class="listContent">
 		<div id="shousuo"></div>
 		<?php  if(is_array($list)) { foreach($list as $row) { ?>
@@ -206,15 +201,6 @@ top: 10px;}
 </div>		
 <script>;</script><script type="text/javascript" src="http://jy.xingheoa.com/app/index.php?i=3&c=utility&a=visit&do=showjs&m=fm_jiaoyu"></script></body>
 </html>
-<script type="text/javascript">
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#BlackBg").hide();
-		document.title="已报课程";
-	}
-}, 100);
-</script>
 <script type="text/javascript">
 $('.btnCancel').click(function() {
 	$('.popUpBox').hide();

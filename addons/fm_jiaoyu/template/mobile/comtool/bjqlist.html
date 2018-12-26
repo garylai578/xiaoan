@@ -10,7 +10,7 @@
 				{if $item['msgtype'] ==3}<span class="diary_tag_recipe">视频</span>&nbsp;&nbsp;&nbsp;{/if}
 				{if $item['msgtype'] ==4}<span class="diary_tag_activity">分享</span>&nbsp;&nbsp;&nbsp;{/if}
 				{if $item['msgtype'] ==5}<span class="diary_tag_work">多媒体</span>&nbsp;&nbsp;&nbsp;{/if}
-				{if $bzj || $teachers['status'] ==1 || $bnjzr}{if $item['isopen'] == 1}<span style="color: #9C2B44;font-weight:400;float: right;" class="shenhe_btn" diaryid="{$item['id']}">审核</span>{/if}{/if}
+				{if $bzj || $teachers['status'] ==1 || $bnjzr || $manger}{if $item['isopen'] == 1}<span style="color: #9C2B44;font-weight:400;float: right;" class="shenhe_btn" diaryid="{$item['id']}">审核</span>{/if}{/if}
             </div>
             <div class="user_text">
                 <div class="inside_user_text">{$item['content']}{$item['linkdesc']}{if $item['link']}<a href="{$item['link']}">{$item['linkdesc']}</a>{/if}</div>

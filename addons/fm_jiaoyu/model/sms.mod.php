@@ -102,35 +102,70 @@ function sms_types($type) {
 	);
 	return $types[$type];
 }
-
+function temp_types($type) {
+	$types = array(
+		'code' 		=> '手机验证码',
+		'bmshtz' 	=> '报名审核提醒',
+		'fzqdshjg'  => '微信签到审核结果',
+		'signshtz' 	=> '微信签到审核提醒',
+		'bmshjgtz' 	=> '报名审核结果通知',
+		'bjqshtz' 	=> array('id' => 'OPENTM400047769'),
+		'bjqshjg' 	=> array('id' => 'OPENTM400501478'),
+		'zuoye' 	=> array('id' => 'OPENTM207873178'),
+		'bjtz' 		=> array('id' => 'OPENTM204533457'),
+		'xsqingjia' => array('id' => 'TM00190'),
+		'xsqjsh'	=> array('id' => 'OPENTM200864357'),
+		'liuyan' 	=> array('id' => 'OPENTM415186896'),
+		'liuyanhf'  => array('id' => 'OPENTM415186896'),
+		'lyhf' 		=> '通讯录私聊',
+		'jsqingjia' => array('id' => 'OPENTM203328559'),
+		'jsqjsh' 	=> array('id' => 'OPENTM207256255'),
+		'jxlxtx' 	=> array('id' => 'TM00188'),
+		'xxtongzhi' => array('id' => 'OPENTM204845041'),
+		'jfjgtz'    => array('id' => 'OPENTM401619319'),
+		'jthd'      => '集体活动通知',
+		'rwtz'      => '任务通知',
+		'xzxx'      => '校长信箱',
+		'xysc'      => '成长手册',
+		'qdqrtz'    => '微信代签通知',
+		'sykstx'    => array('id' => 'OPENTM405457608'),
+		'kcyytx'    => array('id' => 'OPENTM400233342'),
+		'kcqdtx'    => array('id' => 'OPENTM406123046'),
+		'sktxls'    => array('id' => 'OPENTM206931431'),
+		'kcjstz'    => array('id' => 'AT1817'),
+	);
+	return $types[$type];
+}
 function getBasicset($weid,$schoolid){
 	$school = pdo_fetch("SELECT logo,title,issale,tel,address,lat,lng FROM " . tablename('wx_school_index') . " WHERE id = '{$schoolid}'");
-	$stumub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_students')." WHERE schoolid = '{$schoolid}' ");
-	$teamub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_teachers')." WHERE schoolid = '{$schoolid}' ");
-	$wxmub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_user')." WHERE schoolid = '{$schoolid}' ");
-	$kcmub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_tcourse')." WHERE schoolid = '{$schoolid}' ");
-	$macmub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_checkmac')." WHERE schoolid = '{$schoolid}' ");
-	$checklog = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_checklog')." WHERE schoolid = '{$schoolid}' ");
-	$cost = pdo_fetchall('SELECT SUM(cose) FROM ' . tablename('wx_school_order') . " WHERE schoolid = '{$schoolid}' AND status = 2 ");
-    $paymub = $cost[0]['SUM(cose)'];
-	$data = array(
-		'weid' => $weid,
-		'schoolid' => $schoolid,
-		'title' => $school['title'],
-		'logo' => tomedia($school['logo']),
-		'tel' => $school['tel'],
-		'address' => $school['address'],
-		'schooltype' => $school['issale'],
-		'lat' => $school['lat'],
-		'lng' => $school['lng'],
-		'stumub' => $stumub,
-		'teamub' => $teamub,
-		'wxmub' => $wxmub,
-		'kcmub' => $kcmub,
-		'paymub' => $paymub,
-		'macmub' => $macmub,
-		'checklog' => $checklog,
-		'modelname' => 'fm_jiaoyu'
-	);
+	if($school){
+		$stumub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_students')." WHERE schoolid = '{$schoolid}' ");
+		$teamub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_teachers')." WHERE schoolid = '{$schoolid}' ");
+		$wxmub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_user')." WHERE schoolid = '{$schoolid}' ");
+		$kcmub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_tcourse')." WHERE schoolid = '{$schoolid}' ");
+		$macmub = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_checkmac')." WHERE schoolid = '{$schoolid}' ");
+		$checklog = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_checklog')." WHERE schoolid = '{$schoolid}' ");
+		$cost = pdo_fetchall('SELECT SUM(cose) FROM ' . tablename('wx_school_order') . " WHERE schoolid = '{$schoolid}' AND status = 2 ");
+		$paymub = $cost[0]['SUM(cose)'];
+		$data = array(
+			'weid' => $weid,
+			'schoolid' => $school['id'],
+			'title' => $school['title'],
+			'logo' => tomedia($school['logo']),
+			'tel' => $school['tel'],
+			'address' => $school['address'],
+			'schooltype' => $school['issale'],
+			'lat' => $school['lat'],
+			'lng' => $school['lng'],
+			'stumub' => $stumub,
+			'teamub' => $teamub,
+			'wxmub' => $wxmub,
+			'kcmub' => $kcmub,
+			'paymub' => $paymub,
+			'macmub' => $macmub,
+			'checklog' => $checklog,
+			'modelname' => 'fm_jiaoyu'
+		);
+	}
 	return $data;
 }

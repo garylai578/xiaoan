@@ -237,8 +237,10 @@ s.parentNode.insertBefore(hm, s);
             }
 
             setTimeout(function () {
-                ajax_get_point();
-
+				var macid = $("#macid").val();
+				if(macid){
+					ajax_get_point();
+				}
             }, 200);
 
             // 获取自己经纬度

@@ -499,6 +499,7 @@ if ($qty['qty'] < $NumOfGood ) {
 				'userid' => $userid,
 				'type' => 1,
 				'status' => 1,
+				'xufeitype' => 1 ,
 				'kcid' => $_GPC ['kcid'],
 				'uid' => $_GPC['uid'],
 				'cose' => $allcost,

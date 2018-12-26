@@ -1,5 +1,5 @@
 <?php defined('IN_IA') or exit('Access Denied');?><?php  $frames_system = buildframes('system')?>
-<?php  if(empty($frames_system['section']['message']['is_display']) && $frames_system['section']['message']['is_display'] != '0') { ?>
+<?php  if(!empty($frames_system['section']['message']['is_display'])) { ?>
 <li class="dropdown msg header-notice">
     <a href="javascript:;" class="dropdown-toogle" data-toggle="dropdown"><span class="wi wi-bell"><span class="badge"></span></span></a>
     <div class="dropdown-menu">

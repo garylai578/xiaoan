@@ -42,7 +42,7 @@ font-size: 0.3rem;}
 		</a>
 	</div>
 	<div class="m">
-	   <span style="font-size: 18px">在线签到</span>   
+	   <span style="font-size: 18px"><?php  echo $language['wxsign_title'];?></span>   
 	</div>
 </div>
 <section class="signin_section">
@@ -57,24 +57,24 @@ font-size: 0.3rem;}
 		<div class="signin_left_dotsVacation"></div>
 	</div>
 	<div class="signin_vacationInfo">
-		<span class="signin_popup_time">忘记打卡? 在这里签到吧！</span>
+		<span class="signin_popup_time"><?php  echo $language['wxsign_tip'];?></span>
 		<div class="signin_left_dotsVacation"></div>
 	</div>
 	<div class="signin_leftBox"></div>
-	<a href="javascript:;" id="signin" class="needSignin">到校签到</a>
-	<a href="javascript:;" id="signin1" class="needSignin1">离校签到</a> 
+	<a href="javascript:;" id="signin" class="needSignin"><?php  echo $language['wxsign_dxqd'];?></a>
+	<a href="javascript:;" id="signin1" class="needSignin1"><?php  echo $language['wxsign_lxqd'];?></a> 
 </section>
 <?php  if($list) { ?>
 <section class="signin_section" style="margin-top:10px;height:auto;">
 	<div class="signin_vacationInfo">
-		<span class="signin_popup_title signin_mom signin_popup_titleInfo">今日签到记录</span>
+		<span class="signin_popup_title signin_mom signin_popup_titleInfo"><?php  echo $language['wxsign_jrqdjl'];?></span>
 		<span class="signin_popup_title signin_mom signin_popup_titleInfo" id="todayDate"></span>
 		<div class="signin_left_dotsVacation"></div>
 	</div>
 	<?php  if(is_array($list)) { foreach($list as $row) { ?>
 		<div class="signin_vacationInfo">
-			<span class="signin_popup_title signin_mom signin_popup_titleInfo"><?php  if($row['leixing'] ==1) { ?>到校<?php  } else { ?>离校<?php  } ?>:</span>
-			<span class="signin_popup_title signin_mom signin_popup_titleInfo"><?php  echo date('H:i:s',$row['createtime'])?>&nbsp;&nbsp;<?php  if($row['isconfirm'] ==1) { ?>老师已确认<img style="width:15px" src="<?php echo OSSURL;?>public/mobile/img/be_choose_icon_02.png"><?php  } else { ?>等待确认<?php  } ?></span>
+			<span class="signin_popup_title signin_mom signin_popup_titleInfo"><?php  if($row['leixing'] ==1) { ?><?php  echo $language['wxsign_dx'];?><?php  } else { ?><?php  echo $language['wxsign_lx'];?><?php  } ?>:</span>
+			<span class="signin_popup_title signin_mom signin_popup_titleInfo"><?php  echo date('H:i:s',$row['createtime'])?>&nbsp;&nbsp;<?php  if($row['isconfirm'] ==1) { ?><?php  echo $language['wxsign_lsyqr'];?><img style="width:15px" src="<?php echo OSSURL;?>public/mobile/img/be_choose_icon_02.png"><?php  } else { ?>等待确认<?php  } ?></span>
 			<div class="signin_left_dotsVacation"></div>
 		</div>
 	<?php  } } ?>
@@ -127,7 +127,7 @@ font-size: 0.3rem;}
                 success: function (data) {
 					$('#signin1').hide();
                     if (data.status == 1) {
-                        jConfirm('该生已经在今天' + data.data + '微信签到进校，您确定还要签到吗？', '确认对话框', function (r) {
+                        jConfirm('您已经在今天' + data.data + '<?php  echo $language['wxsign_jstipjx'];?>', '确认对话框', function (r) {
                             if (r) {
                                 do_signin();
                             }else{
@@ -144,7 +144,7 @@ font-size: 0.3rem;}
 
         if (!$(this).hasClass('awitAffirm')) {
             $(this).addClass('awitAffirm');
-            $(this).text('等待老师确认');
+            $(this).text('<?php  echo $language['wxsign_ddlsqr'];?>');
         } else {
 
             e.stopPropagation();
@@ -168,7 +168,7 @@ font-size: 0.3rem;}
                 success: function (data) {
 					$('#signin').hide();
                     if (data.status == 1) {
-                        jConfirm('该生已经在今天' + data.data + '微信签到离校，您确定还要签到离校吗？', '确认对话框', function (r) {
+                        jConfirm('您已经在今天' + data.data + '<?php  echo $language['wxsign_jstiplx'];?>', '确认对话框', function (r) {
                             if (r) {
                                 do_signin1();
                             }else{
@@ -185,7 +185,7 @@ font-size: 0.3rem;}
 
         if (!$(this).hasClass('awitAffirm')) {
             $(this).addClass('awitAffirm');
-            $(this).text('等待老师确认');
+            $(this).text('<?php  echo $language['wxsign_ddlsqr'];?>');
         } else {
 
             e.stopPropagation();
@@ -198,7 +198,7 @@ font-size: 0.3rem;}
 
             if ("wait" == "normal") {
                 $(".needSignin").addClass('awitAffirm');
-                $(".needSignin").text('等待老师确认');
+                $(".needSignin").text('<?php  echo $language['wxsign_ddlsqr'];?>');
         }
 
 
@@ -208,7 +208,7 @@ font-size: 0.3rem;}
 
             if ("wait" == "normal") {
                 $(".needSignin1").addClass('awitAffirm');
-                $(".needSignin1").text('等待老师确认');
+                $(".needSignin1").text('<?php  echo $language['wxsign_ddlsqr'];?>');
         }
 
 
@@ -227,7 +227,7 @@ font-size: 0.3rem;}
                 if ("wait" == data.data) {
 					jTips(data.info);
                     $(".needSignin").addClass('awitAffirm');
-                    $(".needSignin").text('等待老师确认');
+                    $(".needSignin").text('<?php  echo $language['wxsign_ddlsqr'];?>');
                 } else {
                     jTips(data.info, function () {
                         location.href = "<?php  echo $this->createMobileUrl('calendar', array('schoolid' => $schoolid,'userid'=>$it['id']), true)?>";
@@ -254,7 +254,7 @@ font-size: 0.3rem;}
                 if ("wait" == data.data) {
 					jTips(data.info);
                     $(".needSignin1").addClass('awitAffirm');
-                    $(".needSignin1").text('等待老师确认');
+                    $(".needSignin1").text('<?php  echo $language['wxsign_ddlsqr'];?>');
                 } else {
                     jTips(data.info, function () {
                         location.href = "<?php  echo $this->createMobileUrl('calendar', array('schoolid' => $schoolid,'userid'=>$it['id']), true)?>";

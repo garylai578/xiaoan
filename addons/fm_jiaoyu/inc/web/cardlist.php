@@ -11,7 +11,8 @@ $action            = 'cardlist';
 $this1             = 'no5';
 $GLOBALS['frames'] = $this->getNaveMenu($_GPC['schoolid'], $action);
 $schoolid          = intval($_GPC['schoolid']);
-$logo              = pdo_fetch("SELECT logo,title,spic,is_cardlist FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
+$schooltype        = $_W['schooltype'];
+$logo              = pdo_fetch("SELECT logo,title,spic,tpic,is_cardlist,is_cardpay,cardset FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
 $bj 			   = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where weid = :weid AND schoolid = :schoolid And type = :type ORDER BY ssort DESC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid));
 $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
 $tid_global = $_W['tid'];
@@ -102,11 +103,22 @@ if($operation == 'post'){
     foreach($list as $key => $row){
         $student              = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where id = :id ", array(':id' => $row['sid']));
         $teacher              = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " where id = :id ", array(':id' => $row['tid']));
-        $bjlist               = pdo_fetch("SELECT * FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $row['bj_id']));
+        
         $jxlog                = pdo_fetchall("SELECT * FROM " . tablename($this->table_checklog) . " where cardid = :cardid", array(':cardid' => $row['idcard']));
         $list[$key]['s_name'] = $student['s_name'];
-        $list[$key]['tname']  = $teacher['tname'];
-        $list[$key]['bjname'] = $bjlist['sname'];
+		$list[$key]['sicon'] = !empty($student['icon'])?tomedia($student['icon']):tomedia($logo['spic']);
+		$list[$key]['ticon'] = !empty($teacher['thumb'])?tomedia($teacher['thumb']):tomedia($logo['tpic']);
+        $list[$key]['scardicon']  = tomedia($row['spic']);
+		$list[$key]['tcardicon']  = tomedia($row['tpic']);
+		$list[$key]['tname']  = $teacher['tname'];
+		if($schooltype){
+			$bjlist  = pdo_fetch("SELECT name  FROM " . tablename($this->table_tcourse) . " where id = :id ", array(':id' => $row['bj_id']));
+			$list[$key]['bjname'] = $bjlist['name'];
+		}else{
+			$bjlist               = pdo_fetch("SELECT * FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $row['bj_id']));
+			$list[$key]['bjname'] = $bjlist['sname'];
+		}
+        
         $list[$key]['num']    = count($jxlog);
     }
     $total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_idcard) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition");
@@ -128,7 +140,179 @@ if($operation == 'post'){
 		}else{
 			$this->imessage('抱歉，本校无可用空卡号,请联系管理添加！');
 		}
-	}	
+	}
+}elseif($operation == 'recording'){
+	mload()->model('tea');
+	$allbjlist = GetAllClassInfoByTid($schoolid,2,$schooltype,$_W['tid']);
+	$allguanxi = getallpardset();
+	$bj_id = $_GPC['bj_id'];
+	if($bj_id){
+		if($schooltype){
+			$nowbj = pdo_fetch("SELECT name as sname FROM " . tablename($this->table_tcourse) . " where id = :id ", array(':id' => $bj_id));
+			$thisKcStu = pdo_fetchall("SELECT distinct sid FROM " . tablename($this->table_order) . " where schoolid = '{$schoolid}' And kcid = '{$bj_id}' And type=1  And sid != 0 ORDER BY id DESC ");
+			//var_dump($thisKcStu);
+			$bjallrs = count($thisKcStu);
+			$Stu_str_temp = '';
+			foreach($thisKcStu as $u){
+				$Stu_str_temp .=$u['sid'].",";
+			}
+			$stu_str = trim($Stu_str_temp,",");
+			
+			$stulist = pdo_fetchall("SELECT id,s_name,icon FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And FIND_IN_SET(id,'{$stu_str}') ORDER BY id DESC  ");
+			foreach($stulist as $key => $row){
+				$stulist[$key]['icon'] = !empty($row['icon'])?tomedia($row['icon']):tomedia($logo['spic']);
+				$cards = pdo_fetchall('SELECT idcard,severend,pard,pname FROM ' . tablename($this->table_idcard) . " WHERE sid = '{$row['id']}' AND schoolid = '{$schoolid}' ");
+				$stulist[$key]['hascards'] = 1;
+				if($cards){
+					$stulist[$key]['cards'] = $cards;
+					$stulist[$key]['hascards'] = 2;
+				}
+				
+			}
+		}else{
+			$nowbj  = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $bj_id));
+			$stulist = pdo_fetchall("SELECT id,s_name,icon FROM " . tablename($this->table_students) . " where schoolid = :schoolid And bj_id = :bj_id ", array(':schoolid' => $schoolid,':bj_id' => $bj_id)); 
+			foreach($stulist as $key => $row){
+				$stulist[$key]['icon'] = !empty($row['icon'])?tomedia($row['icon']):tomedia($logo['spic']);
+				$cards = pdo_fetchall('SELECT idcard,severend,pard,pname FROM ' . tablename($this->table_idcard) . " WHERE sid = '{$row['id']}' AND schoolid = '{$schoolid}' ");
+				$stulist[$key]['hascards'] = 1;
+				if($cards){
+					$stulist[$key]['cards'] = $cards;
+					$stulist[$key]['hascards'] = 2;
+				}
+				
+			}
+		}
+		//$stulist = array_sorts($stulist,'hascards','asc');
+	}
+}elseif($operation == 'getcardinfo'){
+	$sid = $_GPC['sid'];
+	$bj_id = $_GPC['bj_id'];
+	$idcard = $_GPC['idcard'];
+	$pard = intval($_GPC['pard']);
+	$pname = $_GPC['pname'];
+	$now = date('Y-m-d',time());
+	$severend = strtotime($_GPC['severend']);
+	$checkcard = pdo_fetch("SELECT * FROM " . tablename($this->table_idcard) . " WHERE schoolid = :schoolid And idcard = :idcard", array(':schoolid' => $schoolid,':idcard' => $idcard));
+	if($logo['is_cardlist'] == 1){
+		if($_W['tid'] != "founder" && $_W['tid'] != "owner"){
+			if(!empty($checkcard)){
+				if(!empty($checkcard['pard'])){
+					$data['msg'] = "抱歉，本卡已绑定其他用户";
+					$data['result'] = false;
+					die (json_encode($data));
+					exit;
+				}
+			}else{
+				$data['msg'] = "本卡不是有效卡，请联系管理员索取有效卡";
+				$data['result'] = false;
+				die (json_encode($data));
+				exit;
+			}
+		}else{
+			if(!empty($checkcard['sid']) || !empty($checkcard['tid'])){
+				$data['msg'] = "抱歉，本卡已绑定其他用户";
+				$data['result'] = false;
+				die (json_encode($data));
+				exit;
+			}
+		}
+	}
+	if(!empty($checkcard['pard'])){
+		$data['msg'] = "抱歉，本卡已绑定其他用户";
+		$data['result'] = false;
+		die (json_encode($data));
+		exit;
+	}
+	$checkpard = pdo_fetch("SELECT * FROM " . tablename($this->table_idcard) . " WHERE :schoolid = schoolid And :sid = sid And :pard = pard", array(
+		':schoolid' => $schoolid,
+		':sid' => $sid,
+		':pard' => $pard
+	));		
+	if (!empty($checkpard)) {
+			$data['msg'] = "你选择的关系已经绑定其他卡！";
+			$data['result'] = false;
+			die (json_encode($data));
+			exit;
+	}
+	if($logo['is_cardpay'] == 1){
+		$card = unserialize($logo['cardset']);
+		if($card['cardtime'] == 1){
+			if($checkcard['is_frist'] == 1 || empty($checkcard)){
+				$severend = $card['endtime1'] * 86400 + time();
+			}else{
+				$severend = time();
+			}
+		}else{
+			$severend = $card['endtime2'];
+		}
+	}else{
+		if($checkcard['severend']){
+			$severend = $checkcard['severend'];
+		}else{
+			if($now == $_GPC['severend']){
+				$data['msg'] = "抱歉，请在本页顶部选择到期日期";
+				$data['result'] = false;
+				die (json_encode($data));
+				exit;
+			}
+		}
+	}
+	$temp = array(
+		'weid' => $weid,
+		'schoolid' => $schoolid,
+		'idcard' => $idcard,
+		'sid' => $sid,
+		'bj_id' => $bj_id,
+		'pname' => $pname,
+		'pard' => $pard,
+		'usertype' => 1,
+		'is_on' => 1,
+		'createtime' => time(),
+		'severend' => $severend,
+	);
+	if(empty($checkcard['id'])){
+		pdo_insert($this->table_idcard, $temp);
+	}else{
+		pdo_update($this->table_idcard, $temp, array('id' => $checkcard['id']));
+	}
+	$data['msg'] = "录卡成功";
+	$data['result'] = true;
+	die (json_encode($data));
+}elseif($operation == 'writecard'){
+	$idcard = $_GPC['idcard'];
+	$severend = strtotime($_GPC['severend']);
+	$now = date('Y-m-d',time());
+	if($now == $_GPC['severend']){
+		$data['msg'] = "抱歉，请在本页顶部设置到期日期";
+		$data['result'] = false;
+		die (json_encode($data));
+		exit;
+	}
+	$checkcard = pdo_fetch("SELECT * FROM " . tablename($this->table_idcard) . " WHERE schoolid = :schoolid And idcard = :idcard", array(':schoolid' => $schoolid,':idcard' => $idcard));
+	$temp = array(
+		'weid' => $weid,
+		'schoolid' => $schoolid,
+		'idcard' => $idcard,
+		'sid' => 0,
+		'bj_id' => 0,
+		'pname' => 0,
+		'pard' => 0,
+		'usertype' => 0,
+		'is_on' => 0,
+		'createtime' => 0,
+		'severend' => $severend,
+	);
+	if($checkcard){
+		$data['msg'] = "录卡成功,清除旧卡信息成功";
+		$data['result'] = true;
+		pdo_update($this->table_idcard, $temp, array('id' => $checkcard['id']));
+	}else{
+		pdo_insert($this->table_idcard, $temp);
+		$data['msg'] = "录卡成功";
+		$data['result'] = true;
+	}
+	die (json_encode($data));
 }elseif($operation == 'change_endtime'){
 	$rowcount    = 0;
 	$notrowcount = 0;

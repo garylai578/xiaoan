@@ -56,6 +56,36 @@ function TeaInfoByclassArr($staff_jsfz,$schoolid){
 	return $teaarr;		
 }
 
+
+function TeaInfoByclassArr_BothWay($staff_jsfz,$schoolid){
+	if(is_array($staff_jsfz)){
+		$teaarr = array();
+		foreach($staff_jsfz as $row){
+			$alltea = pdo_fetchall("SELECT id FROM ".tablename('wx_school_teachers')." WHERE  fz_id = '{$row}' And schoolid = '{$schoolid}' ORDER BY id ASC ");
+			$alltea_byfz_temp = pdo_fetch("SELECT tidarr FROM ".tablename('wx_school_classify')." WHERE  sid = '{$row}' And schoolid = '{$schoolid}' ");
+			$alltea_byfz = explode(",",$alltea_byfz_temp['tidarr']);
+			if($alltea){
+				foreach($alltea as $r){
+					if(!in_array($r['id'],$teaarr)){
+						$teaarr[] = intval($r['id']);
+					}
+					
+				}
+			}
+			if($alltea_byfz){
+				foreach($alltea_byfz as $r_f){
+					if(!in_array($r_f,$teaarr)){
+						$teaarr[] = intval($r_f);
+					}
+					
+				}
+			}
+		}
+		
+	}
+	return $teaarr;		
+}
+
 function getalljsfzallteainfo_nofz($schoolid,$schooltype){ //查询未分配分组教师	
 	$school = pdo_fetch("SELECT tpic FROM ".tablename('wx_school_index')." WHERE id = '{$schoolid}' ");
 	$alltea = pdo_fetchall("SELECT id,tname,thumb FROM ".tablename('wx_school_teachers')." WHERE schoolid = '{$schoolid}' And fz_id = 0 ORDER BY id ASC ");
@@ -114,7 +144,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 		$kclist = pdo_fetchall("select id as sid ,name as sname, end FROM ".tablename('wx_school_tcourse')." WHERE schoolid = '{$schoolid}'  and (tid like '%,{$tid},%'  or tid like '%,{$tid}' or tid like '{$tid},%' or tid ='{$tid}') ORDER BY end DESC , ssort DESC ");
 		foreach($kclist as $key =>$row){
 			$kclist[$key]['is_over'] = 1;
-			$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_order')." WHERE kcid = '{$row['sid']}' and type = 1 and status = 2 and sid != 0  ");
+			$total = pdo_fetchcolumn("select count(distinct sid) FROM ".tablename('wx_school_order')." WHERE kcid = '{$row['sid']}' and type = 1 and status = 2 and sid != 0  ");
 			$kclist[$key]['sname'] = $row['sname'].'('.$total.'人)';
 			if($row['end'] < $nowtime){
 				$kclist[$key]['info'] = '--(已结课)';
@@ -127,6 +157,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 			$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_students')." WHERE bj_id = '{$v['bj_id']}' ");
 			$bjinfo = pdo_fetch("SELECT is_over,sname FROM " . tablename('wx_school_classify') . " where sid = :sid", array(':sid' => $v['bj_id']));
 			$bjlists[$i]['sname'] = $bjinfo['sname'].'('.$total.'人)';
+			$bjlists[$i]['old_sname'] = $bjinfo['sname'];
 			$bjlists[$i]['sid'] = $v['bj_id'];
 			$bjlists[$i]['is_over'] = $bjinfo['is_over'];
 			if($bjinfo['is_over'] == 2){
@@ -152,7 +183,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 			 
 				foreach($kclist_nj as $key =>$row){
 					$kclist_nj[$key]['is_over'] = 1;
-					$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_order')." WHERE kcid = '{$row['sid']}' and type = 1 and status = 2 and sid != 0  ");
+					$total = pdo_fetchcolumn("select count(distinct sid) FROM ".tablename('wx_school_order')." WHERE kcid = '{$row['sid']}' and type = 1 and status = 2 and sid != 0  ");
 					$kclist_nj[$key]['sname'] = $row['sname'].'('.$total.'人)';
 					if($row['end'] < $nowtime){
 						$kclist_nj[$key]['info'] = '--(已结课)';
@@ -173,6 +204,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 				foreach($classify as $key => $row){
 					$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_students')." WHERE bj_id = '{$row['sid']}' ");
 					$classify[$key]['sname'] = $row['sname'].'('.$total.'人)';
+					$classify[$key]['old_sname'] = $row['sname'];
 					if($row['is_over'] == 2){
 						$classify[$key]['info'] = '--(已毕业)';
 						if($is_over == 1){
@@ -184,7 +216,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 			}
 		}
 	}else{
-		if(is_xiaozhang($tid)){//校长  取全校数据
+		if(is_xiaozhang($tid) || $tid == 'founder' || $tid == 'owner'){//校长  取全校数据
 			if($schooltype){//培训
 				$condition = '';
 				$nowtime = time();
@@ -194,7 +226,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 				$datas = pdo_fetchall("SELECT id as sid,name as sname,end FROM " . tablename('wx_school_tcourse') . " WHERE schoolid='{$schoolid}' $condition  ORDER BY end DESC, ssort DESC");
 				foreach($datas as $key =>$row){
 					$datas[$key]['is_over'] = 1;
-					$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_order')." WHERE kcid = '{$row['sid']}' and type = 1 and status = 2 and sid != 0  ");
+					$total = pdo_fetchcolumn("select count(distinct sid) FROM ".tablename('wx_school_order')." WHERE kcid = '{$row['sid']}' and type = 1 and status = 2 and sid != 0 ");
 					$datas[$key]['sname'] = $row['sname'].'('.$total.'人)';
 					if($row['end'] < $nowtime){
 						$datas[$key]['info'] = '--(已结课)';
@@ -210,6 +242,7 @@ function GetAllClassInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据已�
 				foreach($datas as $key => $row){
 					$total = pdo_fetchcolumn("select COUNT(id) FROM ".tablename('wx_school_students')." WHERE bj_id = '{$row['sid']}' ");
 					$datas[$key]['sname'] = $row['sname'].'('.$total.'人)';
+					$datas[$key]['old_sname'] = $row['sname'];
 					if($row['is_over'] == 2){
 						$datas[$key]['info'] = '--(已毕业)';
 						if($is_over == 1){
@@ -410,6 +443,12 @@ function GetAllClassStuInfoByTid($schoolid,$is_over,$schooltype,$tid){ //根据�
 
 function get_myskbj($tid){ //根据tid查询授课班级包含毕业班
 	$bjlist = pdo_fetchall("SELECT bj_id  FROM ".tablename('wx_school_user_class')." WHERE tid = :tid  ", array(':tid' => $tid));
+	foreach($bjlist as $key =>$row){
+		$bjinfo = pdo_fetch("SELECT sid FROM ".tablename('wx_school_classify')." WHERE  sid ='{$row['bj_id']}'  ");
+		if(empty($bjinfo)){
+			unset($bjlist[$key]);
+		}
+	}
 	return $bjlist;	
 }
 

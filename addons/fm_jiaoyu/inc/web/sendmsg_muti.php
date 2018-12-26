@@ -12,7 +12,8 @@
 	$type = $_GPC['type'];
 	$pindex = max(1, intval($_GPC['page']));
 	$psize = 2;
-	$schooltype  =GetSchoolType($schoolid,$weid);
+	$schooltype  =GetSchoolType($schoolid,$weid); //培训模式的群发还没有做完
+	$schooltype = false ;
 	//班级通知
 	if($type == 1){
 

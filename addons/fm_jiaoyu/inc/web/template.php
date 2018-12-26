@@ -20,6 +20,19 @@ if($state != 'founder' && $state != 'manager' && $state != 'owner'){
    $this->imessage('非法访问，您无权操作该页面','','error');
 }
 if($operation == 'display'){
+	mload()->model('tea');
+	$list = getalljsfzallteainfo($schoolid,0,$schooltype);
+	$list2 = getalljsfzallteainfo_nofz($schoolid,$schooltype);
+	$shteahcers = $logo['sh_teacherids'];
+	$sh_tealist = '';
+	$shteahcersss= explode(',',$shteahcers);
+	foreach($shteahcersss as $row){
+		$teacher = pdo_fetch("SELECT tname FROM " . tablename($this->table_teachers) . " WHERE id = '{$row}'");
+		if($teacher){
+			$sh_tealist .= $teacher['tname'].',';
+		}
+	}
+	$sh_tealist = rtrim($sh_tealist,',');
     if(checksubmit('submit')){
         $data = array(
             'style1'    => trim($_GPC['style1']),
@@ -28,6 +41,7 @@ if($operation == 'display'){
             'userstyle' => trim($_GPC['userstyle']),
             'bjqstyle'  => trim($_GPC['bjqstyle']),
 			'headcolor' => trim($_GPC['headcolor']),
+			'sh_teacherids' => rtrim($_GPC['sh_teacherids'],','),
         );
         pdo_update($this->table_index, $data, array('id' => $schoolid, 'weid' => $weid));
         $this->imessage('修改前端模板成功!', referer(), 'success');
@@ -248,6 +262,14 @@ if($operation == 'display'){
 	$icon22 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'通讯录','icon' => MODULE_URL.'public/mobile/img/ioc11.png','url' => $this -> createMobileUrl('tongxunlu', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tongxunlu','ssort' => 22,'status' => 1,);
 	$icon23 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'周计划','icon' => MODULE_URL.'public/mobile/img/link_zjh.png','url' => $this -> createMobileUrl('tzjhlist', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tzjhlist','ssort' => 23,'status' => 1,);
 	$icon24 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'成长手册','icon' => MODULE_URL.'public/mobile/img/link_zxbx.png','url' => $this -> createMobileUrl('shoucelist', array('schoolid' => $schoolid)),'place' => 13,'do'=>'shoucelist','ssort' => 24,'status' => 1,);
+	$icon25 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'我的评分','icon' => MODULE_URL.'public/mobile/img/circle_icon4.png
+','url' => $this -> createMobileUrl('tmyscore', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tmyscore','ssort' => 25,'status' => 1,);
+	$icon26 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'评分情况','icon' => MODULE_URL.'public/mobile/img/formal_enroll_icon.png','url' => $this -> createMobileUrl('tscoreall', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tscoreall','ssort' => 26,'status' => 1,);
+	if(is_showpf()){
+		$icon27 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'学生评分','icon' => MODULE_URL.'public/mobile/img/circle_icon17.png','url' => $this -> createMobileUrl('tstuscore', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tstuscore','ssort' => 27,'status' => 1,);
+	}
+	//$icon28 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'宿舍考勤','icon' => MODULE_URL.'public/mobile/img/formal_enroll_icon.png','url' => $this -> createMobileUrl('tstuapinfo', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tscoreall','ssort' => 28,'status' => 1,);
+	$icon30 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'监控列表','icon' => MODULE_URL.'public/mobile/img/59ddef4d7a25b_88.png','url' => $this -> createMobileUrl('tallcamera', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tallcamera','ssort' => 30,'status' => 1,);
 	pdo_insert($this->table_icon, $icon1);
 	pdo_insert($this->table_icon, $icon2);
 	pdo_insert($this->table_icon, $icon3);
@@ -272,6 +294,13 @@ if($operation == 'display'){
 	pdo_insert($this->table_icon, $icon22);
 	pdo_insert($this->table_icon, $icon23);
 	pdo_insert($this->table_icon, $icon24);
+	pdo_insert($this->table_icon, $icon25);
+	pdo_insert($this->table_icon, $icon26);
+	if(is_showpf()){
+		pdo_insert($this->table_icon, $icon27);
+	}
+	pdo_insert($this->table_icon, $icon28);
+	pdo_insert($this->table_icon, $icon30);
 	$this->imessage('操作成功!', referer(), 'success');
 }elseif($operation == 'display3'){
 	$icons_10 = pdo_fetch("SELECT * FROM " . tablename($this->table_icon) . " where weid = :weid And schoolid = :schoolid And place = :place ORDER by ssort ASC", array(':weid' => $weid, ':schoolid' => $schoolid, ':place' => 10));

@@ -265,7 +265,7 @@ if ($operation == 'classinfo') {
                             }elseif($k == 0){//星期天
                                 if($checkdateset['sunday'] == 1){
                                     $timeset_sun = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=4 ORDER BY id ASC ");
-                                    $todaytimeset1 = transTimeset4T1($timeset_sun);
+                                       $todaytimeset1 = transTimeset4T1($timeset_sun);
                                     $todaytimeset2 = array(array('startTime'=>$timeset_sun[count($timeset_sun)-1]['end'], 'endTime'=>"23:59"));
                                     $todaytimeset3 =  transTimeset4T3($timeset_sun);
                                 }else{

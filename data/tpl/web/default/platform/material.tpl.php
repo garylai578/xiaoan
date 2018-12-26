@@ -3,20 +3,11 @@
 	素材管理
 </div>
 <ul class="we7-page-tab">
-	<li<?php  if($type == 'news') { ?> class="active"<?php  } ?>>
-	<a href="<?php  echo url('platform/material', array('type' => 'news'))?>"><?php  echo $_W['account']['type_name'];?>图文</a>
-	</li>
-	<li<?php  if($type == 'image') { ?> class="active"<?php  } ?>>
-	<a href="<?php  echo url('platform/material', array('type' => 'image', 'server' => MATERIAL_WEXIN))?>">图片</a>
-	</li>
-	<li<?php  if($type == 'voice') { ?> class="active"<?php  } ?>>
-	<a href="<?php  echo url('platform/material', array('type' => 'voice', 'server' => MATERIAL_WEXIN))?>">语音</a>
-	</li>
-	<?php  if($_W['account']['type'] != ACCOUNT_TYPE_XZAPP_NORMAL) { ?>
-	<li<?php  if($type == 'video') { ?> class="active"<?php  } ?>>
-	<a href="<?php  echo url('platform/material', array('type' => 'video', 'server' => MATERIAL_WEXIN))?>">视频</a>
-	</li>
+	<?php  if(is_array($active_sub_permission)) { foreach($active_sub_permission as $active_menu) { ?>
+	<?php  if(permission_check_account_user($active_menu['permission_name'], false) && $active_menu['is_display'] !== false && (empty($active_menu['is_display']) || is_array($active_menu['is_display']) && in_array($_W['account']['type'], $active_menu['is_display']))) { ?>
+	<li <?php  if($type == $active_menu['active']) { ?>class="active"<?php  } ?>><a href="<?php  echo $active_menu['url'];?>"><?php  echo $active_menu['title'];?></a></li>
 	<?php  } ?>
+	<?php  } } ?>
 </ul>
 <div id="main" ng-controller="materialDisplay" ng-cloak>
 	<div class="material">
@@ -160,9 +151,11 @@
 									<a href="javascript:;" class="" ng-click="checkGroup('news', <?php  echo $material['id'];?>)" data-toggle="tooltip" data-placement="bottom" title="群发"><i class="wi wi-send"></i></a>
 								</li>
 							<?php  } else { ?>
+								<?php  if($_W['account']['type_sign'] != 'xzapp') { ?>
 								<li class="appmsg-opr-item">
 									<a href="javascript:;" ng-click="newsToWechat(<?php  echo $material['id'];?>)" class="" data-toggle="tooltip" data-placement="bottom" title="转换为微信文章"><i class="wi wi-transform"></i></a>
 								</li>
+								<?php  } ?>
 							<?php  } ?>
 							<li class="appmsg-opr-item">
 								<a href="<?php  echo url('platform/material-post/news', array('newsid' => $material['id']))?>" class="" data-toggle="tooltip" data-placement="bottom" title="编辑">&nbsp;<i class="wi wi-text"></i></a>
@@ -211,10 +204,10 @@
 						<span class="appimg-title"><?php  echo $image['filename'];?></span>
 					</div>
 					<div class="img-item">
-						<?php  if($server == 'local') { ?>
-						<img class="img-thumb" src="<?php  echo tomedia($image['attachment']);?>">
+						<?php  if($server == 'local' || !empty($_W['setting']['remote']['type'])) { ?>
+							<img class="img-thumb" src="<?php  echo tomedia($image['attachment']);?>">
 						<?php  } else { ?>
-						<img class="img-thumb" src="<?php  echo tomedia($image['attachment'], true);?>">
+							<img class="img-thumb" src="<?php  echo tomedia($image['attachment'], true);?>">
 						<?php  } ?>
 					</div>
 					<div class="img-opr">

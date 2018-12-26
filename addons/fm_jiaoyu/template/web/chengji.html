@@ -64,37 +64,36 @@ require(['bootstrap'],function($){
     </div>
     <div class="panel panel-default file-container" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcel" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcel" />
-                <input type="hidden" name="ac" value="chengji" />
-				<input type="hidden" name="schoolid" value="{$schoolid}" />
+            <form id="form">
 				<div class="col-sm-2 col-lg-2">
-					<select name="qh_id" class="form-control">
+					<select name="qh_id" id="qh_id" class="form-control">
 						<option value="">请选择期号导入</option>
 						{loop $qh $row}
 						<option value="{$row['sid']}" {if $row['sid'] == $_GPC['qh_id']} selected="selected"{/if}>{$row['sname']}</option>
 						{/loop}
 					</select>
-				</div>	
-				<a class="btn btn-primary" href="javascript:location.reload()"><i class="fa fa-refresh"></i> 刷新</a>				
+				</div>			
                 <input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
-                <a class="btn btn-primary"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcel" id="unload" style="display: none;"
+                <a class="btn btn-warning"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
+                <input type="file" class="pull-left btn-primary span3" name="file" id="unload" style="display: none;"
                        onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcel" value="导入数据">
-                <a class="btn btn-primary" href="../addons/fm_jiaoyu/public/example/example_chengji.xls">下载导入模板</a>
+                <a class="btn btn-danger" onclick="submits('input_cj','form');">导入数据</a>
+                <a class="btn btn-info" href="../addons/fm_jiaoyu/public/example/example_chengji.xls"><i class="fa fa-download"></i>下载导入模板</a>
             </form>
         </div>
     </div>
+	{template 'public/excel_input'}
     <div class="panel panel-default">
         <div class="table-responsive panel-body">
         <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
 		<input type="hidden" name="schoolid" value="{$schoolid}" />
-        <table class="table table-hover">
+		<tr>
+			<td colspan="10">
+				<input name="token" type="hidden" value="{$_W['token']}" />
+				<input type="button" class="btn btn-primary" name="btndeleteall" value="批量删除" />
+			</td>
+		</tr>
+	    <table class="table table-hover">
 			<thead class="navbar-inner">
 				<tr>
                     <th class='with-checkbox' style="width: 3%;"><input type="checkbox" class="check_all" /></th>
@@ -105,7 +104,8 @@ require(['bootstrap'],function($){
                     <th style="width:8%;">手机</th>
                     <th style="width:8%;">期号</th>
 					<th style="width:8%;">科目</th>
-                    <th style="width:8%;">成绩</th>					
+                    <th style="width:8%;">成绩</th>
+					<th style="width:8%;">导入时间</th>					
 					<th class="qx_e_d" style="text-align:right; width:8%;">操作</th>
 				</tr>
 			</thead>
@@ -130,7 +130,10 @@ require(['bootstrap'],function($){
                     <td>
                         {if !empty($category[$item['km_id']])}{$category[$item['km_id']]['sname']}{/if}
                     </td>					
-					<td style="color:#f00;">{$item['my_score']}&nbsp;分</td> 									
+					<td style="color:#f00;">{$item['my_score']}&nbsp;分</td>
+					<td>
+                        <span class="label label-success">{if $item['createtime']}{php echo date('Y-m-d',$item['createtime'])}{/if}</span>
+                    </td>
 					<td class="qx_e_d" style="text-align:right;">
 						<a class="btn btn-default btn-sm qx_802" href="{php echo $this->createWebUrl('chengji', array('id' => $item['id'], 'op' => 'post', 'schoolid' => $schoolid))}" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;<a class="btn btn-default btn-sm qx_804" href="{php echo $this->createWebUrl('chengji', array('id' => $item['id'], 'op' => 'delete', 'schoolid' => $schoolid))}" onclick="return confirm('此操作不可恢复，确认删除？');return false;" title="删除"><i class="fa fa-times"></i></a>
 					</td>

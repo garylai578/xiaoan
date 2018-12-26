@@ -9,12 +9,14 @@
 <div class="pull-right related-info module-related-info">
 </div>
 
+
+<?php  if(!defined('SYSTEM_WELCOME_MODULE')) { ?>
 <script>
 	$.post('./index.php?c=module&a=display&do=accounts_dropdown_menu', {'module_name': "<?php  echo $_W['current_module']['name']?>", 'version_id': "<?php  echo $_GPC['version_id']?>"}, function(data){
 		$('.module-related-info').html(data);
 	}, 'html');
 </script>
-
+<?php  } ?>
 
 <!-- 兼容历史性问题：模块内获取不到模块信息$module的问题-start -->
 <?php  if(defined('CRUMBS_NAV') && CRUMBS_NAV == 1) { ?>

@@ -44,7 +44,7 @@
     <div class="listcontent" style="margin-bottom:5px">
         <div class="main">
             <div class="tongzhiDetails">
-                <div class="tongzhiTitleDetails">学生签到打卡通知</div>
+                <div class="tongzhiTitleDetails"><?php  echo $language['xsqddk'];?></div>
 				<span class="common_no_audit_status">（<?php  echo $mac['name'];?>）</span>
             </div>
             <div class="cutting"></div>

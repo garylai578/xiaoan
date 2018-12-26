@@ -31,17 +31,19 @@
 <div id="titlebar" class="header mainColor">
 	<div class="l"><a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
 	<div class="m">
-		<span style="font-size: 18px">发布班级圈</span>   
+		<span style="font-size: 18px"><?php  echo $language['sbjqfabu_fabutitle'];?></span>   
 	</div>
 </div>    
 <div id="titlebar_bg" class="top_head_blank"></div>
 <div class="feedback_box">
-    <div class="blank"></div>
+    <?php  if($school['bjqstyle'] =='new') { ?>
+	<div class="blank"></div>
 	<div class="feedback_title_box">
         <select class="feedback_title" id="bj_id">
 		<?php  if(!empty($students['bj_id'])) { ?><option value="<?php  echo $students['bj_id'];?>"><?php  echo $bjidname['sname'];?></option><?php  } ?>	
         </select>
-    </div>	
+    </div>
+	<?php  } ?>
     <div class="blank"></div>
     <div class="feedback_content_box">
         <!-- 日志内容 -->

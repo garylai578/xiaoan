@@ -91,6 +91,59 @@ if($operation == 'post'){
     $total = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_score) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition");
 
     $pager = pagination($total, $pindex, $psize);
+}elseif($operation == 'export'){
+	if(checksubmit()) {
+		if(empty($_GPC['qh_id'])){
+			 $this->imessage('抱歉，请先选择期号！','','error');
+		}
+		$file = upload_file($_FILES['file'], 'excel');
+		if(is_error($file)) {
+			$this->imessage($file['message'],'','error');
+		}
+		$data = read_excel($file);
+		if(is_error($data)) {
+			$this->imessage($data['message'],'','error');
+		}
+		unset($data[1]);
+		if(empty($data)) {
+			$this->imessage('没有要导入的数据','','error');
+		}
+		$suc_num = 0;
+		$def_num = 0;
+		$line = "";
+		foreach($data as $key => $strs) {
+			$banji = pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " WHERE sname=:sname And schoolid=:schoolid ", array(':sname' => trim($strs[1]), ':schoolid'=> $schoolid));
+			//名字处理
+			$stu = pdo_fetch("SELECT id FROM " . tablename($this->table_students) . " WHERE s_name=:s_name And schoolid=:schoolid And bj_id = :bj_id ", array(':s_name' => trim($strs[0]),':bj_id' => $banji['sid'], ':schoolid'=> $schoolid));
+			//科目处理
+			$kemu = pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " WHERE sname=:sname And schoolid=:schoolid ", array(':sname' => trim($strs[2]), ':schoolid'=> $schoolid));
+			//年级处理
+			$xueqi = pdo_fetch("SELECT parentid FROM " . tablename('wx_school_classify') . " WHERE sid=:sid  And schoolid=:schoolid ", array(':sid' => $banji['sid'],  ':schoolid'=>$schoolid));
+			if(empty($banji) || empty($stu) || empty($kemu)){
+				$def_num++;
+				$line .= $key.",";
+				continue;
+			}else{
+				$insert = array(
+					'weid' => $weid,
+					'schoolid' => $schoolid,
+					'sid' => $stu['id'],
+					'xq_id' => $xueqi['parentid'],
+					'qh_id' => $_GPC['qh_id'],
+					'bj_id' => $banji['sid'],
+					'km_id' => $kemu['sid'],
+					'my_score' => trim($strs[3]),
+					'info' => intval($strs[4]),
+					'createtime' => time()
+				);
+				pdo_insert($this->table_score, $insert);
+				$score_id = pdo_insertid();
+				$suc_num++;
+			}
+		}
+		$errline = "其中第".$line."行,数据无法插入,请检查";
+		$this->imessage('导入成功'.$suc_num.'条成绩，失败'.$def_num.'条,'.$errline.'', $this->createWebUrl('chengji', array('op' => 'display', 'schoolid' => $schoolid)), 'success');
+	}
 }elseif($operation == 'delete'){
     $id = intval($_GPC['id']);
     if(empty($id)){

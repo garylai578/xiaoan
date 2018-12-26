@@ -73,20 +73,11 @@ body {font-family: initial;}
 <title><?php  echo $school['title'];?></title>
 </head>
 <body> 
-<div id="titlebar" class="header mainColor">
-	<div class="l">
-		<a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);">
-		</a>
-	</div>
-	<div class="m">
-	   <span style="font-size: 18px">请假记录</span>   
-	</div>
-</div>
 <!-- 请假记录列表 -->
 <?php  if(is_array($xsqj)) { foreach($xsqj as $row) { ?>
-	<section id="titlebar_bg" class="vacationRecord_section" <?php  if($row['key'] ==1) { ?>style="margin-top:70px;"<?php  } ?>>
+	<section id="titlebar_bg" class="vacationRecord_section" <?php  if($row['key'] ==1) { ?>style="margin-top:10px;"<?php  } ?>>
 		<div class="vacationItem">
-			<span class="vacation_title">申请人:</span><span class="vacation_mom vacation_left"><?php  echo $student['s_name'];?><?php  echo $row['guanxi'];?></span>
+			<span class="vacation_title"><?php  echo $language['leavelist_dxqd'];?>:</span><span class="vacation_mom vacation_left"><?php  echo $student['s_name'];?><?php  echo $row['guanxi'];?></span>
 			<div class="left_dotsVacation"></div>
 		</div>
 		<div class="vacationItem">
@@ -113,7 +104,7 @@ body {font-family: initial;}
 						<img src="<?php  if($row['thumb']) { ?><?php  echo tomedia($row['thumb'])?><?php  } else { ?><?php  echo tomedia($schol['tpic'])?><?php  } ?>" class="img-responsive">
 					</div>
 					<div class="teachReplyRightTitle">
-						<span class="teachReplyName"><?php  echo $row['tname'];?>-老师</span>
+						<span class="teachReplyName"><?php  echo $row['tname'];?>-<?php  echo $language['leavelist_tip'];?></span>
 						<span class="teachReplyTitle_Time"><?php  echo date('Y-m-d H:i:s',$row['cltime'])?></span>
 					</div>
 				</div>
@@ -157,15 +148,6 @@ body {font-family: initial;}
 <input type="hidden" id="session_visit_sign" value="0" />
 <script>;</script><script type="text/javascript" src="http://jy.xingheoa.com/app/index.php?i=3&c=utility&a=visit&do=showjs&m=fm_jiaoyu"></script></body>
 </html>
-<script type="text/javascript">
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").css("margin-top","10px");
-		document.title="请假记录";
-	}
-}, 100);
-</script>
 <script type="text/javascript">
 	$(function () {
 		$('.vacationRecord_section').each(function () {

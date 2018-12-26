@@ -154,6 +154,12 @@ $(document).on('click', '.custom-url-del', function(){
 <?php  } else if($operation == 'display') { ?>
 <div class="modal fade" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="margin-top:60px;">
 </div>
+
+<div class="modal fade" id="Modal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="margin-top:60px;">
+
+</div>
+
+
 <div class="main">
     <div class="panel panel-default">
         <div class="panel-body">
@@ -168,9 +174,10 @@ $(document).on('click', '.custom-url-del', function(){
                     <thead class="navbar-inner">
                     <tr>
 					    <th style="width:100px;">序号</th>
-                        <th style="width:25%;">分组名称</th>
-						<th style="width:25%;">称谓</th>
-						<th style="width:25%;">修改权限 APP端/后台</th>
+                        <th style="width:20%;">分组名称</th>
+						<th style="width:20%;">称谓</th>
+						<th style="width:20%;text-align:center">修改权限 APP端/后台</th>
+						<th style="width:20%;text-align:center">划分所属教师（仅用于群发通知）</th>
                         <th style="text-align:right;">编辑/删除</th>
                     </tr>
                     </thead>
@@ -180,7 +187,8 @@ $(document).on('click', '.custom-url-del', function(){
 					    <td><div class="type-parent"><?php  echo $row['sid'];?></div></td>
                         <td><div class="type-parent"><?php  echo $row['sname'];?>&nbsp;&nbsp;</div></td>
 						<td><div class="type-parent"><?php  echo $row['pname'];?>&nbsp;&nbsp;</div></td>
-						<td><a class="btn btn-default btn-sm" onclick="set_fzqx_qd(<?php  echo $row['sid'];?>);" title="修改APP端权限"><i class="fa fa-qrcode">&nbsp;&nbsp;修改APP端权限</i></a> &nbsp;<a class="btn btn-default btn-sm" onclick="set_fzqx_ht(<?php  echo $row['sid'];?>);" title="修改APP端权限"><i class="fa fa-qrcode">&nbsp;&nbsp;修改后台权限</i></a></td>
+						<td style="text-align:center"><a class="btn btn-default btn-sm" onclick="set_fzqx_qd(<?php  echo $row['sid'];?>);" title="修改APP端权限"><i class="fa fa-qrcode">&nbsp;&nbsp;修改APP端权限</i></a> &nbsp;<a class="btn btn-default btn-sm" onclick="set_fzqx_ht(<?php  echo $row['sid'];?>);" title="修改APP端权限"><i class="fa fa-qrcode">&nbsp;&nbsp;修改后台权限</i></a></td>
+						<td style="text-align:center"><a class="btn btn-default btn-sm" onclick="set_fz_tea(<?php  echo $row['sid'];?>);" title="划分所属教师（仅用于群发通知）"><i class="fa fa-qrcode">&nbsp;&nbsp;划分所属教师</i></a> &nbsp;</td>
                         <td style="text-align:right;"><a class="btn btn-default btn-sm" href="<?php  echo $this->createWebUrl('jsfz', array('op' => 'post', 'sid' => $row['sid'], 'schoolid' => $schoolid))?>" title="编辑"><i class="fa fa-pencil"></i></a>&nbsp;&nbsp;<a class="btn btn-default btn-sm" href="<?php  echo $this->createWebUrl('jsfz', array('op' => 'delete', 'sid' => $row['sid'], 'schoolid' => $schoolid))?>" onclick="return confirm('确认删除此分类吗？');return false;" title="删除"><i class="fa fa-times"></i></a></td>
                     </tr>
                     <?php  } } ?>
@@ -198,31 +206,41 @@ $(document).on('click', '.custom-url-del', function(){
     <?php  echo $pager;?>
 </div>
 <script type="text/javascript">
+
+
+
 function set_fzqx_qd(sid){
-	$.post("<?php  echo $this->createWebUrl('indexajax',array('op'=>'get_fzqx_qd','schoolid'=>$schoolid))?>", {'sid': sid }, function(data) {
-					
-					//console.log(data);
-					$('#Modal1').html(data);
-					$("#ModalTitle").html("APP端权限");	
-					$("#submit2").hide();
-					$("#submit1").show();
-					$('#Modal1').modal('toggle'); 
-				});
-	
+	$.post("<?php  echo $this->createWebUrl('indexajax',array('op'=>'get_fzqx_qd','schoolid'=>$schoolid))?>", {'sid': sid }, function(data) {	
+		//console.log(data);
+		$('#Modal1').html(data);
+		$("#ModalTitle").html("APP端权限");	
+		$("#submit2").hide();
+		$("#submit1").show();
+		$('#Modal1').modal('toggle'); 
+	});
 }
 
 function set_fzqx_ht(sid){
 	$.post("<?php  echo $this->createWebUrl('indexajax',array('op'=>'get_fzqx_ht','schoolid'=>$schoolid))?>", {'sid': sid }, function(data1) {
-					
-					console.log(data1);
-					$('#Modal1').html(data1);
-					$("#ModalTitle").html("后台权限");	
-					$("#submit1").hide();
-					$("#submit2").show();
-					$('#Modal1').modal('toggle'); 
-				});
-	
+		console.log(data1);
+		$('#Modal1').html(data1);
+		$("#ModalTitle").html("后台权限");	
+		$("#submit1").hide();
+		$("#submit2").show();
+		$('#Modal1').modal('toggle'); 
+	});
 }
+
+function set_fz_tea(sid){
+  var check = $("input[type=checkbox][class!=check_all]:checked");
+	$.post("<?php  echo $this->createWebUrl('jsfz',array('op'=>'get_fztid','schoolid'=>$schoolid))?>", {'sid': sid }, function(data1) {
+		$('#Modal2').html(data1);
+		$('#Modal2').modal('toggle'); 
+	});
+		
+}
+
+
 	
 </script>
 <?php  } ?>

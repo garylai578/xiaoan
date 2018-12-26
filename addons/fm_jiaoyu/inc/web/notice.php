@@ -6,7 +6,8 @@
  */
 global $_GPC, $_W;
 mload()->model('que');
-$schooltype  = $_W['schooltype'];
+//$schooltype  = $_W['schooltype']; 培训机构的群发还没有做好
+$schooltype = false ;
 //lee 0725
 $lastid = pdo_fetch("SELECT id FROM " . tablename($this->table_class) . " ORDER by id DESC LIMIT 0,1");
 $lastids = empty($lastid['id']) ? 1000 :$lastid['id'];
@@ -446,8 +447,8 @@ if($out_excel == "Yes"){
 				 if($total < 2){
 					 $this->imessage('你选择群发的对象组已绑定微信人数小于2人，不可使用群发！');
 				} 
-				var_dump($total);
-				die();
+				//var_dump($total);
+				//die();
 			}elseif($schooltype == false){
 				$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$_W['weid'], ':schoolid'=>$_GPC['schoolid'], ':bj_id'=>$_GPC['bj_id']));
 				if($total < 2){
@@ -480,8 +481,8 @@ if($out_excel == "Yes"){
 				/* if($total < 2){
 					 $this->imessage('你选择群发的对象组已绑定微信人数小于2人，不可使用群发！');
 				} */
-				var_dump($total);
-				die();
+				//var_dump($total);
+				//die();
 			}elseif($schooltype == false){
 				$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$_W['weid'], ':schoolid'=>$_GPC['schoolid'], ':bj_id'=>$_GPC['bj_id']));
 				if($total < 2){
@@ -565,7 +566,7 @@ if($out_excel == "Yes"){
             'createtime' => time(),
             'bj_id'      => $bj_id,
             'km_id'      => $km_id,
-			'kc_id'      => $kc_id,
+			//'kc_id'      => $kc_id,
             'type'       => $_GPC['type'],
             'groupid'    => $groupid,
             'ismobile'   => 1,
@@ -786,7 +787,7 @@ if($out_excel == "Yes"){
 
 	die (json_encode($data));
 }elseif($operation == 'clearall'){
-   	$itemall = pdo_fetchall("SELECT noticeid,sid,tid,userid FROM " . tablename($this->table_record) . " WHERE schoolid = '{$schoolid}'");	
+   	$itemall = pdo_fetchall("SELECT id,noticeid,sid,tid,userid FROM " . tablename($this->table_record) . " WHERE schoolid = '{$schoolid}'");	
 	$rowcount    = 0;
     foreach($itemall as $key => $row){
             $items = pdo_fetch("SELECT id FROM " . tablename($this->table_notice) . " WHERE id = :id", array(':id' => $row['noticeid']));
@@ -825,7 +826,7 @@ if($out_excel == "Yes"){
 
     $this->imessage('删除成功！', referer(), 'success');
 }elseif($operation == 'clear'){
-   	$itemall = pdo_fetchall("SELECT noticeid,sid,tid,userid FROM " . tablename($this->table_record) . " WHERE schoolid = '{$schoolid}'");	
+   	$itemall = pdo_fetchall("SELECT id,noticeid,sid,tid,userid FROM " . tablename($this->table_record) . " WHERE schoolid = '{$schoolid}'");	
 	$rowcount    = 0;
     foreach($itemall as $key => $row){
             $items = pdo_fetch("SELECT id FROM " . tablename($this->table_notice) . " WHERE id = :id", array(':id' => $row['noticeid']));

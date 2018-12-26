@@ -43,6 +43,9 @@ if(checksubmit()){
     if(empty($group)){
         $this->imessage('会员组不存在', referer(), 'error');
     }
+    if(empty($user['tid'])){
+        $this->imessage('请选择一位老师绑定本帐号,注意一个老师只能绑定一个帐号', referer(), 'error');
+    }
     if(!$tuid){
         $cheisbd = pdo_fetch("SELECT * FROM " . tablename('users') . " WHERE tid = :tid", array(':tid' => $user['tid']));
         if(!empty($cheisbd)){

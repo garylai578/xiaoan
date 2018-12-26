@@ -269,7 +269,7 @@ a.btn_addmore{ display: block; border-top:1px solid #ccc;border-bottom:1px solid
 .cost_inf #main,
 #wrap.user_cost .null{ position:fixed; top:10px; bottom:10px; left:5px; right:5px; text-align:center; padding-top:160px; background:#eee url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/uncount.jpg) no-repeat center 20px;; background-size:121px 111px;color:#999; font:14px/30px "黑体";}
 /********************老师列表*******************/
-#wrap.teacher_list{ padding-top:0px; overflow:auto;background:-webkit-gradient(linear,50% 0,50% 100%,from(#010822),to(#c3c5ba)); background:url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/bj.jpg) repeat-x center;background:linear-gradient(to bottom,#010822 0%,#01244c 33%,#034076 50%, #136098 66%,#c3c5ba 100%);}
+#wrap.teacher_list{ padding-top:0px; overflow:auto;}
 .teacher_list #header{ font: 0/30px "黑体"; color: #fff; position:fixed; top:0 ; left:0; right:0; z-index:20}
 .teacher_list #header > div{ background-color: #2d2727; height: 30px; overflow:hidden;}
 .teacher_list #header > div > label{ display:inline-block; padding-left: 35px;font-size: 12px; background:url(http://weimeizhan.oss-cn-shenzhen.aliyuncs.com/public/mobile/img/teacher_title.png) no-repeat 8px center; background-size:21px;}

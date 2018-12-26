@@ -24,11 +24,11 @@
 					<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
 				</div>
 				<div class="m">
-					<span>报名申请</span>
+					<span>{$language['sigup_title']}</span>
 				</div>
 				<div class="r">
 					<a style="font-size:16px;font-weight:bold;position:absolute;color:#f3f3f3;text-align:left;" href="{php echo $this->createMobileUrl('signuplist',array('schoolid'=>$schoolid), true)}">
-						记录
+						{$language['sigup_bmsq_jl']}
 					</a>
 				</div>			
 			</div>
@@ -47,7 +47,7 @@
 					<div id="parentBox" class="changeBox activeBox">
 						<ul>
 							<li>
-								<span class="l">学生姓名：</span>
+								<span class="l">{$language['sigup_bmsq_stuname']}：</span>
 								<span class="r">
 									<input id="s_name" type="text" value="" />
 								</span>
@@ -84,7 +84,7 @@
 								</span>
 							</li>
 							<li>
-								<span class="l">年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;级：</span>
+								<span class="l">{$language['sigup_bmsq_nj']}：</span>
 								<span class="r">
 									<label>请选择</label>
 										<select id="njid">
@@ -99,7 +99,7 @@
 							</li>
 							{if $signset['is_bj'] == 1}
 							<li>
-								<span class="l">班&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;级：</span>
+								<span class="l">{$language['sigup_bmsq_bj']}：</span>
 								<span class="r">
 									<label>请选择</label>
 									<div id="bjid">
@@ -134,7 +134,7 @@
 								<span class="l"></span>
 								<span class="remind">
 									<i><img alt="" src="{OSSURL}public/mobile/img/ico_attention.png" /></i>
-									<label>报名时输入的手机号码是您绑定学生的重要依据</label>
+									<label>{$language['signup_bottip']}</label>
 								</span>
 							</li>
 							{if $signset['is_bd'] == 1}
@@ -144,10 +144,10 @@
 									<label>请选择</label>
 										<select id="subjectId">
 											<option value="">请选择</option>
-											<option value="2">母亲</option>
-											<option value="3">父亲</option>
-											<option value="4">本人</option>
-											<option value="5">家长</option>
+											<option value="2">{php echo get_guanxi(2)}</option>
+											<option value="3">{php echo get_guanxi(3)}</option>
+											<option value="4">{php echo get_guanxi(4)}</option>
+											<option value="5">{php echo get_guanxi(5)}</option>
 										</select>
 									<i></i>
 								</span>
@@ -305,7 +305,7 @@
 							<li class="no_padding">
 								<span class="remind">
 									<i><img alt="" src="{OSSURL}public/mobile/img/ico_attention.png" /></i>
-									<label>抱歉！本校关闭了微信端报名系统！</label>
+									<label>{$language['signup_shutdown']}</label>
 								</span>
 							</li>
 						</ul>
@@ -495,9 +495,9 @@ function changeGrade(gradeId, type, __result) {
 	
 		data = JSON.parse(data);
 		classlevel = data.bjlist;
-		
+		var wrod = "{$language['signup_shutdown']}";
 		var html = '';
-		html += '<select id="bj_id"><option value="">请选择班级</option>';
+		html += '<select id="bj_id"><option value="">'+wrod+'</option>';
 		if (classlevel != '') {
 			for (var i in classlevel) {
 				html += '<option value="' + classlevel[i].sid + '">' + classlevel[i].sname + '</option>';
@@ -520,7 +520,7 @@ function Tijiao(){
 	if(activeBoxID == "parentBox"){
 {if $signset['is_head'] == 1}
 		if($("#headimg").val() == null || $("#headimg").val() == ""){
-			jTips("请上传学生头像");
+			jTips("{$language['signup_jstip2']}");
 			return;
 		}
 {/if}
@@ -625,7 +625,7 @@ function Tijiao(){
 
 
 		if($("#s_name").val() == null || $("#s_name").val() == ""){
-			jTips("学生姓名不能为空！");
+			jTips("{$language['signup_jstip3']}");
 			return;
 		}	
 		if($("#sex").val() == null || $("#sex").val() == ""){
@@ -641,7 +641,7 @@ function Tijiao(){
 
 		var val= ischinese(s_name);               //判断是否包含中文
 		if(!val){
-			jTips("学生姓名不能包含英文或符号");
+			jTips("{$language['signup_jstip4']}");
 			return;
 		}
             		
@@ -668,7 +668,7 @@ function Tijiao(){
 {/if}	
 		if(isbir == 1){	
 			if($("#birthday").val() == null || $("#birthday").val() == ""){
-				jTips("请输入出身日期");
+				jTips("请输入出生日期");
 				return;
 			}
 		}
@@ -680,19 +680,19 @@ function Tijiao(){
 		}
 		
 		if($("#njid").val() == null || $("#njid").val() == ""){
-			jTips("请选择年级");
+			jTips("{$language['signup_jstip5']}");
 			return;
 		}
 		
 		if(isbj == 1){
 			if($("#bj_id").val() == null || $("#bj_id").val() == ""){
-				jTips("请选择班级");
+				jTips("{$language['signup_jstip1']}");
 				return;
 			}
 		}
 		if(isbd == 1){	
 			if($("#subjectId").val() == null || $("#subjectId").val() == ""){
-				jTips("请选择与学生关系");
+				jTips("{$language['signup_jstip6']}");
 				return;
 			}
 		}		

@@ -79,7 +79,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59ddef4d7a25b_19.png">
 					</div>
 					<div class="icon_text">
-						学生姓名<div class="right_arrow_text"><?php  echo $students['s_name'];?></div>
+						<?php  echo $language['myinfo_xsxm'];?><div class="right_arrow_text"><?php  echo $students['s_name'];?></div>
 					</div>
 				</a>
 			</li>
@@ -91,7 +91,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59df389b137bb_31.png">
 					</div>
 					<div class="icon_text">
-						学生二维码
+						<?php  echo $language['myinfo_xsew'];?>
 						<div class="right_arrow_text" id="codetxet">
 							<img style="padding-right: 62px;width: 23px;" src="<?php  echo tomedia($qrinfo['show_url'])?>"><?php  if($overtime) { ?>点击查看<?php  } else { ?>已过期,重新获取<?php  } ?>
 						</div>
@@ -107,7 +107,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59ddef4d7a25b_18.png">
 					</div>
 					<div class="icon_text">
-						学号<div class="right_arrow_text"><?php  echo $students['numberid'];?></div>
+						<?php  echo $language['myinfo_xsxh'];?><div class="right_arrow_text"><?php  echo $students['numberid'];?></div>
 					</div>
 				</a>
 			</li>
@@ -130,7 +130,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59ddef4d7a25b_49.png">
 					</div>
 					<div class="icon_text">
-						班级<div class="right_arrow_text">
+						<?php  echo $language['myinfo_xsbj'];?><div class="right_arrow_text">
 							<?php  if(!empty($bjlist)) { ?>
 								<?php  if(is_array($bjlist)) { foreach($bjlist as $row) { ?>
 									<?php  echo $row['bjname'];?>
@@ -149,7 +149,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59ddef4d7a25b_09.png">
 					</div>
 					<div class="icon_text">
-						报名预留电话<div class="right_arrow_text"><?php  echo $students['mobile'];?></div>
+						<?php  echo $language['myinfo_bmyldh'];?><div class="right_arrow_text"><?php  echo $students['mobile'];?></div>
 					</div>
 				</a>
 			</li>
@@ -160,7 +160,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59ddef4d7a25b_70.png">
 					</div>
 					<div class="icon_text">
-						家庭住址<div class="right_arrow_text"><?php  if($students['area_addr']) { ?><?php  echo $students['area_addr'];?><?php  } else { ?>未填写<?php  } ?></div>
+						<?php  echo $language['myinfo_jtzz'];?><div class="right_arrow_text"><?php  if($students['area_addr']) { ?><?php  echo $students['area_addr'];?><?php  } else { ?>未填写<?php  } ?></div>
 					</div>
 				</a>
 			</li>
@@ -171,7 +171,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						<img src="<?php echo MODULE_URL;?>public/mobile/img/59ddef4d7a25b_80.png">
 					</div>
 					<div class="icon_text">
-						积分<div class="right_arrow_text"><?php  if($students['points']) { ?><?php  echo $students['points'];?><?php  } else { ?>0<?php  } ?></div>
+						<?php  echo $language['myinfo_xsxm'];?><div class="right_arrow_text"><?php  if($students['points']) { ?><?php  echo $students['points'];?><?php  } else { ?>0<?php  } ?></div>
 					</div>
 				</a>
 			</li>
@@ -184,10 +184,10 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 	<div id="myModal" class="reveal-modal">
 		<ul>
 			<li class="user_name">
-				<input type="text" placeholder="学生姓名" name ="name" id="name" value="<?php  echo $students['s_name'];?>">
+				<input type="text" placeholder="<?php  echo $language['myinfo_xsxm'];?>" name ="name" id="name" value="<?php  echo $students['s_name'];?>">
 			</li>
 			<li class="user_name">
-				<input type="text" placeholder="预留手机号" name ="mobile" id="mobile" value="<?php  echo $students['mobile'];?>">
+				<input type="text" placeholder="<?php  echo $language['myinfo_bmyldh'];?>" name ="mobile" id="mobile" value="<?php  echo $students['mobile'];?>">
 			</li>
 			<li class="user_name">
 				<select class="feedback_title" id="sex">
@@ -197,11 +197,11 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 			</li>
 			<?php  if($students['numberid']) { ?>
 			<li class="user_name">
-				<input type="text" placeholder="学籍号" name ="numberid" id="numberid" value="<?php  echo $students['numberid'];?>">
+				<input type="text" placeholder="<?php  echo $language['myinfo_xsxh'];?>" name ="numberid" id="numberid" value="<?php  echo $students['numberid'];?>">
 			</li>
 			<?php  } ?>	
 			<li class="user_name">
-				<input type="text" placeholder="家庭住址" name ="mobile" id="addr" value="<?php  echo $students['area_addr'];?>">
+				<input type="text" placeholder="<?php  echo $language['myinfo_jtzz'];?>" name ="addr" id="addr" value="<?php  echo $students['area_addr'];?>">
 			</li>			
 		</ul>
 		<div class="close_pupop_c">
@@ -216,7 +216,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 		<div class="buy_info">
 			<div class="buy_left">
 				<div class="pirce">长按可保存二维</div>
-				<div class="pirce">可发送给家人绑定学生</div>
+				<div class="pirce"><?php  echo $language['myinfo_ewtip'];?></div>
 				<div class="pirce">过期后可重新生成</div>
 			</div>
 			<div class="buy_right">
@@ -309,7 +309,7 @@ $("#tijiao1").on('click', function () {
 
 	reg=/^(0|86|17951)?(13[0-9]|15[012356789]|17[0-9]|18[0-9]|14[57])[0-9]{8}$/;	
 	if (name == "" || name == undefined || name == null) {
-		jTips('请输入学生姓名！');
+		jTips('请输入<?php  echo $language['myinfo_xsxm'];?>！');
 		return false;
 	}
 	if (mobile == "" || mobile == undefined || mobile == null || !reg.test(mobile)) {
@@ -317,7 +317,7 @@ $("#tijiao1").on('click', function () {
 		return false;
 	}
 	
-	jConfirm("确认修改学生信息吗?", "删除确定对话框", function (isConfirm) {
+	jConfirm("确认修改信息吗?", "删除确定对话框", function (isConfirm) {
 		if(isConfirm){
 			$.post("<?php  echo $this->createMobileUrl('comajax',array('op'=>'reset_stuinfo'))?>",submitData,function(data){
 				if(data.result){

@@ -16,11 +16,17 @@ class Fm_jiaoyuModuleSite extends Core {
 		if ($type == 'web') {
 			checkLogin ();  //检查登陆
 			include_once 'inc/func/list.php';
+			if($_GPC['schoolid']){
+				get_language($_GPC['schoolid']);
+				$language = $_W['lanconfig'][$_GPC['do']];
+			}
 			include_once 'inc/web/' . strtolower ( substr ( $_name, 5 ) ) . '.php';
 		} else if ($type == 'mobile') {
 			 if ($auth) {
 				  include_once 'inc/func/isauth.php';
 			 }
+			get_language($_GPC['schoolid']);
+			$language = $_W['lanconfig'][$_GPC['do']];
 			include_once 'inc/mobile/' . strtolower ( substr ( $_name, 8 ) ) . '.php';
 		} else if ($type == 'func') {
 			include_once 'inc/func/' . strtolower ( substr ( $_name, 8 ) ) . '.php';
@@ -36,7 +42,9 @@ class Fm_jiaoyuModuleSite extends Core {
 			 if ($auth) {
 				  include_once 'inc/func/isauth.php';
 			  }
-			session_start();  
+			session_start();
+			get_language($_GPC['schoolid']);
+			$language = $_W['lanconfig'][$_GPC['do']];
 			include_once 'inc/mobile/common/' . strtolower ( substr ( $_name, 8 ) ) . '.php';
 			include_once $this->template('loading');	
 		}
@@ -51,6 +59,8 @@ class Fm_jiaoyuModuleSite extends Core {
 				  include_once 'inc/func/isauth.php';
 			  }
 			session_start();
+			get_language($_GPC['schoolid']);
+			$language = $_W['lanconfig'][$_GPC['do']];
 			include_once 'inc/mobile/student/' . strtolower ( substr ( $_name, 8 ) ) . '.php';
 			if($_name != 'doMobileSbjq' || $_name != 'doMobileSnoticelist' || $_name != 'doMobileSzjhlist' || !preg_match('/ajax/i', $name) || !preg_match('/list/i', $name) ){
 				include_once $this->template('loading');
@@ -61,9 +71,11 @@ class Fm_jiaoyuModuleSite extends Core {
 	private function getLogicmt($_name, $type = "web", $auth = false) {
 		global $_W, $_GPC;
 		if ($type == 'mobile') {
-			 if ($auth) {
-				  include_once 'inc/func/isauth.php';
-			 }
+			if ($auth) {
+				include_once 'inc/func/isauth.php';
+			}
+			get_language($_GPC['schoolid']);
+			$language = $_W['lanconfig'][$_GPC['do']];
 			include_once 'inc/mobile/teacher/' . strtolower ( substr ( $_name, 8 ) ) . '.php';
 			if($_name != 'doMobileBjq' || $_name != 'doMobileNoticelist' || $_name != 'doMobileZuoyelist' || !preg_match('/ajax/i', $name) ){
 				include_once $this->template('loading');
@@ -81,7 +93,9 @@ class Fm_jiaoyuModuleSite extends Core {
     public function doWebLoginctrl() {
         include_once 'inc/web/loginctrl.php';
     }	
-		
+    public function doWebLanset() {
+        include_once 'inc/web/lanset.php';
+    }
     public function doWebUpgrade() {
         include_once 'inc/web/upgrade.php';
     }
@@ -89,7 +103,9 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doWebIndexajax() {
 		include_once 'inc/web/indexajax.php';
 	}
-	
+	public function doWebExecl_input() {
+		include_once 'inc/web/execl_input.php';
+	}
     public function doWebFenzu() {
         include_once 'inc/web/fenzu.php';
     }
@@ -199,6 +215,10 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doWebXz_device() {
 		$this->getLogic ( __FUNCTION__, 'web' );
 	}
+	
+	public function doWebRemote() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}	
 	
  	public function doMobileXz_device() {
 		$this->getLogic ( __FUNCTION__, 'mobile' );
@@ -483,6 +503,46 @@ class Fm_jiaoyuModuleSite extends Core {
 		$this->getLogic ( __FUNCTION__, 'web' );
 	}
 	
+	public function doWebApartmentset() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	public function doWebAproomset() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	public function doWebApcheck() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebBooksborrow() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	public function doWebBooksrecord() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebApcheckall() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebPrinter() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebPrintlog() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebTeascore() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebTscoreobject() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
+	
+	public function doWebStudentscore() {
+		$this->getLogic ( __FUNCTION__, 'web' );
+	}
 	
 	// ====================== FUNC =====================
 	public function doMobileAuth() {
@@ -540,6 +600,9 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doMobilekcajax() {
 		$this->getLogic ( __FUNCTION__, 'mobile', true );
 	}
+	
+	
+
 	// ====================== Mobile Common=====================
 	public function doMobileGuid() {
 		$this->getLogicmc ( __FUNCTION__, 'mobile', true );
@@ -641,6 +704,7 @@ class Fm_jiaoyuModuleSite extends Core {
 		$this->getLogicmc ( __FUNCTION__, 'mobile', true );
 	}
 	
+	
 	public function doMobileMimax() {
 		$this->getLogicmc ( __FUNCTION__, 'mobile', true );
 	}
@@ -648,6 +712,9 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doMobileSzjhlist() {
 		$this->getLogicms ( __FUNCTION__, 'mobile', true );
 	}
+  	public function doMobileMyqrcode(){
+        $this->getLogicms ( __FUNCTION__, 'mobile', true);
+    }
 	public function doMobileAssteach() {
 		$this->getLogicms ( __FUNCTION__, 'mobile', true );
 	}
@@ -709,12 +776,8 @@ class Fm_jiaoyuModuleSite extends Core {
 	}	
 
     public function doMobileMyinfo() {
-		$this->getLogicms ( __FUNCTION__, 'mobile', true);
+		$this->getLogicms ( __FUNCTION__, 'mobile', true );
 	}
-
-	public function doMobileMyqrcode(){
-        $this->getLogicms ( __FUNCTION__, 'mobile', true);
-    }
 
     public function doMobileJiaoliu() {
 		$this->getLogicms ( __FUNCTION__, 'mobile', true );
@@ -865,11 +928,24 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doMobileMysharedetail() {
 		$this->getLogicms ( __FUNCTION__, 'mobile', true );
 	}
-
+	
+	public function doMobileSmyscore() {
+		$this->getLogicms ( __FUNCTION__, 'mobile', true );
+	}
+	
+	public function doMobileYuecostlog() {
+		$this->getLogicms ( __FUNCTION__, 'mobile', true );
+	}
 
 
 	// ====================== Mobile Teacher =====================
 	//for master
+    public function doMobileTallcamera() {
+		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
+	}
+    public function doMobileTcamera() {
+		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
+	}
     public function doMobileClasschecklog() { //与狼共舞
 		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
 	}
@@ -1168,6 +1244,22 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doMobileTkcstu() {
 		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
 	}
+	
+	public function doMobileTmyscore() {
+		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
+	}
+	
+	public function doMobileTscoreall() {
+		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
+	}
+	
+	public function doMobileTstuscore() {
+		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
+	}
+	
+	public function doMobileMyinfodetail() {
+		$this->getLogicmt ( __FUNCTION__, 'mobile', true );
+	}
 
 
 	
@@ -1211,8 +1303,8 @@ class Fm_jiaoyuModuleSite extends Core {
 				$this->actions_titles22['theclass'] = '班级管理';
 			}
 			if(IsHasQx($tid,1000231,1,$schoolid)){
-				$this->actions_titles['score'] = '成绩管理';
-				$this->actions_titles22['score'] = '成绩管理';
+				$this->actions_titles['score'] = '期号管理';
+				$this->actions_titles22['score'] = '期号管理';
 			}
 			if(IsHasQx($tid,1000241,1,$schoolid)){
 				$this->actions_titles['coursetype'] ='课程类型';
@@ -1234,6 +1326,10 @@ class Fm_jiaoyuModuleSite extends Core {
 				$this->actions_titles['week'] = '星期管理';
 				$this->actions_titles22['week'] = '星期管理';
 			}
+			if(IsHasQx($tid,1000291,1,$schoolid)){
+				$this->actions_titles['tscoreobject'] = '评分项目';
+				$this->actions_titles22['tscoreobject'] = '评分项目';
+			}	
 			$this->actions_titles22['jsfz'] = '教师分组';
 			$this->actions_titles22['permiss'] = '帐号管理';
 			
@@ -1252,12 +1348,13 @@ class Fm_jiaoyuModuleSite extends Core {
     public $actions_titles11 = array(
 	    'semester'   => NJNAMEGL,
 	    'theclass'   => '班级管理',
-	    'score'      => '成绩管理',
+	    'score'      => '期号管理',
 	    'coursetype' => '课程类型',
 	    'editaddr'   => '教室管理',
 	    'subject'    => '科目管理',
 	    'timeframe'  => '时段管理',
 	    'week'       => '星期管理',
+		'tscoreobject'=> '评分项目',
 	    'jsfz'       => '教师分组',
 	    'permiss'    => '帐号管理',
 	    'template'   => '模板管理',
@@ -1367,6 +1464,8 @@ class Fm_jiaoyuModuleSite extends Core {
                     $count = $count + $this->upload_bjlist($row, TIMESTAMP, $array);
                 } else if ($array['ac'] == "cardlistfromschool") {
                     $count = $count + $this->upload_cardlistfromschool($row, TIMESTAMP, $array);					
+                } else if ($array['ac'] == "teascore") {
+                    $count = $count + $this->upload_teascore($row, TIMESTAMP, $array);
                 }
             }
         }
@@ -1499,6 +1598,38 @@ class Fm_jiaoyuModuleSite extends Core {
 		$insert['createtime'] = time();
 
         return pdo_insert('wx_school_score', $insert);
+    }
+	
+	
+	 function upload_teascore($strs, $time, $array) {
+        global $_W;
+        $insert = array();		
+
+		$tid = pdo_fetch("SELECT id FROM " . tablename('wx_school_teachers') . " WHERE tname=:tname AND weid=:weid And schoolid=:schoolid  ", array(':tname' => trim($strs[1]), ':weid' => $_W['uniacid'], ':schoolid'=> $array['schoolid']));
+
+        $insert['tid'] = empty($tid) ? 0 : intval($tid['id']);
+		$insert['score'] = trim($strs[2]);
+		$insert['obid'] = $array['ob_id'];
+		$parentobid = pdo_fetch("SELECT parentid FROM " . tablename('wx_school_classify') . " WHERE sid='{$array['ob_id']}' AND weid='{$_W['uniacid']}' And schoolid='{$array['schoolid']}' and type='tscoreobject'")['parentid'];
+		$insert['parentobid'] = $parentobid;
+		$insert['fromtid'] = $array['fromtid'];
+		if($array['fromtid'] == 'founder' || $array['fromtid'] == 'owner' ){
+			$insert['fromfzid'] = -1 ;
+		}else{
+			$fromtea = pdo_fetch("SELECT fz_id FROM " . tablename('wx_school_teachers') . " WHERE tid=:tid AND weid=:weid And schoolid=:schoolid  ", array(':tid' => $array['fromtid'], ':weid' => $_W['uniacid'], ':schoolid'=> $array['schoolid']));
+			$insert['fromfzid'] = $fromtea['fz_id'];
+		}
+		$insert['scoretime'] = strtotime($strs[3]);
+		$insert['schoolid'] = $array['schoolid'];
+        $insert['weid'] = $_W['uniacid'];
+		$insert['createtime'] = time();
+		$check = pdo_fetch("SELECT id FROM " . tablename('wx_school_teascore') . " WHERE tid='{$tid['id']}' AND weid='{$_W['uniacid']}' And schoolid='{$array['schoolid']}' and obid = '{$array['ob_id']}' and scoretime = '{$insert['scoretime']}'  ");
+		if(!empty($check)){
+			return pdo_update('wx_school_teascore', $insert,array('id'=>$check['id']));
+		}else{
+			return pdo_insert('wx_school_teascore', $insert);
+		}
+        
     }
 
     function upload_kecheng($strs, $time, $array) {
@@ -1644,10 +1775,11 @@ class Fm_jiaoyuModuleSite extends Core {
 		$insert['pname'] = empty($strs[7]) ? 0 : trim($strs[7]);
         
 		if (empty($card)) {
-		    if($insert['sid'] != 0)
+          	if($insert['sid'] != 0)
 		        pdo_update('wx_school_students', array("createdate"=>time()), array('id'=>$insert['sid']));
             if($insert['tid'] != 0)
                 pdo_update('wx_school_teachers', array("updatetime"=>time()), array('id'=>$insert['tid']));
+
             return pdo_insert('wx_school_idcard', $insert);
         }else{
 			 message('有重复卡号【'.$strs[1].'】，请检查');
@@ -1726,6 +1858,11 @@ class Fm_jiaoyuModuleSite extends Core {
             if ($_GPC['ac'] == 'chengji') {
 				if (empty($_GPC['qh_id'])) {
 					message('请选择成绩期号！');
+				}
+            }
+			if ($_GPC['ac'] == 'teascore') {
+				if (empty($_GPC['ob_id'])) {
+					message('请选择评分项目！');
 				}
             }
             $msg = $this->uploadFile($filename, $tmp_name, $_GPC);
@@ -2160,6 +2297,20 @@ class Fm_jiaoyuModuleSite extends Core {
 				$taocan = pdo_fetch("SELECT chongzhi FROM " . tablename($this->table_chongzhi) . " where :id = id", array(':id' =>$order['taocanid']));
 				$new = $students['chongzhi'] + $taocan['chongzhi'];
 				pdo_update($this->table_students,array('chongzhi'=>$new),array('id'=>$sid));
+				$data_chongzhilog = array(
+					'schoolid' 	=> $order['schoolid'],
+					'weid'	   	=> $order['weid'],
+					'sid'	   	=> $order['sid'],
+					'yue_type' 	=> 2,
+					'cost_type' => 1,
+					'cost'	   	=> $taocan['chongzhi'],
+					'costtime' 	=> $order['paytime'],
+					'orderid'  	=> $order['id'], 
+					'on_offline' => 1,
+					'createtime' => time()
+				);
+				pdo_insert($this->table_yuecostlog,$data_chongzhilog);
+				$send = $this->sendMobileJfjgtz($order['id']);
 			}else if($order['type'] == 4){
 				$sign = pdo_fetch("SELECT name,nj_id FROM " . tablename($this->table_signup) . " where :id = id", array(':id' => $order['signid']));
 				$njinfo = pdo_fetch("SELECT tid FROM " . tablename($this->table_classify) . " WHERE :sid = sid ", array(':sid' => $sign['nj_id']));
@@ -2170,8 +2321,22 @@ class Fm_jiaoyuModuleSite extends Core {
 			}else{
 				$this->sendMobileJfjgtz($order['id']);
 			}
-				
+			mload()->model('print');
+			order_print($order['id']);	
 			if($params['chongzhi'] == 'chongzhi'){
+				$data_yuelog = array(
+					'schoolid' 	=> $order['schoolid'],
+					'weid'	   	=> $order['weid'],
+					'sid'	   	=> $order['sid'],
+					'yue_type' 	=> 2,
+					'cost_type' => 2,
+					'cost'	   	=> $order['cose'],
+					'costtime' 	=> $order['paytime'],
+					'orderid'  	=> $order['id'],
+					'on_offline' => 1,
+					'createtime' => time()
+				);
+				pdo_insert($this->table_yuecostlog,$data_yuelog);
 				$params['from'] = 'return';
 			}
 		}
@@ -2349,7 +2514,15 @@ class Fm_jiaoyuModuleSite extends Core {
 		$token = $account_api->getAccessToken();
 		return $token;
 	}
-		
+	public function getAccessToken3($weid) {//返回原来TOKEN
+		global $_GPC, $_W;
+		load()->func('communication');
+		load()->classs('weixin.account');
+		$jsauth = pdo_fetch("SELECT * FROM " . tablename('account_wechats') . " WHERE uniacid = '{$weid}'");
+		$uniacccount = WeAccount::create($jsauth['acid']);
+		$token = $uniacccount->getAccessToken();
+		return $token;
+	}
 }
 if(getoauthurl() == 'edu.d3xf.com'){
 	define('NJNAME', '机构');

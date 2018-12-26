@@ -50,7 +50,7 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 		<a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
 		<?php  } ?>
 		</div>
-	<div class="m"><a><span style="font-size: 18px">集体活动列表</span></a></div>
+	<div class="m"><a><span style="font-size: 18px"><?php  echo $language['galist_title'];?></span></a></div>
 	
 </div>
 <title><?php  echo $school['title'];?></title>
@@ -84,9 +84,9 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 						
 						<?php  if($v['isall'] == 1) { ?>
 						
-						<div class="JobLeaderBox" style="background: #313ed6;">全校可报</div>
+						<div class="JobLeaderBox" style="background: #313ed6;"><?php  echo $language['galist_qxkb'];?></div>
 						<?php  } else { ?>
-						<div class="JobLeaderBox">限制班级</div>
+						<div class="JobLeaderBox"><?php  echo $language['galist_xzbj'];?></div>
 						<?php  } ?>
 						<?php  if($_GPC['op'] == 'signup') { ?>
 						<?php  if(!empty($v['issign'])) { ?>
@@ -108,7 +108,7 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 <div class="clear"></div>-->	
 <?php  if($_GPC['op'] == signup) { ?>
 	  <div class="F_div" onclick="mysign();">
-        <div class="F_div_text" style="margin: 10px 0 0 0px;">我的报名记录</div>
+        <div class="F_div_text" style="margin: 10px 0 0 0px;"><?php  echo $language['galist_wdbmjl'];?></div>
     </div>	
     <?php  } ?>
 	

@@ -26,7 +26,7 @@ if($operation == 'display'){
         $this->imessage('批量更新排序成功', referer(), 'success');
     }
     $children = array();
-    $score    = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'score' And schoolid = '{$schoolid}' ORDER BY sid ASC, ssort DESC");
+    $score    = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And (type = 'score' or  type = 'xq_score') And schoolid = '{$schoolid}' ORDER BY sid ASC, ssort DESC");
     foreach($score as $index => $row){
         if(!empty($row['parentid'])){
             $children[$row['parentid']][] = $row;
@@ -57,15 +57,41 @@ if($operation == 'display'){
             $this->imessage('抱歉，请输入名称！', referer(), 'error');
         }
 
-        $data = array(
-            'weid'     => $weid,
-            'schoolid' => $_GPC['schoolid'],
-            'sname'    => $_GPC['catename'],
-            'ssort'    => intval($_GPC['ssort']),
-			'qh_bjlist'     => $bj_id,
-			'qhtype'     => $_GPC['qhtype'],
-            'type'     => 'score',
-        );
+		if($_GPC['scoretype'] == 'score'){
+		   $data = array(
+				'weid'     => $weid,
+				'schoolid' => $_GPC['schoolid'],
+				'sname'    => $_GPC['catename'],
+				'ssort'    => intval($_GPC['ssort']),
+				'qh_bjlist'     => $bj_id,
+				'qhtype'     => $_GPC['qhtype'],
+				'type'     => 'score',
+			);
+			
+		}elseif($_GPC['scoretype'] == 'xq_score'){
+			$start_t =strtotime($_GPC['start']);
+			$end_t = strtotime($_GPC['end']);
+			if($start_t >=$end_t){
+				$this->imessage('抱歉，开始日期必须小于结束日期！', referer(), 'error');
+			}
+			$check = pdo_fetch("SELECT * FROM " . tablename($this->table_classify) . " WHERE type='xq_score' and schoolid = '{$schoolid}' and weid = '{$weid}' and (( sd_start < '{$start_t}' and sd_end > '{$start_t}') or (sd_start < '{$end_t}' and sd_end > '{$end_t}') or (sd_start > '{$start_t}' and sd_start < '{$end_t}')) ");
+			
+			if(!empty($check)){
+				$this->imessage("抱歉，时段有重复，请重新设置{$check['sid']}！", referer(), 'error');
+			}
+			
+			
+			 $data = array(
+				'weid'     => $weid,
+				'schoolid' => $_GPC['schoolid'],
+				'sname'    => $_GPC['catename'],
+				'ssort'    => intval($_GPC['ssort']),
+				'type'     => 'xq_score',
+				'sd_start' => $start_t,
+				'sd_end' => $end_t,
+			);
+		}
+     
 
 
         if(!empty($sid)){

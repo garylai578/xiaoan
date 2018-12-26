@@ -210,7 +210,8 @@
 							<?php  if($_GPC['status'] == 'recycle') { ?>启用<?php  } else { ?>安装应用模块<?php  } ?>
 						</a>
 						<?php  if(permission_check_account_user('see_module_manage_system_stop')) { ?>
-						<a href="<?php  echo url('module/manage-system/recycle_post', array('support' => $module_support_name))?>&module_name={{ module.name }}" class="btn btn-primary" onclick="return confirm('确认要将应用放入回收站吗？')">删除</a>
+						<a ng-if="module.installed_support.length < 1" href="<?php  echo url('module/manage-system/recycle_post', array('support' => $module_support_name))?>&module_name={{ module.name }}" class="btn btn-primary" onclick="return confirm('确认要将应用放入回收站吗？')">删除</a>
+						<a ng-if="module.installed_support.length > 0" href="#" class="btn btn-primary" data-support="{{module.installed_support.join(',')}}" onclick="util.message('已安装该应用的' + $(this).data('support') + '支持, 不可直接删除该支持','','error')">删除</a>
 						<?php  } ?>
 					<?php  } ?>
 				<?php  } ?>
@@ -264,7 +265,9 @@
 		<?php  if(permission_check_account_user('see_module_manage_system_ugrade')) { ?>
 		<a  href="javascript:;" ng-click="changeShow('upgrade')" class="btn " ng-class="{'active' : show == 'upgrade'}" ng-show="checkupgrade == 1">升级</a>
 		<?php  } ?>
+		<?php  if(permission_check_account_user('see_workorder')) { ?>
 		<a  href="javascript:;" ng-click="changeShow('workorder')" ng-class="{'active' : show == 'workorder'}" class="btn">工单系统</a>
+		<?php  } ?>
 	</div>
 	<div class="panel we7-panel" ng-show="show == 'workorder'">
 		<div class="panel-heading">
@@ -418,7 +421,11 @@
 		<tbody>
 		<tr>
 			<td class="text-left">{{ branch.name }}</td>
-			<td class="color-red">{{ branch.displayorder > upgradeInfo.site_branch.displayorder || (branch.displayorder == upgradeInfo.site_branch.displayorder && branch.id > upgradeInfo.site_branch.id) ? branch.upgrade_price : ''}}<span class="label label-success" ng-if="branch.id == upgradeInfo.site_branch.id">当前分支</span></td>
+			<td class="color-red">
+				<span ng-if="branch.displayorder > upgradeInfo.site_branch.displayorder" ng-bind="branch.price"></span>
+				<span ng-if="branch.displayorder == upgradeInfo.site_branch.displayorder && branch.id > upgradeInfo.site_branch.id" ng-bind="branch.upgrade_price"></span>
+				<span class="label label-success" ng-if="branch.id == upgradeInfo.site_branch.id">当前分支</span>
+			</td>
 			<td>{{ upgradeInfo.site_branch.id == branch.id ? moduleinfo.version : ''}}</td>
 			<td>{{ branch.version.version }}</td>
 			<td class="text-right">

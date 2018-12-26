@@ -20,7 +20,10 @@
 			        $njzr = GetNjzr($it['tid']);
 			       // var_dump($njzr);
 			       $is_njzr = is_njzr($it['tid']);
-			      //var_dump($is_njzr);
+				   if(!$is_njzr){
+					   $is_njzr = 0 ;
+				   }
+			     // var_dump($is_njzr);
 			 }else{
 				 $is_njzr = 1 ;
 			 }

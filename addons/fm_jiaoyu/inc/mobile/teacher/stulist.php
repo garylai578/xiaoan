@@ -55,8 +55,6 @@
 				$MyKcList =  pdo_fetchall("SELECT id,name  FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' ORDER BY end  DESC  ");
 			}else{
 				$firstKC =  pdo_fetch("SELECT id  FROM " . tablename($this->table_tcourse) . " where weid = '{$weid}' And schoolid = '{$schoolid}' and maintid = '{$it['tid']}' ORDER BY end  DESC ");
-			 	
-
 				$MyKcList = pdo_fetchall("select * FROM ".tablename($this->table_tcourse)." WHERE schoolid = '{$schoolid}' and weid = '{$weid}' and maintid = '{$it['tid']}'  And  FIND_IN_SET(xq_id,'{$nj_str}') ORDER BY end  DESC ");				
 			}	
 			
@@ -92,7 +90,13 @@
 				foreach($leave1 as $key =>$row){
 					$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
 					$leave1[$key]['banji'] = $banji['sname'];
-					$leave1[$key]['pard'] = pdo_fetchall("SELECT pard FROM ".tablename($this->table_user)." WHERE weid = '{$weid}' And schoolid = '{$schoolid}' And sid = '{$row['id']}' ");
+					$leave1[$key]['pard'] = pdo_fetchall("SELECT pard FROM ".tablename($this->table_user)." WHERE schoolid = '{$schoolid}' And sid = '{$row['id']}' ");
+					$yq = pdo_fetchcolumn("SELECT count(*) FROM " . tablename($this->table_kcsign) . " where schoolid = '{$schoolid}' And sid = {$row['id']} And kcid = '{$kc_id}' And status = 2 ");
+					$buy = pdo_fetchcolumn("SELECT ksnum FROM " . tablename($this->table_coursebuy) . " where schoolid = '{$schoolid}' And sid = {$row['id']} And kcid = '{$kc_id}' ");
+					$leave1[$key]['yq'] = $yq;
+					$leave1[$key]['buy'] =$buy?$buy:0;
+					$rest = $leave1[$key]['buy'] - $yq;
+					$leave1[$key]['rest'] = ($rest>= 0)?$rest:0;
 					if($leave1[$key]['pard']){
 						foreach($leave1[$key]['pard'] as $k => $v){
 							$leave1[$key]['pard'][$k]['pardid'] = $v['pard'];
@@ -112,6 +116,12 @@
 					$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
 					$leave[$key]['banji'] = $banji['sname'];
 					$leave[$key]['pard'] = pdo_fetchall("SELECT pard FROM ".tablename($this->table_user)." WHERE weid = '{$weid}' And schoolid = '{$schoolid}' And sid = '{$row['id']}' ");
+					$yq = pdo_fetchcolumn("SELECT count(*) FROM " . tablename($this->table_kcsign) . " where schoolid = '{$schoolid}' And sid = {$row['id']} And kcid = '{$kc_id}' And status = 2 ");
+					$buy = pdo_fetchcolumn("SELECT ksnum FROM " . tablename($this->table_coursebuy) . " where schoolid = '{$schoolid}' And sid = {$row['id']} And kcid = '{$kc_id}' ");
+					$leave[$key]['yq'] = $yq;
+					$leave[$key]['buy'] =$buy?$buy:0;
+					$rest = $leave[$key]['buy'] - $yq;
+					$leave[$key]['rest'] = ($rest>= 0)?$rest:0;
 					if($leave[$key]['pard']){
 						foreach($leave[$key]['pard'] as $k => $v){
 							$leave[$key]['pard'][$k]['pardid'] = $v['pard'];

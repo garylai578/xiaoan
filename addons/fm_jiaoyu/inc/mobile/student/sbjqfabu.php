@@ -34,22 +34,15 @@
         $shenfen = "";
 		
 		if ($it['pard'] == 2){
-			$shenfen = "母亲";
-		}else if($it['pard'] == 3){
-		    $shenfen = "父亲";
+			$shenfen = get_guanxi(2);
 		}else if($it['pard'] == 4){
-		    $shenfen = "本人";
+		    $shenfen = get_guanxi(4);
 		}else if($it['pard'] == 5){
-		    $shenfen = "家长";				
+		    $shenfen = get_guanxi(5);				
 		}
 			
-        if(!empty($it)){       			
-		    if($school['bjqstyle'] =='old'){
-				include $this->template(''.$school['style2'].'/sbjqfabu');
-			}
-			if($school['bjqstyle'] =='new'){
-				include $this->template(''.$school['style2'].'/sbjqfbnew');
-			}
+        if(!empty($it)){
+			include $this->template(''.$school['style2'].'/sbjqfbnew');
 		}else{
 			session_destroy();
 		    $stopurl = $_W['siteroot'] .'app/'.$this->createMobileUrl('bangding', array('schoolid' => $schoolid));

@@ -74,6 +74,10 @@
                 if (empty($item)) {   
                     $this->imessage('抱歉，本条信息不存在在或是已经删除！', '', 'error');
                 }
+				mload()->model('print');
+				$nowprints = explode(',', $item['printarr']);
+				$printers = printers($schoolid);
+				$printer_name = printer_name();
             }
             if (checksubmit('submit')) {
 	            if(empty($_GPC['tidarr'])){
@@ -142,6 +146,7 @@
 				    'cose'     => trim($_GPC['cose']),
 				    'dagang'   => trim($_GPC['dagang']),
 				    'adrr'     => trim($_GPC['adrr']),
+					'is_dm'    => intval($_GPC['is_dm']),
 					'is_tx'    => intval($_GPC['is_tx']),
 					'txtime'   => intval($_GPC['txtime']),
 				    'is_hot'   => intval($_GPC['is_hot']),
@@ -149,6 +154,8 @@
 				    'ssort'    => intval($_GPC['ssort']),
 				    'start'    => strtotime($_GPC['start']),
 				    'end'      => strtotime($_GPC['end']),
+					'printarr' => implode(',', $_GPC['printarr']),
+					'is_print' => intval($_GPC['is_print']),
 				    'payweid'  => empty($_GPC['payweid']) ? $weid : $_GPC['payweid'],
 				    'signTime' => $signTime,
 				    'isSign'   => $isSign,
@@ -157,6 +164,7 @@
 				    'ReNum'    => $ReNum,
 				    'RePrice'  => $RePrice,
 				    'thumb'	   => $_GPC['kcthumb'],
+					'bigimg'   => $_GPC['bigimg'],
 				    'Ctype'    => $_GPC['Ctype'],
 				    'maintid'  => $maintid,
 				    'Point2Cost'=> intval($_GPC['Point2Cost']),

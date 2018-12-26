@@ -2,7 +2,7 @@
 <!--here-->
 <?php  if(!defined('IS_OPERATOR')) { ?>
 <section id="container" class="">  
-      <header class="header white-bg">
+      <header class="header white-bg" <?php  if(($_GPC['do'] == 'apcheckall' && $big_small == 2 )) { ?>style="display:none"<?php  } ?>>
             <div class="sidebar-toggle-box">
 				<img class="avatar" width="29" height="29" src="<?php  if($logo['logo']) { ?><?php  echo tomedia($logo['logo'])?><?php  } else { ?><?php  echo tomedia('headimg_'.$_W['account']['acid'].'.jpg')?>?time=<?php  echo time()?><?php  } ?>" onerror="this.src='resource/images/gw-wx.gif'" alt="<?php  echo $logo['title'];?>">
             </div>
@@ -44,7 +44,7 @@
 							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
 								<i class="fa fa-user"></i>
 								<span class="username">
-									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'owner') { ?>副创始人<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
+									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'vice_founder') { ?>副创始人<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
 								</span>
 								<b class="caret"></b>
 							</a>
@@ -89,7 +89,7 @@
 							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
 								<i class="fa fa-user"></i>
 								<span class="username">
-									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'owner') { ?>副创始人<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
+									<?php  echo $_W['user']['username'];?> (<?php  if($_W['isfounder']) { ?>系统管理员<?php  } else if($_W['role'] == 'vice_founder') { ?>副创始人<?php  } else if($_W['role'] == 'owner') { ?>公众号管理员<?php  } else { ?><?php  echo $mysf['tname'];?><?php  } ?>)
 								</span>
 								<b class="caret"></b>
 							</a>
@@ -117,7 +117,7 @@
                 <!--  notification end -->
             </div>       
         </header>
-		<div class="navbar navbar-inverse navbar-static-top" role="navigation" style="position:static;">
+		<div class="navbar navbar-inverse navbar-static-top" role="navigation" style="position:static;<?php  if(($_GPC['do'] == 'apcheckall' && $big_small == 2 )) { ?>display:none<?php  } ?>">
 
 		</div>
 		<?php  } ?>
@@ -175,7 +175,7 @@
 				<?php $frames = empty($frames) ? $GLOBALS['frames'] : $frames; mine_current_frames($frames);?>
 			<?php  } ?>
 			<?php  if(!empty($frames)) { ?>
-				<div class="col-xs-12 col-sm-3 col-lg-2 big-menu"  style="margin-left:10px;margin-bottom:100px;height: 100%;background-color: #233646;overflow-x: scroll;">
+				<div class="col-xs-12 col-sm-3 col-lg-2 big-menu "  style="margin-left:10px;margin-bottom:100px;height: 100%;background-color: #233646;overflow-x: scroll;<?php  if(($_GPC['do'] == 'apcheckall' && $big_small == 2 )) { ?>display:none<?php  } ?>">
 					<div class="panel panel-default" style="background-color: #233646;">
 						<span style="width:13.3333337%; height:100px;display: table-cell; line-height:100px;background-color: #233646; vertical-align:middle;text-align: center;">
 							<img style="width:100px;height: 100px;margin-top:10px;border-radius:50%;" alt="image" class="img-circle" src="<?php  if($mysf['thumb']) { ?><?php  echo tomedia($mysf['thumb'])?><?php  } else { ?><?php  echo tomedia($logo['logo'])?><?php  } ?>" />

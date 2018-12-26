@@ -83,6 +83,10 @@ if($operation == 'display'){
     if(empty($timeframe)){
         $this->imessage('抱歉，该日期安排不存在或是已删除！', referer(), 'error');
     }
+	$bj_old =  pdo_fetchall("SELECT sid FROM " . tablename($this->table_classify) . " where weid = :weid And schoolid = :schoolid And type = :type and datesetid = :datesetid ORDER BY ssort DESC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid,':datesetid'=>$id));
+	foreach($bj_old as $key_o => $value_o){
+		pdo_update($this->table_classify,array('datesetid'=>0),array('sid'=>$value_o['sid']));  
+	}
     pdo_delete($this->table_checkdateset, array('id' => $id), 'OR');
     $this->imessage('日期安排删除成功！', referer(), 'success');
 }

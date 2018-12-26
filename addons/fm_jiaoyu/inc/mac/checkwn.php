@@ -3,7 +3,7 @@
  * By 高贵血迹
  */
 	global $_GPC, $_W;
-	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'class', 'check', 'gps', 'banner', 'video', 'start', 'notice', 'users', 'getdate','getleave','command') ) ? $_GPC ['op'] : 'default';
+	$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'class', 'check', 'gps', 'banner', 'video', 'start', 'notice', 'users', 'getdate','getleave','command','getdevremote') ) ? $_GPC ['op'] : 'default';
 	$weid      = $_GPC['i'];
 	$schoolid  = $_GPC['schoolid'];
 	$macid     = empty($_GPC['macid'])? $_GPC['device_id'] : $_GPC['macid'];
@@ -57,7 +57,7 @@
 				'consumptionurl'=>'',
 				'brandurl'=>'',
 				'commondurl'=>$_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=command&m=fm_jiaoyu',
-				
+				'DeviceSetUrl'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=getdevremote&m=fm_jiaoyu',
 				'password'=>$banner['password'],
 				'starttime'=>$banner['starttime'],
 				'shutdowntime'=>$banner['shutdowntime'],
@@ -75,10 +75,10 @@
 			echo json_encode($result);
 			exit;
 		}
-    }	
+    }	 
 	if ($operation == 'users') { //getstatus获取学生信息
 		if(!empty($ckmac)){		                  
-			$users = pdo_fetchall("SELECT idcard, sid, pname, bj_id, usertype, tid FROM " . tablename($this->table_idcard) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And is_on = 1 ORDER BY id DESC");
+			$users = pdo_fetchall("SELECT id,idcard, sid, pname, bj_id, usertype, tid FROM " . tablename($this->table_idcard) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And is_on = 1 ORDER BY id DESC");
 				if($users){
 					$result['status'] = 0;
 					$result['msg']    = "获取数据成功";
@@ -90,7 +90,7 @@
 							$users[$key]['relationship'] = '';
 							$users[$key]['fingercards'] = array();
 							$users[$key]['car_cards'] =array();
-							$users[$key]['id']           = "02".$row['tid'];
+							//$users[$key]['id']           = "02".$row['tid'];
 							$users[$key]['sex']          = $teacher['sex'];
 							$users[$key]['name']         = $teacher['tname'];	
 							$users[$key]['s_type']       = 2;	//暂时全部告诉考勤机都是走读学
@@ -142,7 +142,7 @@
 							$users[$key]['fingercards'] = array();
 							$users[$key]['car_cards'] =array();
 							//修改结束	
-							$users[$key]['id']      = $row['sid'];
+							//$users[$key]['id']      = $row['sid'];
 							$users[$key]['sex']     = $student['sex'];
 							$users[$key]['name']    = $student['s_name'];	
 							//暂时全部告诉考勤机都是走读学
@@ -155,7 +155,12 @@
 							$users[$key]['parentsphone'] = '';
 							$users[$key]['cid']          = $row['bj_id'];
 							$users[$key]['type']         = 1;
-							$users[$key]['picrul']       = empty($student['icon']) ? tomedia($school['spic']) : tomedia($student['icon']);
+							if($row['icon']){
+								$picrul = tomedia($row['icon']);
+							}else{
+								$picrul = empty($student['icon']) ? tomedia($school['spic']) : tomedia($student['icon']);//未设置头像，取默认头像
+							}
+							$users[$key]['picrul']       = $picrul;
 							$users[$key]['iccodes'] = array(
 								array(
 									'stu_id' => $row['sid'],
@@ -247,7 +252,15 @@
 						}
 						
 					}
-					
+					if(!empty($ckmac['apid'])){
+						$todaytype = 0;
+						$todaytimeset = array(
+							array(
+								'start'=>'00:00',
+								'end'  =>'23:59'
+							),
+						);
+					}
 					$class[$key]['info']         = $row['classes'];
 					$class[$key]['yearid']       = '';
 					$class[$key]['token']        = '';
@@ -354,6 +367,8 @@
 				'gpsurl'        => '',
 				'leaveurl'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=getleave&m=fm_jiaoyu',
 				'outTimeUrl'		=> $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&op=class&m=fm_jiaoyu',
+				
+				
 			);
 			$result['servertime'] = time();
 			echo json_encode($result);
@@ -361,7 +376,7 @@
 		}
     }
 	
-		if ($operation == 'command') {
+	if ($operation == 'command') {
 		if(!empty($ckmac)){	
 			$order = pdo_fetch("SELECT * FROM " . tablename($this->table_online) . " WHERE :macid = macid And result = 2", array(':macid' => trim($ckmac['id'])));
 			if($order){
@@ -412,6 +427,7 @@
 		$bj            = pdo_fetch("SELECT bj_id FROM " . tablename($this->table_students) . " WHERE id = '{$ckuser['sid']}' ");
 		$signTime = $_GPC['signtime'];
 		$checkthisdata = pdo_fetch("SELECT id FROM " . tablename($this->table_checklog) . " WHERE cardid = '{$_GPC['iccode']}' And createtime = '{$signTime}' And schoolid = '{$schoolid}' ");
+		
 		//if(empty($checkthisdata)){
 			if(!empty($ckuser)){
 				$times = time();
@@ -447,72 +463,228 @@
 					include 'checktime.php';	
 				}
 				if(!empty($ckuser['sid'])){
-					if($school['is_cardpay'] == 1){					
-						if($ckuser['severend'] > $times){
-							$data = array(
-							'weid'        => $weid,
-							'schoolid'    => $schoolid,
-							'macid'       => $ckmac['id'],
-							'cardid'      => $_GPC ['iccode'],
-							'sid'         => $ckuser['sid'],
-							'bj_id'       => $bj['bj_id'],
-							'lon'         => $_GPC['lon'],
-							'lat'         => $_GPC['lat'],							
-							'type'        => $type,
-							'pic'         => $pic,
-							'pic2'        => $pic2,
-							'temperature' => $_GPC['signTemp'],
-							'leixing'     => $leixing,
-							'pard'        => $ckuser['pard'],
-							'createtime'  => $signTime
-							);
+					if(!empty($ckmac['apid'])){
+						$nowdate = date("Y-n-j",$signTime);
+						$nowweek = date("w",$signTime);
+						
+						$student = pdo_fetch("SELECT bj_id,roomid FROM " . tablename($this->table_students) . " WHERE  schoolid = '{$schoolid}' and id = '{$ckuser['sid']}' ");
+						$stu_class = pdo_fetch("SELECT datesetid FROM " . tablename($this->table_classify) . " WHERE  schoolid = '{$schoolid}' and sid = '{$student['bj_id']}' ");
+						$checktime  =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$stu_class['datesetid']}' and date = '{$nowdate}' ");
+
+						if(!empty($checktime)){
+							if($checktime['type'] == 6){
+								$todaytype = 1;//放假
+							}elseif($checktime['type'] == 5){
+								$todaytype = 2;//上课
+							}
+						}else{
+							if($nowweek != 6 && $nowweek != 0){
+								$todaytype = 2;//上课
+							}else{
+								$todaytype = 1;//放假
+							}
+						}
+						
+						if(!empty($student['roomid'])){
+							$roominfo =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  id = '{$student['roomid']}' ");
+
+							if($roominfo['noon_start'] != $roominfo['noon_end']){
+								$noon_start = $roominfo['noon_start'];
+								$noon_end = $roominfo['noon_end'];
+							}else{
+								$noon_start ='00:00';
+								$noon_end = '23:59';
+							}
+							if($roominfo['night_start'] != $roominfo['night_end']){
+								$night_start = $roominfo['night_start'];
+								$night_end = $roominfo['night_end'];
+							}else{
+								$night_start ='00:00';
+								$night_end = '23:59';
+							}
+						}else{
+							$noon_start  = '00:00';
+							$noon_end 	 = '23:59';
+							$night_start = '00:00';
+							$night_end 	 = '23:59';
+						}
+						
+						//放假期间，不经过时段判断
+						if($todaytype == 1){
+							$isCanCheck = 1 ;
+						//上课期间，经过时段判断						
+						}elseif($todaytype == 2){
+							if(($nowtime >= $noon_start && $nowtime <= $noon_end) || ($nowtime >= $night_start && $nowtime <= $night_end)){
+								$isCanCheck = 1 ;
+							}else{
+								$isCanCheck = 0 ;
+							}
+						}
+						if($roominfo['apid'] != $ckmac['apid']){
+							$isCanCheck = 0 ;
+						}
+					}else{
+						$isCanCheck = 1 ;
+					}
+					if($isCanCheck == 1){
+						if($school['is_cardpay'] == 1){					
+							if($ckuser['severend'] > $times){
+								if(!empty($ckmac['apid'])){
+									if(!empty($roominfo)){
+										$this_roomid = $roominfo['id'];
+										$this_apid = $ckmac['apid'];
+									}else{
+										$this_roomid = 0 ;
+										$this_apid = 0 ;
+									}
+									if($leixing == 1){
+										$ap_type = 1;
+									}elseif($leixing == 2){
+										$ap_type = 2;
+									}else{
+										$ap_type = 0 ;
+									}
+									$data = array(
+										'weid'        => $weid,
+										'schoolid'    => $schoolid,
+										'macid'       => $ckmac['id'],
+										'cardid'      => $_GPC['iccode'],
+										'sid'         => $ckuser['sid'],
+										'bj_id'       => $bj['bj_id'],
+										'lon'         => $_GPC['lon'],
+										'lat'         => $_GPC['lat'],							
+										'pic'         => $pic,
+										'pic2'        => $pic2,
+										'sc_ap'		  => 1,
+										'ap_type' 	  => $ap_type,
+										'roomid' 	  => $this_roomid,
+										'apid'		  => $this_apid,
+										'createtime'  => $signTime
+									);
+								}else{
+									$data = array(
+										'weid'        => $weid,
+										'schoolid'    => $schoolid,
+										'macid'       => $ckmac['id'],
+										'cardid'      => $_GPC['iccode'],
+										'sid'         => $ckuser['sid'],
+										'bj_id'       => $bj['bj_id'],
+										'lon'         => $_GPC['lon'],
+										'lat'         => $_GPC['lat'],							
+										'type'        => $type,
+										'pic'         => $pic,
+										'pic2'        => $pic2,
+										'temperature' => $_GPC['signTemp'],
+										'leixing'     => $leixing,
+										'pard'        => $ckuser['pard'],
+										'createtime'  => $signTime
+									);
+									
+								}
+								
+								pdo_insert($this->table_checklog, $data);
+								$checkid = pdo_insertid();						
+								if($school['send_overtime'] >= 1){
+									$overtime = $school['send_overtime']*60;
+									$timecha  = $times - $signTime;
+									if($overtime >= $timecha){
+										if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'],$checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
+										
+									}
+								}else{
+									if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'],$checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
+								}
+								$fstype = true;	
+							}else{
+								$fstype = false;
+								$result['msg'] = "刷卡失败,本卡已过有效期";
+							}					
+						}else{
+							
+							if(!empty($ckmac['apid'])){
+								if(!empty($roominfo)){
+									$this_roomid = $roominfo['id'];
+									$this_apid = $ckmac['apid'];
+								}
+								if($leixing == 1){
+									$ap_type = 1;
+								}elseif($leixing == 2){
+									$ap_type = 2;
+								}else{
+									$ap_type = 0 ;
+								}
+								$data = array(
+									'weid'        => $weid,
+									'schoolid'    => $schoolid,
+									'macid'       => $ckmac['id'],
+									'cardid'      => $_GPC['iccode'],
+									'sid'         => $ckuser['sid'],
+									'bj_id'       => $bj['bj_id'],
+									'lon'         => $_GPC['lon'],
+									'lat'         => $_GPC['lat'],							
+									'pic'         => $pic,
+									'pic2'        => $pic2,
+									'sc_ap'		  => 1,
+									'ap_type' 	  => $ap_type,
+									'roomid' 	  => $this_roomid,
+									'apid'		  => $this_apid,
+									'createtime'  => $signTime
+								);
+							}else{
+								$data = array(
+									'weid'        => $weid,
+									'schoolid'    => $schoolid,
+									'macid'       => $ckmac['id'],
+									'cardid'      => $_GPC['iccode'],
+									'sid'         => $ckuser['sid'],
+									'bj_id'       => $bj['bj_id'],
+									'lon'         => $_GPC['lon'],
+									'lat'         => $_GPC['lat'],							
+									'type'        => $type,
+									'pic'         => $pic,
+									'pic2'        => $pic2,
+									'temperature' => $_GPC['signTemp'],
+									'leixing'     => $leixing,
+									'pard'        => $ckuser['pard'],
+									'createtime'  => $signTime
+								);
+							}
+
 							pdo_insert($this->table_checklog, $data);
-							$checkid = pdo_insertid();						
+							$checkid = pdo_insertid();
 							if($school['send_overtime'] >= 1){
 								$overtime = $school['send_overtime']*60;
-								$timecha  = $times - $signTime;
+								$timecha = $times - $signTime;
 								if($overtime >= $timecha){
-									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'],$checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
 								}
 							}else{
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
-							}
-							$fstype = true;	
-						}else{
-							$fstype = false;
-							$result['msg'] = "刷卡失败,本卡已过有效期";
-						}					
-					}else{
-						$data = array(
-						'weid'        => $weid,
-						'schoolid'    => $schoolid,
-						'macid'       => $ckmac['id'],
-						'cardid'      => $_GPC ['iccode'],
-						'sid'         => $ckuser['sid'],
-						'bj_id'       => $bj['bj_id'],
-						'lon'         => $_GPC['lon'],
-						'lat'         => $_GPC['lat'],
-						'type'        => $type,
-						'pic'         => $pic,
-						'pic2'        => $pic2,
-						'temperature' => $_GPC ['signTemp'],
-						'leixing'     => $leixing,
-						'pard'        => $ckuser['pard'],
-						'createtime'  => $signTime
-						);
-						pdo_insert($this->table_checklog, $data);
-						$checkid = pdo_insertid();
-						if($school['send_overtime'] >= 1){
-							$overtime = $school['send_overtime']*60;
-							$timecha = $times - $signTime;
-							if($overtime >= $timecha){
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
-							}
-						}else{
-							$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
-						}					
-						$fstype = true;
+								if(is_showyl()){
+											$this->sendMobileJxlxtz_yl($schoolid, $weid, $ckuser['sid'],$checkid,$ckmac['id']);
+										}else{
+											$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+										}
+							}					
+							$fstype = true;
+						}
+					}elseif($isCanCheck == 0){
+						$fstype = false;
+						$result['msg'] = "本时段禁止放行";
+						
 					}
+
 				}
 				if(!empty($ckuser['tid'])){
 					$data = array(
@@ -557,14 +729,38 @@
 		$ckuser        = pdo_fetch("SELECT sid FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$_GPC['iccode']}' And weid = '{$weid}' And schoolid = '{$schoolid}' ");
 		$leave        =  pdo_fetch("SELECT sid,startime1,endtime1 FROM " . tablename($this->table_leave) . " WHERE weid = '{$weid}'  And schoolid = '{$schoolid}' and isliuyan = 0 and status = 1 and startime1 <= '{$time}' and endtime1 >= '{$time}' and sid = '{$ckuser['sid']}' ");
 		$result['status'] = "0";
-		$result['msg']    = "获取数据成功";
 		if(!empty($leave)){
 			$result['data']['openDoor']   = 0;	
+			$result['msg']    = "获取数据成功";
 		}else{
 			$result['data']['openDoor']   = 1;
+			$result['msg']    = "当前时间禁止外出";
 		}
 		
 		echo json_encode($result);
 		exit;
     }
+	if ($operation == 'getdevremote') {	
+		$time = $_GPC['signtime'];
+		$pid=$ckmac['id'];
+		$list = pdo_fetchall("SELECT deviceId,passType,passDeviceId,cameras FROM " . tablename('wx_school_checkmac_remote') . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' and pid='{$pid}' ORDER BY id DESC");
+		foreach($list as $key => $row){
+			
+			$list[$key]['cameras'] = unserialize($row['cameras']);
+			
+		}
+		
+		if(!empty($list)){
+			$result['status'] = "0";
+			$result['msg']    = "获取数据成功";
+			$result['data']   = $list;	
+			
+		}else{
+			$result['status'] = "1";
+			$result['msg']    = "空数据";
+		}
+		
+		echo json_encode($result);
+		exit;
+    }	
 ?>

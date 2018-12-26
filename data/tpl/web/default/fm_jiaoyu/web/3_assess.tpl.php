@@ -33,7 +33,12 @@ border-radius: 4px;-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);box-shad
 					</div>	
 					<div class="col-sm-2 col-lg-2">
 						<button class="btn btn-success qx_605" name="out_putcode" value="out_putcode"><i class="fa fa-download"></i>导出教师绑定码</button>
-					</div>             
+					</div>  
+					<?php  if(is_showpf()) { ?>
+					<div class="col-sm-2 col-lg-2">
+						<button class="btn btn-success qx_608" name="out_putTeaInfo" value="out_putTeaInfo"><i class="fa fa-download"></i>导出教师信息</button>
+					</div>
+					<?php  } ?>					
                 </div>
 				<div class="form-group">
 					<a style="margin-left:40px;background-color: #ffffff;" class="btn btn-primary " href="<?php  echo $this->createWebUrl('assess', array('op' => 'post', 'schoolid' => $schoolid))?>"></a>
@@ -52,42 +57,30 @@ border-radius: 4px;-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);box-shad
     </div>
     <div class="panel panel-default file-container" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcel" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcel" />
-                <input type="hidden" name="ac" value="assess" />
-                <input type="hidden" name="schoolid" value="<?php  echo $schoolid;?>" />
-				<input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
+            <form id="form">
+                <input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
                 <a class="btn btn-primary"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcel" id="unload" style="display: none;" onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcel" value="导入数据">
-                <a class="btn btn-primary" href="../addons/fm_jiaoyu/public/example/example_assess.xls"><i class="fa fa-download"></i>下载导入模板</a>
+                <input type="file" class="pull-left btn-primary span3" name="file" id="unload" style="display: none;"
+                       onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
+                <a class="btn btn-primary" onclick="submits('input_tea','form');">导入数据</a>
+                <a class="btn btn-info" href="../addons/fm_jiaoyu/public/example/example_assess.xls"><i class="fa fa-download"></i>下载导入模板</a>
             </form>
         </div>
     </div>
     <div class="panel panel-default file-container1" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcels" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcels" />
-                <input type="hidden" name="ac" value="bjlist" />
-                <input type="hidden" name="schoolid" value="<?php  echo $schoolid;?>" />
-				<input name="viewfiles" id="viewfiles" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
-                <a class="btn btn-primary"><label for="unloads" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcels" id="unloads" style="display: none;" onchange="document.getElementById('viewfiles').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcels" value="导入数据">
+            <form id="form1">
+                <input name="viewfile1" id="viewfile1" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
+                <a class="btn btn-warning"><label for="unload1" style="margin: 0px;padding: 0px;">上传...</label></a>
+                <input type="file" class="pull-left btn-primary span3" name="file1" id="unload1" style="display: none;" onchange="document.getElementById('viewfile1').value=this.value;this.style.display='none';">
+                <a class="btn btn-danger" onclick="submits('input_teabj','form1');">导入数据</a>
 				<a class="btn btn-info" href="<?php  echo $this->createWebUrl('assess', array('out_putbjlist' => 'out_putbjlist', 'schoolid' => $schoolid))?>"><i class="fa fa-download"></i>下载导入模板</a>				
 				<a class="btn btn-info" href="<?php  echo $this->createWebUrl('theclass', array('out_putcode' => 'out_putcode', 'schoolid' => $schoolid))?>"><i class="fa fa-download"></i>下载班级对照表</a>
 				<a class="btn btn-info" href="<?php  echo $this->createWebUrl('theclass', array('out_putsub' => 'out_putsub', 'schoolid' => $schoolid))?>"><i class="fa fa-download"></i>下载科目对照表</a>
             </form>
         </div>
-    </div>	
+    </div>
+	<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('public/excel_input', TEMPLATE_INCLUDEPATH)) : (include template('public/excel_input', TEMPLATE_INCLUDEPATH));?>
     <div class="panel panel-default">
         <div class="table-responsive panel-body">
         <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
@@ -279,7 +272,7 @@ $(function(){
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">教师姓名</label>
                     <div class="col-sm-9">
                         <div class="input-group">
-                            <input type="text" name="tname" class="form-control" value="<?php  echo $item['tname'];?>" />
+                            <input type="text" name="tname" class="form-control" value="<?php  echo $item['tname'];?>"  required="required" oninvalid="setCustomValidity('教师姓名不能为空！！！');" oninput="setCustomValidity('');"/>
                         </div>
                     </div>
                 </div>
@@ -296,7 +289,7 @@ $(function(){
                         <label for="isshow1" class="radio-inline"><input type="radio" name="is_show" value="1" id="isshow1" <?php  if(empty($item) || $item['is_show'] == 1) { ?>checked="true"<?php  } ?> /> 否</label>
                         &nbsp;&nbsp;&nbsp;
                         <label for="isshow2" class="radio-inline"><input type="radio" name="is_show" value="0" id="isshow2"  <?php  if(!empty($item) && $item['is_show'] == 0) { ?>checked="true"<?php  } ?> /> 是</label>
-                        <span class="help-block"></span>
+                        <span class="help-block">是否显示在首页教师风采列表中</span>
                     </div>
                 </div>            
 				<div class="form-group">
@@ -309,6 +302,46 @@ $(function(){
                     </div>
                 </div>
 				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">身份证号码</label>
+                    <div class="col-sm-9">
+						<div class="input-group">
+							<input type="text" name="idcard" class="form-control" value="<?php  echo $item['idcard'];?>" <?php  if(is_showpf()) { ?>  required="required" oninvalid="setCustomValidity('身份证号码不能为空！！！');" oninput="setCustomValidity('');"<?php  } ?>/>
+						</div>
+					</div>
+                </div> 
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">籍贯</label>
+                    <div class="col-sm-9">
+						<div class="input-group">
+							<input type="text" name="jiguan" class="form-control" value="<?php  echo $item['jiguan'];?>" <?php  if(is_showpf()) { ?>  required="required" oninvalid="setCustomValidity('籍贯不能为空！！！');" oninput="setCustomValidity('');"<?php  } ?>/>
+						</div>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">民族</label>
+                    <div class="col-sm-9">
+						<div class="input-group">
+							<input type="text" name="minzu" class="form-control" value="<?php  echo $item['minzu'];?>" <?php  if(is_showpf()) { ?>  required="required" oninvalid="setCustomValidity('民族不能为空！！！');" oninput="setCustomValidity('');"<?php  } ?>/>
+						</div>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">政治面貌</label>
+                    <div class="col-sm-9">
+						<div class="input-group">
+							<input type="text" name="zzmianmao" class="form-control" value="<?php  echo $item['zzmianmao'];?>" <?php  if(is_showpf()) { ?>  required="required" oninvalid="setCustomValidity('民族不能为空！！！');" oninput="setCustomValidity('');"<?php  } ?>/>
+						</div>
+					</div>
+                </div>
+				<div class="form-group">
+                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">现住址</label>
+                    <div class="col-sm-9">
+						<div class="input-group">
+							<input type="text" name="address" class="form-control" value="<?php  echo $item['address'];?>" />
+						</div>
+					</div>
+                </div>
+				<div class="form-group">
                    <label class="col-xs-12 col-sm-3 col-md-2 control-label">出生日期</label>
                    <div class="col-sm-9">
 					   <div class="input-group">
@@ -319,10 +352,10 @@ $(function(){
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">固定电话</label>
                     <div class="col-sm-9">
-                  <div class="input-group">
-                        <input type="text" name="tel" class="form-control" value="<?php  echo $item['tel'];?>" />
-                      </div>
-                </div>
+						<div class="input-group">
+							<input type="text" name="tel" class="form-control" value="<?php  echo $item['tel'];?>" />
+						</div>
+					</div>
                 </div>            
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">手机号码</label>
@@ -407,7 +440,7 @@ $(function(){
 								<option value="<?php  echo $it['sid'];?>" <?php  if($it['sid'] == $row['xq_id']) { ?> selected="selected"<?php  } ?>><?php  echo $it['sname'];?></option>
 								<?php  } } ?>
 							</select>
-						</div>	
+						</div>	 
 					</div>
 					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">班级</label>
 					<div class="col-sm-2 col-lg-2">
@@ -531,20 +564,348 @@ $(function(){
 				</div>
 				<div class="form-group">
 					 <label class="col-xs-12 col-sm-3 col-md-2 control-label">教学成果</label>
-						<div class="col-sm-9">
-						   <?php  echo tpl_ueditor('info', $item['info']);?>
+					<div class="col-sm-9">
+					   <?php  echo tpl_ueditor('info', $item['info']);?>
 						<div class="help-block">教学成果</div>
-						</div>
+					</div>
 				</div>
 				 <div class="form-group">
 					 <label class="col-xs-12 col-sm-3 col-md-2 control-label">教学经验</label>
-						<div class="col-sm-9">
-						   <?php  echo tpl_ueditor('jinyan', $item['jinyan']);?>
+					<div class="col-sm-9">
+					   <?php  echo tpl_ueditor('jinyan', $item['jinyan']);?>
 						<div class="help-block">教学经验</div>
-						</div>
-				  </div>
+					</div>
 				</div>
-        </div>		
+			</div>
+				
+			<?php  if(is_showpf()) { ?>	
+			<div class="panel panel-info">
+				<div class="panel-heading">
+					详细信息 
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">第一学历</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="first_xl" class="form-control" value="<?php  echo $item['otherinfo']['first_xl'];?>"   required="required" oninvalid="setCustomValidity('第一学历不能为空！！！');" oninput="setCustomValidity('');"/>
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">专业</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="first_zy" class="form-control" value="<?php  echo $item['otherinfo']['first_zy'];?>"   required="required" oninvalid="setCustomValidity('专业不能为空！！！');" oninput="setCustomValidity('');"/>
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">毕业院校</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="first_yx" class="form-control" value="<?php  echo $item['otherinfo']['first_yx'];?>"   required="required" oninvalid="setCustomValidity('毕业院校不能为空！！！');" oninput="setCustomValidity('');"/>
+						</div>	
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">毕业时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('first_bytime', $item['otherinfo']['first_bytime'])?>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">最高学历</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="top_xl" class="form-control" value="<?php  echo $item['otherinfo']['top_xl'];?>"   required="required" oninvalid="setCustomValidity('最高学历不能为空！！！');" oninput="setCustomValidity('');"/>
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">专业</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="top_zy" class="form-control" value="<?php  echo $item['otherinfo']['top_zy'];?>"   required="required" oninvalid="setCustomValidity('专业不能为空！！！');" oninput="setCustomValidity('');"/>
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">毕业院校</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="top_yx" class="form-control" value="<?php  echo $item['otherinfo']['top_yx'];?>"   required="required" oninvalid="setCustomValidity('毕业院校不能为空！！！');" oninput="setCustomValidity('');"/>
+						</div>	
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">毕业时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('top_bytime',$item['otherinfo']['top_bytime'])?>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">主要学习简历</label>
+					<div class="col-sm-9">
+						<?php  echo tpl_ueditor('main_study_jl', $item['otherinfo']['main_study_jl']);?>
+						<div class="help-block">主要学习简历</div>
+					</div>
+				 </div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">参加工作时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('time2work',$item['otherinfo']['time2work'])?>	
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">任教学科</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="tea_subject" class="form-control" value="<?php  echo $item['otherinfo']['tea_subject'];?>" />
+						</div>	
+					</div>   				
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">职称</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zhicheng" class="form-control" value="<?php  echo $item['otherinfo']['zhicheng'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">评审时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('zc_pstime',$item['otherinfo']['zc_pstime'])?>		
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">聘任时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('zc_prtime',$item['otherinfo']['zc_prtime'])?>	
+					</div> 					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">专业技术职务</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zjzhiwu" class="form-control" value="<?php  echo $item['otherinfo']['zjzhiwu'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">评审时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('zjzw_pstime',$item['otherinfo']['zjzw_pstime'])?>	
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">聘任时间</label>
+					<div class="col-sm-2 col-lg-2">
+						<?php  echo tpl_form_field_date('zjzw_prtime',$item['otherinfo']['zjzw_prtime'])?>	
+					</div> 					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">主要工作简历</label>
+					<div class="col-sm-9">
+						<?php  echo tpl_ueditor('main_work_jl', $item['otherinfo']['main_work_jl']);?>
+						<div class="help-block">主要工作简历</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">教师资格种类</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jszg_type" class="form-control" value="<?php  echo $item['otherinfo']['jszg_type'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">证书编号</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jszgzs_num" class="form-control" value="<?php  echo $item['otherinfo']['jszgzs_num'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">普通话等级</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="pth_level" class="form-control" value="<?php  echo $item['otherinfo']['pth_level'];?>" />
+						</div>	
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">证书编号</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="pthzs_num" class="form-control" value="<?php  echo $item['otherinfo']['pthzs_num'];?>" />
+						</div>
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">业绩证书情况</label>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">优质课一：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="yzk1_level" class="form-control" value="<?php  echo $item['otherinfo']['yzk1_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="yzk1_rank" class="form-control" value="<?php  echo $item['otherinfo']['yzk1_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="yzk1_org" class="form-control" value="<?php  echo $item['otherinfo']['yzk1_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">优质课二：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="yzk2_level" class="form-control" value="<?php  echo $item['otherinfo']['yzk2_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="yzk2_rank" class="form-control" value="<?php  echo $item['otherinfo']['yzk2_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="yzk2_org" class="form-control" value="<?php  echo $item['otherinfo']['yzk2_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">综合表彰一：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zhbz1_level" class="form-control" value="<?php  echo $item['otherinfo']['zhbz1_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zhbz1_rank" class="form-control" value="<?php  echo $item['otherinfo']['zhbz1_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="zhbz1_org" class="form-control" value="<?php  echo $item['otherinfo']['zhbz1_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">综合表彰二：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zhbz2_level" class="form-control" value="<?php  echo $item['otherinfo']['zhbz2_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="zhbz2_rank" class="form-control" value="<?php  echo $item['otherinfo']['zhbz2_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="zhbz2_org" class="form-control" value="<?php  echo $item['otherinfo']['zhbz2_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">教科研一：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jky1_level" class="form-control" value="<?php  echo $item['otherinfo']['jky1_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jky1_rank" class="form-control" value="<?php  echo $item['otherinfo']['jky1_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="jky1_org" class="form-control" value="<?php  echo $item['otherinfo']['jky1_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">教科研二：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jky2_level" class="form-control" value="<?php  echo $item['otherinfo']['jky2_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="jky2_rank" class="form-control" value="<?php  echo $item['otherinfo']['jky2_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="jky2_org" class="form-control" value="<?php  echo $item['otherinfo']['jky2_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">其他证书（辅导、论文等）</label>
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">证书一：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="qtzs1_level" class="form-control" value="<?php  echo $item['otherinfo']['qtzs1_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="qtzs1_rank" class="form-control" value="<?php  echo $item['otherinfo']['qtzs1_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="qtzs1_org" class="form-control" value="<?php  echo $item['otherinfo']['qtzs1_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">证书二：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="qtzs2_level" class="form-control" value="<?php  echo $item['otherinfo']['qtzs2_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="qtzs2_rank" class="form-control" value="<?php  echo $item['otherinfo']['qtzs2_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="qtzs2_org" class="form-control" value="<?php  echo $item['otherinfo']['qtzs2_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">证书三：级别</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="qtzs3_level" class="form-control" value="<?php  echo $item['otherinfo']['qtzs3_level'];?>" />
+						</div>
+					</div>
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">等次</label>
+					<div class="col-sm-2 col-lg-2">
+						<div class="input-group">
+							<input type="text" name="qtzs3_rank" class="form-control" value="<?php  echo $item['otherinfo']['qtzs3_rank'];?>" />
+						</div>	
+					</div>   
+					<label class="col-xs-12 col-sm-2 col-md-2 control-label" style="width: 100px;">发证单位</label>
+					<div class="col-sm-2 col-lg-2" style="width:30%">
+						<div class="input-group" style="width:100%">
+							<input type="text" name="qtzs3_org" class="form-control" value="<?php  echo $item['otherinfo']['qtzs3_org'];?>" />
+						</div>	
+					</div>					
+				</div>
+			</div>
+			<?php  } ?>
+        </div>			
         <div class="form-group col-sm-12">
             <input type="submit" name="submit" value="提交" class="btn btn-primary col-lg-1" />
             <input type="hidden" name="token" value="<?php  echo $_W['token'];?>" />
@@ -816,6 +1177,9 @@ $(document).ready(function() {
 	<?php  } ?>
 	<?php  if(!(IsHasQx($tid_global,1000605,1,$schoolid))) { ?>
 		$(".qx_605").hide();
+	<?php  } ?>
+	<?php  if(!(IsHasQx($tid_global,1000608,1,$schoolid))) { ?>
+		$(".qx_608").hide();
 	<?php  } ?>
 	<?php  if(!(IsHasQx($tid_global,1000606,1,$schoolid))) { ?>
 		$(".qx_606").hide();

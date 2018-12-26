@@ -11,6 +11,17 @@
 		load()->func('tpl');
 		$state = uni_permission($_W['uid'], $uniacid);
 		$versionfile = IA_ROOT . '/addons/fm_jiaoyu/inc/func/auth2.php';
+		$access_token = $this->getAccessToken2();
+		$res = ihttp_post('https://api.weixin.qq.com/cgi-bin/template/get_industry?access_token='.$access_token,$postarr='');
+		$content = @json_decode($res['content'],true);
+		if($content['primary_industry']){
+			$first_class = $content['primary_industry']['first_class'];
+			$second_class = $content['primary_industry']['second_class'];
+		}
+		if($content['secondary_industry']){
+			$first_class1 = $content['secondary_industry']['first_class'];
+			$second_class1 = $content['secondary_industry']['second_class'];
+		}
 		require $versionfile;
             $setting = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE weid = :weid", array(':weid' => $weid));
 			$xsqingjia = get_weidset($weid,'xsqingjia');

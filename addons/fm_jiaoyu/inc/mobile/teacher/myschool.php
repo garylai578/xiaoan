@@ -182,6 +182,30 @@
 					    UnsetArrayByKey($iconsF,$i);
 				    }
 			    }
+				if (!(IsHasQx($tid_global,2002001,2,$schoolid))){
+			     	if($iconsF[$i]['do'] == 'tmyscore'){
+					    UnsetArrayByKey($iconsF,$i);
+				    }
+			    }
+				
+				if($iconsF[$i]['do'] == 'tstuapinfo'){
+					UnsetArrayByKey($iconsF,$i);
+				}
+				if (!(IsHasQx($tid_global,2002101,2,$schoolid))){
+			     	if($iconsF[$i]['do'] == 'tscoreall'){
+					    UnsetArrayByKey($iconsF,$i);
+				    }
+			    }
+				if (!(IsHasQx($tid_global,2002201,2,$schoolid)) || !is_showpf()){
+			     	if($iconsF[$i]['do'] == 'tstuscore'){
+					    UnsetArrayByKey($iconsF,$i);
+				    }
+			    }
+				if ( (!(IsHasQx($tid_global,2002501,2,$schoolid)) && !$_W['schooltype']) || $_W['schooltype'] ){
+			     	if($iconsF[$i]['do'] == 'tallcamera'){
+					    UnsetArrayByKey($iconsF,$i);
+				    }
+			    }
 				
 			}
 			

@@ -74,7 +74,19 @@
 			if ($_GPC['type'] ==6) {
 				$type = intval($_GPC['type']);
 				$condition .= " AND type = '{$type}' ";
-			}			
+			}
+			if ($_GPC['type'] ==7) {
+				$type = intval($_GPC['type']);
+				$condition .= " AND type = '{$type}' ";
+			}
+			if ($_GPC['type'] ==8) {
+				$type = intval($_GPC['type']);
+				$condition .= " AND type = '{$type}' ";
+			}
+			if ($_GPC['type'] ==9) {
+				$type = intval($_GPC['type']);
+				$condition .= " AND type = '{$type}' ";
+			}
 			if ($_GPC['paytype'] ==1) {
 				$paytype = intval($_GPC['paytype']);
 				$condition .= " AND paytype = '{$paytype}' ";
@@ -240,6 +252,10 @@
 								$kcname = '报名费';
 							}else if($row['type']==5){
 								$kcname = '考勤卡费';
+							}else if($row['type']==8){
+								$kcname = '余额充值';
+							}else if($row['type']==9){
+								$kcname = '充电桩充次';
 							}else if($row['type']==7){
 								$vod = pdo_fetch("SELECT name FROM " . tablename($this->table_allcamera) . " WHERE id = :id ", array(':id' => $row['vodid']));						
 								$kcname = $vod['name'];
@@ -300,18 +316,18 @@
 								$payweid = pdo_fetch("SELECT name FROM " . tablename('account_wechats') . " where uniacid = :uniacid ", array(':uniacid' => $row['payweid']));
 								$arr[$ii]['payacuont'] = $payweid['name'];
 							}
+							$arr[$ii]['ksnum'] = $row['ksnum'];
 							$ii++;
 				}
 				//echo "<pre>";print_r($arr);exit;
 				if ($_W['isfounder'] || $_W['role'] == 'owner'){
-					$this->exportexcel($arr, array('订单号','项目名','学生','学号','班级','缴费人','手机号','付费时间','金额','支付状态','支付方式','支付类型','收款公众号'), time());
+					$this->exportexcel($arr, array('订单号','项目名','学生','学号','班级','缴费人','手机号','付费时间','金额','支付状态','支付方式','支付类型','收款公众号','包含课时节数'), time());
 				}else{
-					$this->exportexcel($arr, array('订单号','项目名','学生','学号','班级','缴费人','手机号','付费时间','金额','支付状态','支付方式','支付类型'), time());
+					$this->exportexcel($arr, array('订单号','项目名','学生','学号','班级','缴费人','手机号','付费时间','金额','支付状态','支付方式','支付类型','包含课时节数'), time());
 				}
                 exit();
             }
 			////////////////////////////////			
-
         } elseif ($operation == 'tuifei') {
             $id = intval($_GPC['id']);
             if (empty($id)) {
@@ -320,6 +336,22 @@
 			$data = array('status' => 3); 
             pdo_update($this->table_order, $data, array('id' => $id));
             $this->imessage('操作成功！', referer(), 'success');
+        } elseif ($operation == 'print') {
+            $id = intval($_GPC['id']);
+			mload()->model('print');
+			$item = pdo_fetch("SELECT type FROM " . tablename($this->table_order) . " WHERE id = {$id}");
+            if (empty($item)) {
+                $this->imessage('抱歉，本条信息不存在在或是已经被删除！');
+            }
+			$isset = GetPrinterArrByOrderType($item['type'],$schoolid,$id);
+            if (empty($isset['printarr'])) {
+                $this->imessage('抱歉，本类型订单未设置打印规则或未启用打印设备！');
+            }
+			$status = order_print($id, true);
+			if(is_error($status)) {
+				 $this->imessage($status['message']);
+			}
+            $this->imessage('成功发送打印命令！', referer(), 'success');
         } elseif ($operation == 'pay') {
             $id = intval($_GPC['id']);
             if (empty($id)){
@@ -489,12 +521,49 @@
 						} 
 					} 
 				}
+			//余额充值
        		}elseif($temporder['type'] == 8){
 				$sid = $temporder['sid'];
 				$students = pdo_fetch("SELECT chongzhi FROM " . tablename($this->table_students) . " where :id = id", array(':id' =>$sid));
 				$taocan = pdo_fetch("SELECT chongzhi FROM " . tablename($this->table_chongzhi) . " where :id = id", array(':id' =>$temporder['taocanid']));
 				$new = $students['chongzhi'] + $taocan['chongzhi'];
 				pdo_update($this->table_students,array('chongzhi'=>$new),array('id'=>$sid));
+				$data_chongzhilog = array(
+					'schoolid' 	=> $temporder['schoolid'],
+					'weid'	   	=> $temporder['weid'],
+					'sid'	   	=> $sid,
+					'yue_type' 	=> 2,
+					'cost_type' => 1,
+					'cost'	   	=> $taocan['chongzhi'],
+					'costtime' 	=> $temporder['paytime'],
+					'orderid'  	=> $temporder['id'],
+					'on_offline' => 1,
+					'createtime' => time()
+				);
+				pdo_insert($this->table_yuecostlog,$data_chongzhilog);
+				
+				$back =  $this->sendMobileJfjgtz($temporder['id']);
+			//充电桩充值
+			}elseif($temporder['type'] == 9){
+				$sid = $temporder['sid'];
+				$students = pdo_fetch("SELECT chargenum FROM " . tablename($this->table_students) . " where :id = id", array(':id' =>$sid));
+				$new = $students['chargenum'] + $temporder['ksnum'];
+				pdo_update($this->table_students,array('chargenum'=>$new),array('id'=>$sid));
+				$data_chongzhilog = array(
+					'schoolid' 	=> $temporder['schoolid'],
+					'weid'	   	=> $temporder['weid'],
+					'sid'	   	=> $sid,
+					'yue_type' 	=> 3,
+					'cost_type' => 1,
+					'cost'	   	=> $temporder['ksnum'],
+					'costtime' 	=> $temporder['paytime'],
+					'orderid'  	=> $temporder['id'],
+					'on_offline' => 1,
+					'createtime' => time()
+				);
+				pdo_insert($this->table_yuecostlog,$data_chongzhilog);
+			}else{
+				$this->sendMobileJfjgtz($temporder['id']);
 			}
        		
             $this->imessage('操作成功！', referer(), 'success');
@@ -506,7 +575,7 @@
 			$data = array('status' => 1,'paytime' => '','paytype' => 3,'pay_type' => 'no'); 
             pdo_update($this->table_order, $data, array('id' => $id));
     		pdo_delete(core_paylog,array('tid' => $id));
-             $temporder = pdo_fetch("SELECT * FROM " . tablename($this->table_order) . " WHERE weid = '{$weid}' AND schoolid ={$schoolid} And id = {$id}");
+            $temporder = pdo_fetch("SELECT * FROM " . tablename($this->table_order) . " WHERE weid = '{$weid}' AND schoolid ={$schoolid} And id = {$id}");
             $Morder = pdo_fetch("SELECT * FROM " . tablename($this->table_mallorder) . " WHERE weid = '{$weid}' AND schoolid ={$schoolid} And id = {$temporder['morderid']}");
             $Mdata = array('status' => 1);
              if(!empty($Morder))
@@ -589,6 +658,64 @@
 			$data ['msg'] = $message;
 
 			die (json_encode($data));
+        }elseif ($operation == 'getorderpayinfo') {
+			$orderid = $_GPC['orderid'];
+			$order = pdo_fetch("SELECT * FROM " . tablename($this->table_order) . " WHERE id = :id", array(':id' => $orderid));
+			$user = pdo_fetch("SELECT userinfo,pard,tid,sid FROM " . tablename($this->table_user) . " WHERE id = :id ", array(':id' => $order['userid']));
+			$student = pdo_fetch("SELECT s_name,bj_id FROM " . tablename($this->table_students) . " WHERE id = :id ", array(':id' => $user['sid']));
+			$bjinfo = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " WHERE sid = :sid ", array(':sid' => $student['bj_id']));
+			$orderName = '';
+			$this_name = $student['s_name'];
+			$addinfo = $bjinfo['sname'];
+				
+			if($order['type'] == 8){
+				$taocan = pdo_fetch("SELECT chongzhi FROM " . tablename($this->table_chongzhi) . " WHERE id = :id ", array(':id' => $order['taocanid']));
+				$orderName = '余额充值【'.$taocan['chongzhi'].'】元';
+			}elseif($order['type'] == 9){
+				$orderName = '充电桩充次'.$order['ksnum'].'】元';
+			}elseif($order['type'] ==4){
+				$orderName = '报名费';
+			}
+			elseif($order['type'] ==5){
+				$orderName = '考勤卡费';
+			}
+			elseif($order['type'] ==6){
+				$orderName = '商城订单';
+				if(!empty($user['tid']) && empty($user['sid'])){
+					$teacher = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " WHERE id = :id And weid = :weid And schoolid = :schoolid", array(':id' => $user['tid'],':weid' => $weid,':schoolid' => $schoolid));
+					if(!empty($teacher)){
+						$this_name = $teacher['tname'];
+						$addinfo = '教师';
+					}
+				}
+			}
+			elseif($order['type'] ==7){
+				$vod = pdo_fetch("SELECT name FROM " . tablename($this->table_allcamera) . " WHERE id = :id ", array(':id' => $order['vodid']));
+				$orderName = $vod['name'];
+			}elseif($order['type'] ==1){
+				$kc = pdo_fetch("SELECT * FROM " . tablename($this->table_tcourse) . " WHERE id = :id ", array(':id' => $order['kcid']));
+				$orderName = $kc['name'];
+				if ($order['ksnum'] != 0){
+					$orderName .='【含'.$order['ksnum'].'课时】';
+				}
+			}
+			else{
+				$ob = pdo_fetch("SELECT name FROM " . tablename($this->table_cost) . " WHERE id = :id ", array(':id' => $order['costid']));
+				$orderName = $ob['name'];
+			}
+			$result['status'] = true;
+			$result['order'] = $order;
+			$result['ordername'] = $orderName;
+			$result['this_name'] = $this_name.'-'.$addinfo;
+			
+			die(json_encode($result));
+        }elseif ($operation == 'changePay') {
+			$orderid = $_GPC['orderid'];
+			$newcost = $_GPC['newcost'];
+			pdo_update($this->table_order, array('cose'=>$newcost), array('id' => $orderid));
+			$result['status'] = true;
+			$result['msg'] = "修改成功";
+			die(json_encode($result));
         }	
         include $this->template ( 'web/payall' );
 ?>

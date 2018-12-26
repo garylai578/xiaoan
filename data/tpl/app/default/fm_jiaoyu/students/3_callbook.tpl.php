@@ -26,16 +26,8 @@
 </style>
 </head>
 <body>
-<div id="titlebar" class="header mainColor">
-	<div class="l">
-		<a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
-	</div>
-	<div class="m">
-       <span style="font-size: 18px">通讯录</span>   
-	</div>
-</div>
-<div id="ADVtips" class="ADVtips" style="margin-top: 60px">
-    <div class="ADVtips_title">消息设置</div>
+<div id="ADVtips" class="ADVtips">
+    <div class="ADVtips_title"><?php  echo $language['callbook_xxsz'];?></div>
 	<span id="msg_word"><?php  if($it['is_allowmsg'] == 2) { ?>接收聊天信息<?php  } else { ?>不接收聊天信息<?php  } ?>&nbsp;&nbsp;&nbsp;</span>
     <div class="switch  scale03 <?php  if($it['is_allowmsg'] == 2) { ?>switch_off<?php  } else { ?>switch_on<?php  } ?>">
         <div class="switch_push">
@@ -43,7 +35,7 @@
         </div>
     </div>
 </div>
-<i class="runad"></i><span id="info_word">打开上方开关,他人可在通讯录里与你发起聊天,你的联系电话也将显示在此处</span>
+<i class="runad"></i><span id="info_word"><?php  echo $language['callbook_tip'];?></span>
 <div class="new_search_option_box">
     <input type="text" />
     <div class="search_option_btn"><span>搜索</span></div>
@@ -53,12 +45,12 @@
 <div class="contentBg">
 	<input id="wlzyid" type="hidden">
 	<div class="teacher_box" count="11">
-		<div count="<?php  echo $masterCount;?>" name="校长">
+		<div count="<?php  echo $masterCount;?>" name="<?php  echo $language['callbook_xz'];?>">
 			<div class="common_til2">
-				<a href="###" class="joeBoxA" onclick="openShutManager(this,'校长','校长（<?php  echo $masterCount;?>人）','校长（<?php  echo $masterCount;?>人）')">校长（<?php  echo $masterCount;?>人）</a>
+				<a href="###" class="joeBoxA" onclick="openShutManager(this,'<?php  echo $language['callbook_xz'];?>','<?php  echo $language['callbook_xz'];?>（<?php  echo $masterCount;?>人）','<?php  echo $language['callbook_xz'];?>（<?php  echo $masterCount;?>人）')"><?php  echo $language['callbook_xz'];?>（<?php  echo $masterCount;?>人）</a>
 			</div>
 			<div class="common_box1" style="">
-				<div class="main_box2" style="padding:0 0; display:block;"  id="校长">
+				<div class="main_box2" style="padding:0 0; display:block;"  id="<?php  echo $language['callbook_xz'];?>">
 					<ul class="common_list_imgtext2">
 					<?php  if(is_array($master)) { foreach($master as $item) { ?>
 						<li style="padding-left: 70px;">
@@ -86,12 +78,12 @@
 				</div>
 			</div>
 		</div>		
-		<div count="<?php  echo $masterCount1;?>" name="年级管理">
+		<div count="<?php  echo $masterCount1;?>" name="<?php  echo $language['callbook_njgl'];?>">
 			<div class="common_til2">
-				<a href="###" class="joeBoxA" onclick="openShutManager(this,'年级管理','年级管理（<?php  echo $masterCount1;?>人）','年级管理（<?php  echo $masterCount1;?>人）')">年级管理（<?php  echo $masterCount1;?>人）</a>
+				<a href="###" class="joeBoxA" onclick="openShutManager(this,'<?php  echo $language['callbook_njgl'];?>','<?php  echo $language['callbook_njgl'];?>（<?php  echo $masterCount1;?>人）','<?php  echo $language['callbook_njgl'];?>（<?php  echo $masterCount1;?>人）')"><?php  echo $language['callbook_njgl'];?>（<?php  echo $masterCount1;?>人）</a>
 			</div>
 			<div class="common_box1" style="">
-				<div class="main_box2" style="padding:0 0; display:block;"  id="年级管理">
+				<div class="main_box2" style="padding:0 0; display:block;"  id="<?php  echo $language['callbook_njgl'];?>">
 					<ul class="common_list_imgtext2">
 					<?php  if(is_array($master1)) { foreach($master1 as $item) { ?>
 						<li style="padding-left: 70px;">
@@ -121,12 +113,12 @@
 				</div>
 			</div>
 		</div>
-		<div count="<?php  echo $masterCount2;?>" name="我的老师们">
+		<div count="<?php  echo $masterCount2;?>" name="<?php  echo $language['callbook_wdlsm'];?>">
 			<div class="common_til2">
-				<a href="###" class="joeBoxA" onclick="openShutManager(this,'我的老师们','我的老师们（<?php  echo $masterCount2;?>人）','我的老师们（<?php  echo $masterCount2;?>人）')">我的老师们（<?php  echo $masterCount2;?>人）</a>
+				<a href="###" class="joeBoxA" onclick="openShutManager(this,'<?php  echo $language['callbook_wdlsm'];?>','<?php  echo $language['callbook_wdlsm'];?>（<?php  echo $masterCount2;?>人）','<?php  echo $language['callbook_wdlsm'];?>（<?php  echo $masterCount2;?>人）')"><?php  echo $language['callbook_wdlsm'];?>（<?php  echo $masterCount2;?>人）</a>
 			</div>
 			<div class="common_box1" style="">
-				<div class="main_box2" style="padding:0 0; display:none;"  id="我的老师们">
+				<div class="main_box2" style="padding:0 0; display:none;"  id="<?php  echo $language['callbook_wdlsm'];?>">
 					<ul class="common_list_imgtext2">
 					<?php  if(is_array($master2)) { foreach($master2 as $item) { ?>
 						<li style="padding-left: 60px;">
@@ -243,12 +235,6 @@
 </div>
 <div class="top_height_blank50"></div>    
 <script>
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").css("display","none");
-		$(".ADVtips").css("margin-top","");
-	}
-}, 100);
 var PB = new PromptBox();
 $(function () {
 

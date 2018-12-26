@@ -32,7 +32,7 @@
 			$lastids = empty($lastid['id']) ? 1000 :$lastid['id'];
 			if(!empty($id)){
 				$item = pdo_fetch("SELECT * FROM " . tablename($this->table_teachers) . " WHERE id = :id", array(':id' => $id));
-		
+				$item['otherinfo'] = unserialize($item['otherinfo']);
 				$bjlists = get_mylist($schoolid,$item['id'],'teacher',1);
 				//var_dump($bjlists);
 				if(empty($item)){
@@ -72,7 +72,69 @@
 					'jinyan'    => trim($_GPC['jinyan']),
 					'info'      => htmlspecialchars_decode($_GPC['info']),
 					'code'      => $rand,
+					'idcard'    => $_GPC['idcard'],
+					'jiguan'    => $_GPC['jiguan'],
+					'minzu'     => $_GPC['minzu'],
+					'zzmianmao' => $_GPC['zzmianmao'],
+					'address'   => $_GPC['address']
 				);
+				
+				if (is_showpf()){		
+					$otherinfo = array(
+						'first_xl'     	=> $_GPC['first_xl'],
+						'first_zy'     	=> $_GPC['first_zy'],
+						'first_yx'     	=> $_GPC['first_yx'],
+						'first_bytime' 	=> $_GPC['first_bytime'],
+						'top_xl'       	=> $_GPC['top_xl'],
+						'top_zy'       	=> $_GPC['top_zy'],
+						'top_yx'       	=> $_GPC['top_yx'],
+						'top_bytime'   	=> $_GPC['top_bytime'],
+						'main_study_jl' => $_GPC['main_study_jl'],
+						'time2work' 	=> $_GPC['time2work'],
+						'tea_subject' 	=> $_GPC['tea_subject'],
+						'zhicheng' 		=> $_GPC['zhicheng'],
+						'zc_pstime' 	=> $_GPC['zc_pstime'],
+						'zc_prtime' 	=> $_GPC['zc_prtime'],
+						'zjzhiwu' 		=> $_GPC['zjzhiwu'],
+						'zjzw_pstime' 	=> $_GPC['zjzw_pstime'],
+						'zjzw_prtime' 	=> $_GPC['zjzw_prtime'],
+						'main_work_jl' 	=> $_GPC['main_work_jl'],
+						'jszg_type' 	=> $_GPC['jszg_type'],
+						'jszgzs_num'	=> $_GPC['jszgzs_num'],
+						'pth_level' 	=> $_GPC['pth_level'],
+						'pthzs_num' 	=> $_GPC['pthzs_num'],
+						'yzk1_level' 	=> $_GPC['yzk1_level'],
+						'yzk1_rank' 	=> $_GPC['yzk1_rank'],
+						'yzk1_org' 		=> $_GPC['yzk1_org'],
+						'yzk2_level' 	=> $_GPC['yzk2_level'],
+						'yzk2_rank' 	=> $_GPC['yzk2_rank'],
+						'yzk2_org' 		=> $_GPC['yzk2_org'],
+						'zhbz1_level' 	=> $_GPC['zhbz1_level'],
+						'zhbz1_rank' 	=> $_GPC['zhbz1_rank'],
+						'zhbz1_org' 	=> $_GPC['zhbz1_org'],
+						'zhbz2_level' 	=> $_GPC['zhbz2_level'],
+						'zhbz2_rank' 	=> $_GPC['zhbz2_rank'],
+						'zhbz2_org' 	=> $_GPC['zhbz2_org'],
+						'jky1_level' 	=> $_GPC['jky1_level'],
+						'jky1_rank' 	=> $_GPC['jky1_rank'],
+						'jky1_org' 		=> $_GPC['jky1_org'],
+						'jky2_level' 	=> $_GPC['jky2_level'],
+						'jky2_rank' 	=> $_GPC['jky2_rank'],
+						'jky2_org' 		=> $_GPC['jky2_org'],
+						'qtzs1_level' 	=> $_GPC['qtzs1_level'],
+						'qtzs1_rank' 	=> $_GPC['qtzs1_rank'],
+						'qtzs1_org' 	=> $_GPC['qtzs1_org'],
+						'qtzs2_level' 	=> $_GPC['qtzs2_level'],
+						'qtzs2_rank' 	=> $_GPC['qtzs2_rank'],
+						'qtzs2_org' 	=> $_GPC['qtzs2_org'],
+						'qtzs3_level' 	=> $_GPC['qtzs3_level'],
+						'qtzs3_rank' 	=> $_GPC['qtzs3_rank'],
+						'qtzs3_org' 	=> $_GPC['qtzs3_org'],
+					);
+					$otherinfo_temp = serialize($otherinfo);
+					$data['otherinfo'] = $otherinfo_temp;
+				}
+			
 				
 				if(empty($data['tname'])){
 					$this->imessage('请输入教师姓名！', referer(), 'error');
@@ -150,43 +212,43 @@
 				$this->imessage('操作成功', $this->createWebUrl('assess', array('op' => 'display', 'schoolid' => $schoolid)), 'success');
 			}
 		}elseif($operation == 'changebjdata'){
-				$oldbjdata = pdo_fetchall("SELECT * FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' AND schoolid ={$schoolid} ORDER BY id DESC");
-				foreach($oldbjdata as $index => $row){
-					if($row['bj_id1']){
-						$data1 = array(
-							'weid'     => $weid,
-							'schoolid' => $schoolid,
-							'tid'      => $row['id'],
-							'bj_id'    => $row['bj_id1'],
-							'km_id'    => $row['km_id1'],
-							'type'     => 1,
-						);
-						pdo_insert($this->table_class, $data1);
-					}
-					if($row['bj_id2']){
-						$data2 = array(
-							'weid'     => $weid,
-							'schoolid' => $schoolid,
-							'tid'      => $row['id'],
-							'bj_id'    => $row['bj_id2'],
-							'km_id'    => $row['km_id2'],
-							'type'     => 1,
-						);
-						pdo_insert($this->table_class, $data2);						
-					}
-					if($row['bj_id3']){
-						$data2 = array(
-							'weid'     => $weid,
-							'schoolid' => $schoolid,
-							'tid'      => $row['id'],
-							'bj_id'    => $row['bj_id3'],
-							'km_id'    => $row['km_id3'],
-							'type'     => 1,
-						);
-						pdo_insert($this->table_class, $data2);							
-					}					
+			$oldbjdata = pdo_fetchall("SELECT * FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' AND schoolid ={$schoolid} ORDER BY id DESC");
+			foreach($oldbjdata as $index => $row){
+				if($row['bj_id1']){
+					$data1 = array(
+						'weid'     => $weid,
+						'schoolid' => $schoolid,
+						'tid'      => $row['id'],
+						'bj_id'    => $row['bj_id1'],
+						'km_id'    => $row['km_id1'],
+						'type'     => 1,
+					);
+					pdo_insert($this->table_class, $data1);
 				}
-				$this->imessage('操作成功', $this->createWebUrl('assess', array('op' => 'display', 'schoolid' => $schoolid)), 'success');
+				if($row['bj_id2']){
+					$data2 = array(
+						'weid'     => $weid,
+						'schoolid' => $schoolid,
+						'tid'      => $row['id'],
+						'bj_id'    => $row['bj_id2'],
+						'km_id'    => $row['km_id2'],
+						'type'     => 1,
+					);
+					pdo_insert($this->table_class, $data2);						
+				}
+				if($row['bj_id3']){
+					$data2 = array(
+						'weid'     => $weid,
+						'schoolid' => $schoolid,
+						'tid'      => $row['id'],
+						'bj_id'    => $row['bj_id3'],
+						'km_id'    => $row['km_id3'],
+						'type'     => 1,
+					);
+					pdo_insert($this->table_class, $data2);
+				}					
+			}
+			$this->imessage('操作成功', $this->createWebUrl('assess', array('op' => 'display', 'schoolid' => $schoolid)), 'success');
 		}elseif($operation == 'display'){
 			if (!(IsHasQx($tid_global,1000601,1,$schoolid))){
 				$this->imessage('非法访问，您无权操作该页面','','error');	
@@ -252,6 +314,70 @@
 				$this->exportexcel($arr, array('教师','绑定码','手机'), '教师绑定码');
                 exit();
 			}
+			
+			///////////////////导出教师信息////////////////////////////////
+			if($_GPC['out_putTeaInfo'] == 'out_putTeaInfo'){
+				$listss = pdo_fetchall("SELECT * FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ORDER BY id DESC");
+				$ii   = 0;
+				foreach($listss as $index => $row){
+					$arr[$ii]['tname'] = $row['tname'];
+					if($row['sex'] == 1){
+						$arr[$ii]['sex'] = '男';
+					}elseif($row['sex'] == 0 ){
+						$arr[$ii]['sex'] = '女';
+					}
+					$arr[$ii]['birthdate'] = date("Y-m-d",$row['birthdate']);
+					$arr[$ii]['idcard'] = $row['idcard'];
+					$arr[$ii]['jiguan'] = $row['jiguan'];
+					$arr[$ii]['minzu'] = $row['minzu'];
+					$arr[$ii]['zzmianmao'] = $row['zzmianmao'];
+					$arr[$ii]['address'] = $row['address'];
+					$arr[$ii]['email'] = $row['email'];
+					$arr[$ii]['mobile'] = $row['mobile'];
+					$this_otherinfo = unserialize($row['otherinfo']);
+					//第一学历
+					
+					$arr[$ii]['firstxl'] = "【学历】".($this_otherinfo['first_xl']?$this_otherinfo['first_xl']:"未填写")."【专业】".($this_otherinfo['first_zy']?$this_otherinfo['first_zy']:"未填写")."【毕业院校】".($this_otherinfo['first_yx']?$this_otherinfo['first_yx']:"未填写")."【毕业时间】".($this_otherinfo['first_bytime'] != '1970-01-01' && !empty($this_otherinfo['first_bytime']) ? $this_otherinfo['first_bytime']:"未填写");
+					//最高学历
+					$arr[$ii]['topxl'] = "【学历】".($this_otherinfo['top_xl']?$this_otherinfo['top_xl']:"未填写")."【专业】".($this_otherinfo['top_zy']?$this_otherinfo['top_zy']:"未填写")."【毕业院校】".($this_otherinfo['top_yx']?$this_otherinfo['top_yx']:"未填写")."【毕业时间】".($this_otherinfo['top_bytime'] != '1970-01-01' && !empty($this_otherinfo['top_bytime']) ? $this_otherinfo['top_bytime']:"未填写");
+					//主要学习简历
+					$arr[$ii]['main_study_jl'] =  strip_tags(htmlspecialchars_decode($this_otherinfo['main_study_jl']));
+					//参加工作
+					$arr[$ii]['time2work'] = "【参加工作时间】".($this_otherinfo['time2work'] != '1970-01-01' && !empty($this_otherinfo['time2work']) ? $this_otherinfo['time2work']:"未填写")."【任教学科】".($this_otherinfo['tea_subject']?$this_otherinfo['tea_subject']:"未填写");
+					//职称
+					$arr[$ii]['zhicheng'] = "【职称】".($this_otherinfo['zhicheng']?$this_otherinfo['zhicheng']:"未填写")."【评审时间】".($this_otherinfo['zc_pstime'] != '1970-01-01' && !empty($this_otherinfo['zc_pstime']) ? $this_otherinfo['zc_pstime']:"未填写")."【聘任时间】".($this_otherinfo['zc_prtime'] != '1970-01-01' && !empty($this_otherinfo['zc_prtime']) ? $this_otherinfo['zc_prtime']:"未填写");
+					//专业技术职务
+					$arr[$ii]['zjzhiwu'] = "【职务】".($this_otherinfo['zjzhiwu']?$this_otherinfo['zjzhiwu']:"未填写")."【评审时间】".($this_otherinfo['zjzw_pstime'] != '1970-01-01' && !empty($this_otherinfo['zjzw_pstime']) ? $this_otherinfo['zjzw_pstime']:"未填写")."【聘任时间】".($this_otherinfo['zjzw_prtime'] != '1970-01-01' && !empty($this_otherinfo['zjzw_prtime']) ? $this_otherinfo['zjzw_prtime']:"未填写");
+					//主要工作简历
+					$arr[$ii]['main_work_jl'] =  strip_tags(htmlspecialchars_decode($this_otherinfo['main_work_jl']));
+					//教师资格证
+					$arr[$ii]['jszgz'] = "【资格证类型】".($this_otherinfo['jszg_type']?$this_otherinfo['jszg_type']:"未填写")."【证书编号】".($this_otherinfo['jszgzs_num'] ? $this_otherinfo['jszgzs_num']:"未填写");
+					//普通话证
+					$arr[$ii]['pth'] = "【级别】".($this_otherinfo['pth_level']?$this_otherinfo['pth_level']:"未填写")."【证书编号】".($this_otherinfo['pthzs_num'] ? $this_otherinfo['pthzs_num']:"未填写");
+					//优质课一
+					$arr[$ii]['yzk1'] = "【级别】".($this_otherinfo['yzk1_level']?$this_otherinfo['yzk1_level']:"未填写")."【等次】".($this_otherinfo['yzk1_rank'] ? $this_otherinfo['yzk1_rank']:"未填写")."【发证单位】".($this_otherinfo['yzk1_org'] ? $this_otherinfo['yzk1_org']:"未填写");
+					//优质课二
+					$arr[$ii]['yzk2'] = "【级别】".($this_otherinfo['yzk2_level']?$this_otherinfo['yzk2_level']:"未填写")."【等次】".($this_otherinfo['yzk2_rank'] ? $this_otherinfo['yzk2_rank']:"未填写")."【发证单位】".($this_otherinfo['yzk2_org'] ? $this_otherinfo['yzk2_org']:"未填写");
+					//综合表彰一
+					$arr[$ii]['zhbz1'] = "【级别】".($this_otherinfo['zhbz1_level']?$this_otherinfo['zhbz1_level']:"未填写")."【等次】".($this_otherinfo['zhbz1_rank'] ? $this_otherinfo['zhbz1_rank']:"未填写")."【发证单位】".($this_otherinfo['zhbz1_org'] ? $this_otherinfo['zhbz1_org']:"未填写");
+					//综合表彰二
+					$arr[$ii]['zhbz2'] = "【级别】".($this_otherinfo['zhbz2_level']?$this_otherinfo['zhbz2_level']:"未填写")."【等次】".($this_otherinfo['zhbz2_rank'] ? $this_otherinfo['zhbz2_rank']:"未填写")."【发证单位】".($this_otherinfo['zhbz2_org'] ? $this_otherinfo['zhbz2_org']:"未填写");
+					//教科研一
+					$arr[$ii]['jky1'] = "【级别】".($this_otherinfo['jky1_level']?$this_otherinfo['jky1_level']:"未填写")."【等次】".($this_otherinfo['jky1_rank'] ? $this_otherinfo['jky1_rank']:"未填写")."【发证单位】".($this_otherinfo['jky1_org'] ? $this_otherinfo['jky1_org']:"未填写");
+					//教科研二
+					$arr[$ii]['jky2'] = "【级别】".($this_otherinfo['jky2_level']?$this_otherinfo['jky2_level']:"未填写")."【等次】".($this_otherinfo['jky2_rank'] ? $this_otherinfo['jky2_rank']:"未填写")."【发证单位】".($this_otherinfo['jky2_org'] ? $this_otherinfo['jky2_org']:"未填写");
+					//证书一
+					$arr[$ii]['qtzs1'] = "【级别】".($this_otherinfo['qtzs1_level']?$this_otherinfo['qtzs1_level']:"未填写")."【等次】".($this_otherinfo['qtzs1_rank'] ? $this_otherinfo['qtzs1_rank']:"未填写")."【发证单位】".($this_otherinfo['qtzs1_org'] ? $this_otherinfo['qtzs1_org']:"未填写");
+					//证书二
+					$arr[$ii]['qtzs2'] = "【级别】".($this_otherinfo['qtzs2_level']?$this_otherinfo['qtzs2_level']:"未填写")."【等次】".($this_otherinfo['qtzs2_rank'] ? $this_otherinfo['qtzs2_rank']:"未填写")."【发证单位】".($this_otherinfo['qtzs2_org'] ? $this_otherinfo['qtzs2_org']:"未填写");
+					//证书三
+					$arr[$ii]['qtzs3'] = "【级别】".($this_otherinfo['qtzs3_level']?$this_otherinfo['qtzs3_level']:"未填写")."【等次】".($this_otherinfo['qtzs3_rank'] ? $this_otherinfo['qtzs3_rank']:"未填写")."【发证单位】".($this_otherinfo['qtzs3_org'] ? $this_otherinfo['qtzs3_org']:"未填写");
+					$ii++;
+				}
+				$this->exportexcel($arr, array('教师','性别','出生年月日','身份证号码','籍贯','民族','政治面貌','现住址','邮箱','手机','第一学历','最高学历','主要学习简历','参加工作时间','职称','专业技术职务','主要工作简历','教师资格证','普通话证','优质课一','优质课二','综合表彰一','综合表彰二','教科研一','教科研二','其他证书一','其他证书二','其他证书三'), '教师详细信息');
+                exit();
+			}
+			
 			////////////////////////////////
 			$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' AND schoolid ={$schoolid} $condition ORDER BY status DESC, sort DESC, id DESC LIMIT " . ($pindex - 1) * $psize . ',' . $psize);
 			foreach($list as $key => $value){

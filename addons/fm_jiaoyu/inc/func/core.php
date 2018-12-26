@@ -85,13 +85,25 @@ class Core extends WeModuleSite {
 	public $table_checkdateset = 'wx_school_checkdateset';
 	public $table_checkdatedetail = 'wx_school_checkdatedetail';
 	public $table_checktimeset = 'wx_school_checktimeset';
+	public $table_apartment = 'wx_school_apartment';
+	public $table_aproom = 'wx_school_aproom';
+	public $table_booksborrow = 'wx_school_booksborrow';
 	public $table_help = 'wx_school_helps';
+	public $table_printer = 'wx_school_printer';
+	public $table_print_log = 'wx_school_print_log';
+	public $table_printset = 'wx_school_printset';
+	public $table_teascore = 'wx_school_teascore';
+	public $table_lanset = 'wx_school_language';
+	public $table_buzhulog = 'wx_school_buzhulog';
+	public $table_yuecostlog = 'wx_school_yuecostlog';
+	public $table_upsence = 'wx_school_upsence';
+	public $table_teasencefiles = 'wx_school_teasencefiles';
     public function getNaveMenu($schoolid, $action)
     {
         global $_W, $_GPC;
         $do = $_GPC['do'];
         $navemenu = array();
-		$school = pdo_fetch("SELECT is_cost,is_recordmac,is_rest,shoucename,is_video,videoname,is_kb,mallsetinfo,issale,is_chongzhi,is_qx FROM " . tablename($this->table_index) . " WHERE :id = id", array(':id' => $schoolid));
+		$school = pdo_fetch("SELECT is_cost,is_recordmac,is_rest,shoucename,is_video,videoname,is_kb,mallsetinfo,issale,is_chongzhi,is_qx,is_printer FROM " . tablename($this->table_index) . " WHERE :id = id", array(':id' => $schoolid));
 		$mallsetinfo = unserialize($school['mallsetinfo']);
 		if(!empty($_W['tid']) && $_W['tid'] != 0 ){
 			$tid = $_W['tid'];
@@ -183,6 +195,16 @@ class Core extends WeModuleSite {
 					),
 				);
 			}
+			if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'100310')    ){
+				$navemenu[$tag]['items'][] = array(
+					'title' => '教师评分',
+					'url' => $do != 'teascore' ? $this->createWebUrl('teascore', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
+					'active' => $action == 'teascore' ? ' active' : '',
+					'append' => array(
+						'title' => '<i style="color:#7228b5;" class="fa fa-pencil"></i>',
+					),
+				);
+			}
 			if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'100070')    ){
 				$navemenu[$tag]['items'][] =  array(
 					'title' => '学生管理',
@@ -193,6 +215,20 @@ class Core extends WeModuleSite {
 					),
 				);
 			}
+			if (is_showpf()){
+				if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'100330')    ){
+					$navemenu[$tag]['items'][] =  array(
+						'title' => '学生评分',
+						'url' => $do != 'studentscore' ? $this->createWebUrl('studentscore', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
+						'active' => $action == 'studentscore' ? ' active' : '',
+						'append' => array(
+							'title' => '<i style="color:#7228b5;" class="fa fa-pencil-square-o"></i>',
+						),
+					);
+				}
+			}
+			
+			
 			if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'100080')    ){
 				$navemenu[$tag]['items'][] =  array(
 				'title' => '成绩管理', 
@@ -205,7 +241,7 @@ class Core extends WeModuleSite {
 			}
 			if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'10009')    ){
 				if( strstr($qxarr,'1000901') || strstr($qxarr,'1000921') || strstr($qxarr,'1000941') || (is_showgkk() && strstr($qxarr,'1000951')) || $_W['isfounder'] || $_W['role'] == 'owner' ){
-					$navemenu[$tag]['items'][3] = array(
+					$navemenu[$tag]['items'][] = array(
 						'title' => '课程管理', 'url' => $do != 'kecheng' ? $this->createWebUrl('kecheng', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
 						'active' => $action == 'kecheng' ? ' active' : '',
 						'append' => array(
@@ -365,6 +401,18 @@ class Core extends WeModuleSite {
 					);
 				}	
 			}
+			if (($school['is_cost'] != 2 && strstr($qxarr,'10030') ) || $_W['isfounder'] || $_W['role'] == 'owner'    ) {
+				if($school['is_printer'] == 1){
+		        	$navemenu[$tag]['items'][] = array(				
+						'title' => '小票打印', 
+						'url' => $do != 'printlog' ? $this->createWebUrl('printlog', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
+	                    'active' => $action == 'printlog' ? ' active' : '',
+	                    'append' => array(
+	                        'title' => '<i style="color:#cc6b08;" class="fa fa-print"></i>',
+	                    ),							
+					);
+				}	
+			}
 			$tag++;
 	    }
 		if($_W['isfounder'] || $_W['role'] == 'owner' || ($school['is_recordmac'] != 2 && (strstr($qxarr,'100230') || strstr($qxarr,'100240') || strstr($qxarr,'100250'))) ){
@@ -372,7 +420,7 @@ class Core extends WeModuleSite {
                 'title' => '<icon style="color:#077ccc;" class="fa fa-credit-card"></icon>  考勤管理',
                 'this' => 'no5'	
             );
-			    	if ( ($school['is_recordmac'] != 2 && strstr($qxarr,'100290') ) || $_W['isfounder'] || $_W['role'] == 'owner'    ) {
+			if ( ($school['is_recordmac'] != 2 && strstr($qxarr,'100290') ) || $_W['isfounder'] || $_W['role'] == 'owner'    ) {
 	        	$navemenu[$tag]['items'][] = array(				
 					'title' => '时间设置', 
 					'url' => $do != 'checkdateset' ? $this->createWebUrl('checkdateset', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
@@ -455,14 +503,18 @@ class Core extends WeModuleSite {
         return $navemenu;
     }
 
-	public function sendtempmsg($template_id, $url, $data, $topcolor, $tousers = '') {
-		$access_token = $this->getAccessToken2();
-		if(empty($access_token)) {
-			return;
+	public function sendtempmsg($template_id, $url, $data, $topcolor, $tousers = '',$weid= '') {
+		if($weid == ''){
+			$access_token = $this->getAccessToken2();
+			if(empty($access_token)) {
+				return;
+			}
+		}else{
+			$access_token = $this->getAccessToken3($weid);
 		}
 		$postarr = '{"touser":"'.$tousers.'","template_id":"'.$template_id.'","url":"'.$url.'","topcolor":"'.$topcolor.'","data":'.$data.'}';
 		$res = ihttp_post('https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$access_token,$postarr);
-		return true;
+		return $res;
 	}
 
 	public function sendMobileBmshtz($signup_id, $schoolid, $weid, $tid, $s_name) { //报名审核提醒老师
@@ -735,13 +787,17 @@ class Core extends WeModuleSite {
 		}
 	}
 	
-	public function sendMobileBjqshtz($schoolid, $weid, $shername, $bj_id) { //班级圈审核提醒老师
+	public function sendMobileBjqshtz($schoolid, $weid, $shername, $bj_id,$tid) { //班级圈审核提醒老师
 		global $_GPC,$_W;
 		$smsset = get_weidset($weid,'bjqshtz');	
 		$sms_set = get_school_sms_set($schoolid);
 		if($sms_set['bjqshtz'] == 1 || !empty($smsset['bjqshtz'])){
 			$bzj = pdo_fetch("SELECT tid FROM " . tablename($this->table_classify) . " where weid = :weid And schoolid = :schoolid And sid = :sid", array(':weid' => $weid, ':schoolid' => $schoolid, ':sid' => $bj_id));
-			$teachers = pdo_fetch("SELECT tname,openid,mobile FROM " . tablename($this->table_teachers) . " where id = :id ", array(':id' => $bzj['tid']));
+			if($tid){
+				$teachers = pdo_fetch("SELECT tname,openid,mobile FROM " . tablename($this->table_teachers) . " where id = :id ", array(':id' => $tid));
+			}else{
+				$teachers = pdo_fetch("SELECT tname,openid,mobile FROM " . tablename($this->table_teachers) . " where id = :id ", array(':id' => $bzj['tid']));
+			}
 			$leibie = "班级圈内容审核";
 			$zhuangtai = "未审核";
 			$ttime = date('Y-m-d H:i:s', TIMESTAMP);
@@ -839,7 +895,7 @@ class Core extends WeModuleSite {
 		}
 		$this->imessage('发送成功！', $this -> createWebUrl('notice', array('op' => 'display5','schoolid' => $schoolid,'notice_id' => $notice_id)));
 	}
-	public function sendMobileZytzToUserArr($schoolid,$schooltype, $weid, $tname, $arr, $noticearr, $usertaype, $pindex='1', $psize='20'){ //向指定用户发送班级通知
+	public function sendMobileZytzToUserArr($schoolid,$schooltype, $weid, $tname, $arr, $noticearr, $usertaype, $pindex='1', $psize='20'){ //向指定用户发送作业通知
 		global $_GPC,$_W;
 		$smsset = get_weidset($weid,'zuoye');	
 		$sms_set = get_school_sms_set($schoolid);
@@ -897,7 +953,7 @@ class Core extends WeModuleSite {
 							':openid'=>$openid,
 							':sid'=>$values['sid'],
 							':userid'=>$values['id'],
-							':type'=>1
+							':type'=>2
 						));
 						$datas=array(
 							'name'=>array('value'=>$_W['account']['name'],'color'=>'#173177'),
@@ -917,7 +973,7 @@ class Core extends WeModuleSite {
 									'sid' => $values['sid'],
 									'userid' => $values['id'],
 									'openid' => $openid,
-									'type' => 1,
+									'type' => 2,
 									'createtime' => $notice['createtime']
 								);
 								pdo_insert($this->table_record, $date);
@@ -2081,10 +2137,9 @@ class Core extends WeModuleSite {
 							$guanxi = "家长";
 						}
 						$ttime = date('Y-m-d H:i:s', $notice['createtime']);
-						$ttimes = date('m月d日 H:i', TIMESTAMP);
 						$content = array(
 							'name' => "(".$student['s_name'].")".$guanxi,
-							'time' => $ttimes,
+							'time' => $ttime,
 						);								
 						$title = "【{$student['s_name']}】{$guanxi}，您收到一条学校通知";
 						$schoolname ="{$school['title']}";
@@ -2194,10 +2249,9 @@ class Core extends WeModuleSite {
 							}
 							if(isallow_sendsms($schoolid,'xxtongzhi')){
 								if($teacher['mobile']){
-									$ttimes = date('m月d日 H:i', TIMESTAMP);
 									$content = array(
 										'name' => $teacher['tname']."老师",
-										'time' => $ttimes,
+										'time' => $ttime,
 									);
 									mload()->model('sms');
 									sms_send($teacher['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'xxtongzhi', $weid, $schoolid);
@@ -2281,10 +2335,9 @@ class Core extends WeModuleSite {
 								}
 								if(isallow_sendsms($schoolid,'xxtongzhi')){
 									if($value['mobile']){
-										$ttimes = date('m月d日 H:i', TIMESTAMP);
 										$content = array(
 											'name' => $value['tname']."老师",
-											'time' => $ttimes,
+											'time' => $ttime,
 										);
 										mload()->model('sms');
 										sms_send($value['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'xxtongzhi', $weid, $schoolid);
@@ -2324,10 +2377,9 @@ class Core extends WeModuleSite {
 								$title = "【{$teacher['tname']}】老师，您收到一条学校通知";
 								$ttime = date('Y-m-d H:i:s', $notice['createtime']);
 								$mobile = $teacher['mobile'];
-								$ttimes = date('m月d日 H:i', TIMESTAMP);
 								$content = array(
 									'name' => $teacher['tname'],
-									'time' => $ttimes,
+									'time' => $ttime,
 								);
 								$url =  $_W['siteroot'] .'app/'.$this->createMobileUrl('mnotice', array('schoolid' => $schoolid,'id' => $notice_id,'record_id' => $record_id));		
 							}
@@ -2435,10 +2487,9 @@ class Core extends WeModuleSite {
 									$guanxi = "家长";
 								}
 								$ttime = date('Y-m-d H:i:s', $notice['createtime']);
-								$ttimes = date('m月d日 H:i', TIMESTAMP);
 								$content = array(
 									'name' => "(".$value['s_name'].")".$guanxi,
-									'time' => $ttimes,
+									'time' => $ttime,
 								);								
 								$title = "【{$value['s_name']}】{$guanxi}，您收到一条学校通知";
 								$schoolname ="{$school['title']}";
@@ -3127,6 +3178,77 @@ class Core extends WeModuleSite {
 		}
 	}
 	
+	public function sendMobileJxlxtz_yl($schoolid, $weid, $sid, $id,$macid) { //学生进校离校通知 养老院
+		global $_GPC,$_W;
+		$smsset  = get_weidset($weid,'jxlxtx');	
+		$sms_set = get_school_sms_set($schoolid);
+		$schoool = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where id = :id ", array(':id' => $schoolid));
+		if($macid != 'wechatSign'){
+			$ckmac   = pdo_fetch("SELECT * FROM " . tablename($this->table_checkmac) . " WHERE macid = '{$macid}' And weid = '{$weid}' And schoolid = '{$schoolid}' ");
+			$macName = $ckmac['name'];
+		}else{
+			$macName = '代签';
+		}
+		
+		if($sms_set['jxlxtx'] == 1 || !empty($smsset['jxlxtx'])) {
+			$student = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where id = :id ", array(':id' => $sid));
+			$log = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " where id = :id ", array(':id' => $id));
+			$userinfo = pdo_fetchall("SELECT id,userinfo FROM ".tablename($this->table_user)." where weid = :weid And schoolid = :schoolid And sid = :sid",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':sid'=>$sid));
+			foreach ($userinfo as $key => $value) {
+				$openid = pdo_fetch("select id,openid from ".tablename($this->table_user)." where id = '{$value['id']}' ");
+				$s_name = $student['s_name'];
+			
+				$fans_info		 = mc_fansinfo($openid['openid']);
+				$member_nickname = $fans_info['nickname'];
+				$check_time		 = date("H:i",time());
+				$check_date		 = date("Y-m-d",time());
+				if($check_time >= '04:00' && $check_time <= '06:40'){
+					$status_word = "晨练健身，寅时阳气生，卯时主生发";
+				}
+				if($check_time > '06:40' && $check_time <= '07:40'){
+					$status_word = "进早膳，早晨吃得像皇帝";
+				}
+				if($check_time > '07:40' && $check_time <= '11:00'){
+					$status_word = "上午休闲娱乐，遛弯顺便刷个卡";
+				}
+				if($check_time > '11:00' && $check_time <= '12:30'){
+					$status_word = "进午膳啦，午餐吃得像平民";
+				}
+				if($check_time > '13:30' && $check_time <= '16:30'){
+					$status_word = "下午休闲娱乐";
+				}
+				if($check_time > '16:30' && $check_time <= '18:00'){
+					$status_word = "进晚膳，晚膳吃得像乞丐，才能长寿哦";
+				}
+				
+				if($check_time > '18:00' && $check_time <= '22:00'){
+					$status_word = "晚上散步溜";
+				}
+					
+					
+				$title = "【{$member_nickname}】\r\n您好,这是一条来自【{$schoool['title']}】的充满生命活力打卡通知。";
+				$body  = "亲友【{$s_name}】在 {$check_time} 打卡，这个时间是【{$status_word}】\r\n打卡成功，点击详情查看照片哦 ";
+				$ttime = date('Y-m-d H:i:s', $log['createtime']);
+				$time = date('Y-m-d', $log['createtime']);
+				$datas=array(
+					'name'		=>array('value'=>$_W['account']['name'],'color'=>'#173177'),
+					'first'		=>array('value'=>$title,'color'=>'#FF9E05'),
+					'keyword1'	=>array('value'=>$macName,'color'=>'#1587CD'),
+					'keyword2'	=>array('value'=>$check_date,'color'=>'#2D6A90'),
+					'keyword3'	=>array('value'=>$check_time,'color'=>'#2D6A90'),
+					'keyword4'	=>array('value'=>$s_name,'color'=>'#1587CD'),
+					'keyword5'	=>array('value'=>$schoool['title'],'color'=>'#1587CD'),
+					'remark'	=> array('value'=>$body,'color'=>'#FF9E05')
+				); 
+				$data = json_encode($datas); //发送的消息模板数据
+				$url =  $_W['siteroot'] .'app/'.$this->createMobileUrl('checklogdetail', array('schoolid' => $schoolid,'userid' => $openid['id'],'time' => $time,'logid' => $id));
+				if(!empty($smsset['jxlxtx'])){
+					$this->sendtempmsg($smsset['jxlxtx'], $url, $data, '#FF0000', $openid['openid']);
+				}
+			}
+		}
+	}
+	
     public function pushMess($pdata){
         $path = dirname(__FILE__);
         require_once( $path . '/Jpush.php');
@@ -3461,6 +3583,95 @@ class Core extends WeModuleSite {
 		}
 	}	
 
+	
+	
+	
+	public function sendMobileOfflinexf($sid,$cost,$macid,$paytime,$schoolid,$weid,$mac_type){ //线下消费通知
+		global $_W;
+		$weid = $weid;
+		$schoolid = $schoolid;		
+		$smsset = get_weidset($weid,'jfjgtz');	
+		$sms_set = get_school_sms_set($schoolid);
+		if($sms_set['jfjgtz'] == 1 || !empty($smsset['jfjgtz'])) {
+			$student = pdo_fetch("SELECT s_name,chongzhi FROM " . tablename($this->table_students) . " where id = :id ", array(':id' => $sid));
+			$nowtime = time();
+			$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where weid ='{$weid}' and id='{$schoolid}' ");	
+			if($school['is_buzhu']){
+				$student_buzhu = pdo_fetch("SELECT now_yue FROM " . tablename($this->table_buzhulog) . " where weid ='{$weid}' AND sid = '{$sid}' and starttime <= '{$nowtime}' and endtime >= '{$nowtime}' ");		
+			}else{
+				$student_buzhu['now_yue'] = 0 ;
+				
+			}			
+		
+
+			$userinfo = pdo_fetchall("SELECT id,pard,openid,userinfo FROM ".tablename($this->table_user)." where schoolid = :schoolid And sid = :sid",array(':schoolid'=>$schoolid, ':sid'=>$sid));	
+			foreach ($userinfo as $key => $value) {
+				$openid = pdo_fetch("select openid from ".tablename($this->table_user)." where id = '{$value['id']}' ");
+				$s_name = $student['s_name'];
+				$pard = $value['pard'];
+				if($pard == 2){
+					$jsr  = "妈妈";
+				}
+				if($pard == 3){
+					$jsr  = "爸爸";
+				}
+				if($pard == 4){
+					$jsr  = "";
+				}
+				if($pard == 5){
+					$jsr  = "家长";
+				}
+		
+				
+				$time = date('Y-m-d H:i:s', $paytime);
+				
+				
+				$restyue = $student['chongzhi'];
+				if($mac_type == 1){
+					$ob = $macid."#消费机";
+					$title = "【{$s_name}】{$jsr},您收到一条学生消费通知";
+					$ty = "扣除余额 ￥".$cost.' ，剩余 ￥'.$restyue;
+				}elseif($mac_type == 2){
+					$ckmac = pdo_fetch("SELECT * FROM " . tablename($this->table_checkmac) . " WHERE macid = '{$macid}' And schoolid = '{$schoolid}' ");
+					$ob = $ckmac['name'];
+					$title = "【{$s_name}】{$jsr},您收到一条学生充电桩使用通知";
+					$ty = "扣除次数 一次，剩余 ".$student['chargenum']."次";
+				}
+				$body  = "点击查看详情";
+				$datas=array(
+					'name'=>array('value'=>$_W['account']['name'],'color'=>'#173177'),
+					'first'=>array('value'=>$title,'color'=>'#FF9E05'),
+					'keyword1'=>array('value'=>$s_name,'color'=>'#1587CD'),
+					'keyword2'=>array('value'=>$time,'color'=>'#2D6A90'),
+					'keyword3'=>array('value'=>$ob,'color'=>'#1587CD'),
+					'keyword4'=> array('value'=>$ty,'color'=>'#FF9E05'),
+					'remark'=> array('value'=>$body,'color'=>'#FF9E05')
+				);		
+				$data = json_encode($datas); //发送的消息模板数据
+				$url =  $_W['siteroot'] .'app/'.$this->createMobileUrl('user', array('schoolid' => $schoolid,'userid' => $value['id']));
+				if(isallow_sendsms($schoolid,'jfjgtz')){
+					$mobile = unserialize($value['userinfo']);
+					if($mobile['mobile']){
+						$ttimes = date('m月d日 H:i', TIMESTAMP);
+						$content = array(
+							'name' => $student['s_name'],
+							'time' => $ttimes,
+							'type' => $ty,
+						);
+						mload()->model('sms');
+						sms_send($mobile['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'jfjgtz', $weid, $schoolid);
+					}
+				}				
+				if(!empty($smsset['jfjgtz'])){
+					$this->sendtempmsg($smsset['jfjgtz'], $url, $data, '#FF0000', $openid['openid']);
+				}	
+			}
+		}
+	}
+	
+	
+	
+	
 	public function sendMobileTxkcpj($kcid, $schoolid, $weid) { //提醒评价课程通知
 		global $_GPC,$_W;
 		$smsset = get_weidset($weid,'xxtongzhi');	

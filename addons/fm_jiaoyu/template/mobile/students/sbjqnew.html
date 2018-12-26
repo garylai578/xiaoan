@@ -14,16 +14,19 @@
 <body>
 {php include $this->template('bjqcss');}
 <header class="header">
-    <div class="headerContent">{$students['s_name']}的班级圈</div>
+    <div class="headerContent">{if $school['bjqstyle'] =='new'}{$students['s_name']}{$language['sbjq_title']}{else}校园动态{/if}</div>
+    {if $school['bjqstyle'] =='new'}
     <div class="hederRightBox">
         <a class="choice_baby">
             <img src="{OSSURL}public/mobile/img/selectMean.png" class="img-responsive">
         </a>
     </div>
+	{/if}
 </header>
+{if $school['bjqstyle'] =='new'}
 <div class="slide_left_menu_bg">
     <div class="slide_left_menu">
-        <div class="slide_left_menu_til">绑定列表</div>
+        <div class="slide_left_menu_til">{$language['sbjq_bdlb']}</div>
         <ul class="slide_left_menu_ul">
 		{loop $user $row}
 			<li {if $it['id'] == $row['id']}class="act"{/if} userid="{$row['id']}" schoolid="{$row['schoolid']}">
@@ -33,6 +36,7 @@
         </ul>
     </div>
 </div>
+{/if}
 <div id="container" class="scroller" >
 <div style="top:100px;height:100px; line-height:160px;text-align:center; width:100%;">
 	<span id="gif"><img style="width:25px;" src="{OSSURL}public/mobile/img/gh_xh_wating.gif"/>&nbsp;努力加载中...</span>
@@ -55,9 +59,10 @@
 	</div>
 
 </div>
+{if $school['bjqstyle'] =='new'}
 {if $bjset['is_bjzx'] ==1}
 <div class="myCrowns">
-	<p>班级之星</p>
+	<p>{$language['sbjq_bjstar']}</p>
 	<div class="_myCrowns">
 		<div class="crowns">
 			<div class="mydiv">
@@ -99,6 +104,7 @@
 </div>
 {else}
 <div class="top_height_blank50"></div>
+{/if}
 {/if}
 <!--
 <a class="new_info_tips3">
@@ -178,7 +184,6 @@
 				{loop $item['zname'] $row1}
 					<span style="color:#2B779C;" class="praiseContent" user_id="{$row1['uid']}">{$row1['zname']}</span> 
 				{/loop}
-				
             </div>
 			{else}
             <div class="praiseBox"></div>			
@@ -205,7 +210,7 @@
 </ul>
 {/if}
 </div>
-<a href="{php echo $this->createMobileUrl('sbjqfabu', array('schoolid' => $schoolid), true)}" class="F_div" style="z-index: 2;right: 20px; margin-bottom: 90px; display: block"><div class="F_div_text">发布</div></a>
+<a href="{php echo $this->createMobileUrl('sbjqfabu', array('schoolid' => $schoolid), true)}" class="F_div" style="z-index: 2;right: 20px; margin-bottom: 90px; display: block"><div class="F_div_text">{$language['sbjq_fabu']}</div></a>
 <div class="top_height_blank50"></div>
 {php include $this->template('port');}
 <div class="bottom_comment_box3 hidden" style="padding: 0 0 0 8px; border: 1px solid #dedee0; box-sizing: border-box; padding-right: 90px; height: 30px; line-height: 30px;">

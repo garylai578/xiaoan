@@ -19,6 +19,8 @@ if($_W['role'] != 'manager' && !$_W['isfounder'] && $_W['role'] !='owner' ){
 		$this->imessage('非法访问，您无权操作该页面','','error');	
 	}
 if($operation == 'display'){
+	
+	
     if(!empty($_GPC['ssort'])){
         foreach($_GPC['ssort'] as $sid => $ssort){
             pdo_update($this->table_classify, array('ssort' => $ssort), array('sid' => $sid));
@@ -26,13 +28,40 @@ if($operation == 'display'){
         $this->imessage('批量更新排序成功', referer(), 'success');
     }
     $children = array();
-    $jsfz     = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'jsfz' And schoolid = {$schoolid} ORDER BY sid ASC, ssort DESC");
+    $jsfz     = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And type = 'jsfz' And schoolid = {$schoolid} ORDER BY sid ASC, ssort DESC",array(),'sid');
     foreach($jsfz as $index => $row){
         if(!empty($row['parentid'])){
             $children[$row['parentid']][] = $row;
             unset($jsfz[$index]);
         }
     }
+}elseif ($operation == 'setdown_fztidarr') {
+
+	$tidarr = $_GPC['tidarr'];
+	$arr_str = '';
+	foreach($tidarr as $value){
+		$arr_str .=$value.',';
+	}
+	$arr_str = trim($arr_str,',');
+	
+	$sid = $_GPC['sid'];
+	if(pdo_update($this->table_classify,array('tidarr'=>$arr_str), array('sid' => $sid))){
+		 die ( json_encode ( array (
+			'result' => true,
+			'msg' => '设置成功！' 
+		) ) ); 
+	}
+	
+}elseif ($operation == 'get_fztid') {
+	$teachers_list = pdo_fetchall("SELECT id,tname FROM " . tablename ($this->table_teachers) . " where weid = :weid And schoolid = :schoolid ORDER BY  CONVERT(tname USING gbk)  ASC ", array(	':weid' => $weid,':schoolid' => $schoolid) );
+	$fzid = $_GPC['sid'];
+	$schoolid = $_GPC['schoolid'];
+	$school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " where id={$schoolid}");
+	$fztid = pdo_fetch("SELECT * FROM " . tablename($this->table_classify) . " where sid={$fzid} and schoolid={$schoolid} And type='jsfz' ");
+	$qx = array();
+	$fztidarr = explode ( ',', $fztid['tidarr'] );
+	include $this->template('web/fztidarr');
+	exit();
 }elseif($operation == 'post'){
     $parentid = intval($_GPC['parentid']);
     $sid      = intval($_GPC['sid']);

@@ -67,19 +67,15 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 -webkit-box-pack: center;-moz-box-pack: center;-ms-flex-pack: center;-webkit-justify-content: center;justify-content: center;border-top-right-radius: 10px;border-bottom-left-radius: 10px;}
 .audit_statusPass {background-color: #cccccc;color: #333333;}
 .audit_statusNew {background-color: #ff9f22;color: white;}
+#qbyd{position: absolute;right: 12px;font-size: 12px;color: #30c6e1;}
 </style>
-<div id="BlackBg" class="BlackBg"></div>
-<div id="titlebar" class="header mainColor">
-	<div class="l"><a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
-	<div class="m"><a><span style="font-size: 18px">作业列表</span></a></div>
-	<div class="r">
-	</div>
-</div>
-<title>{$school['title']}</title>
+<title>{$language['szuoyelist_title']}</title>
 </head>
 <body>
 <div class="All">       
-	<div id="titlebar_bg" class="top_head_blank"></div>
+	<span id="qbyd">全部已读</span>
+	<div class="blank"></div>
+	<div class="blank"></div>
 	<div class="listContent">
 		{loop $leave $v}
 		<li class="main" time="{$v['createtime']}" id="{$v['id']}" style="display: block;">
@@ -124,12 +120,31 @@ display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-box-align: cent
 <script type="text/javascript">
 setTimeout(function() {
 	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").hide();
-		document.title="作业记录";
+		document.title="{$language['szuoyelist_title']}";
 	}
 }, 100);
-
+$("#qbyd").click(function () {
+	jConfirm("{$language['szuoyelist_jstip']}", "删除确定对话框", function (isConfirm) {
+		if(isConfirm){
+			var submitData = {
+				openid :"{$openid}",
+				schoolid :"{$schoolid}",
+				weid :"{$weid}",
+				userid :"{$it['id']}",
+				sid :"{$student['id']}",
+				noticetype :2
+			};
+			$.post("{php echo $this->createMobileUrl('dongtaiajax',array('op'=>'snotice_qbyd'))}",submitData,function(data){
+				if(data.result){
+					jTips(data.msg);
+					location.reload();
+				}else{
+					jTips(data.msg);
+				}
+			},'json'); 
+		}
+	});
+}); 
 </script>
 <script type="text/javascript">
 	String.prototype.Trim = function() {

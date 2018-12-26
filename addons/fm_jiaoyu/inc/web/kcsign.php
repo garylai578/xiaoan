@@ -147,7 +147,7 @@
 		    }
 		    $title="签到信息-".date("Y年m月d日导出",time());
 		    $this->exportexcel($array_out, array('签到人','教师/学生','课程名称','课时','签到时间','状态' ), $title);
-	                exit();
+			exit();
 	 	}else{
 		    $list = pdo_fetchall("SELECT * FROM " . tablename($this->table_kcsign) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition ORDER BY createtime DESC LIMIT " . ($pindex - 1) * $psize . ',' . $psize);
 		    foreach($list as $key => $row){

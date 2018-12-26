@@ -27,7 +27,7 @@
 <div id="titlebar" class="header mainColor">
 	<div class="l"><a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
 	<div class="m">
-     <span style="font-size: 18px">{$nowbj['sname']}{$nowkm['sname']}作业</span>   
+     <span style="font-size: 18px">{$nowbj['sname']}{$nowkm['sname']}{$language['szuoye_title']}</span>   
 	</div>
 </div>
 <div id="titlebar_bg" class="_header"></div>
@@ -87,8 +87,8 @@
 		</div>	
 		{if !empty($leave['anstype'])}
 			{if !empty($testBB['MyAnswer'])}
-			<span style="color:red">你已经回答过问题了，不能重复回答哟</span></br>
-			<span style="color:blue">你的回答：</span>
+			<span style="color:red">{$language['szuoye_wordtips1']}</span></br>
+			<span style="color:blue">{$language['szuoye_wordtips2']}：</span>
 				<div class="content parent">
 								<p id="neirong">{php echo htmlspecialchars_decode($testBB['MyAnswer']['text'])}</p><br/>
 			<!--视频-->
@@ -135,12 +135,12 @@
 		{/if}
 {if is_showgkk()}
 					{if !empty($teaPy_p)}
-					</br><span style="font-size:15px;color:blue">{$teaPy['tname']}老师的批阅：</span></br><span class="answerSpan " style="color:#D2691E">&nbsp;{$teaPy_p['content']}</span>
+					</br><span style="font-size:15px;color:blue">{$teaPy['tname']}{$language['szuoye_lspy']}</span></br><span class="answerSpan " style="color:#D2691E">&nbsp;{$teaPy_p['content']}</span>
 					{/if}
 			{else}
 	{if  !empty($remark)}
 	<div class="content">
-		<p style="color:blue">老师批阅：</p>
+		<p style="color:blue">{$language['szuoye_lspy']}</p>
 		<p id="neirong">{php echo htmlspecialchars_decode($remark['content'])}</p><br/>
 		{if $remark['video']}
 			<video id="videocon" controls width="100%"  height="264" poster="{php echo tomedia($school['logo']);}" webkit-playsinline playsinline>
@@ -175,8 +175,8 @@
 		<div class="questionContent">
 			<div class="questionBox">
 				 
-					  {if !empty($testAA)}<span style="color:red;padding-left: 10px;"> 你已经提交过本次作业，不能再提交了哦~</span></br></br>
-<span style="color:blue;padding-left: 10px;">你的答题情况：</span>
+					  {if !empty($testAA)}<span style="color:red;padding-left: 10px;"> {$language['szuoye_wordtips1']}</span></br></br>
+<span style="color:blue;padding-left: 10px;">{$language['szuoye_wordtips2']}：</span>
 					  {/if}
 				{loop $ZY_contents $key $row}
 				 
@@ -239,7 +239,7 @@
 					{/if}
 					{if is_showgkk()}
 					{if !empty($teaPy)}
-					</br><span style="font-size:15px;color:blue">{$teaPy['tname']}老师的批阅：</span></br><span class="answerSpan " style="color:#D2691E">&nbsp;{$teaPy[$ZY_contents[$key]['qorder']]}</span>
+					</br><span style="font-size:15px;color:blue">{$teaPy['tname']}{$language['szuoye_lspy']}</span></br><span class="answerSpan " style="color:#D2691E">&nbsp;{$teaPy[$ZY_contents[$key]['qorder']]}</span>
 					{/if}
 					{/if}
 					
@@ -325,7 +325,7 @@
 <div class="commentBox">
 	<div class="mobile_comment" >
 		<div class="commentTitle">
-			<span class="l">已答学生</span>
+			<span class="l">{$language['szuoye_ydxs']}</span>
 		</div>
 		<ul class="commentList">
 			<li class="comment_li">
@@ -374,7 +374,7 @@ setTimeout(function() {
 	if(window.__wxjs_environment === 'miniprogram'){
 		$("#titlebar").hide();
 		$("#titlebar_bg").hide();
-		document.title="作业详情";
+		document.title="{$language['szuoye_title']}";
 	}
 }, 100);
  

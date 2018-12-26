@@ -59,7 +59,7 @@ body{padding-bottom: 0 !important;}
                     </li>
                     <li><label>科目：</label>{$category[$item['km_id']]['sname']}</li>
                     <li><label>教室：</label>{$category[$item['adrr']]['sname']}</li>
-                    <li><label>授课教师：</label>{$tname_array_end}{$item['ReNum']}</li>
+                    <li><label>授课教师：</label>{$tname_array_end}</li>
                     {if $item['OldOrNew'] == 1 || $item['ReNum'] != 0}
                     <li><label>总课时/已购课时：</label>{$item['AllNum']}/{if !empty($ygks)}{$ygks['ksnum']}{else}0{/if}课时<a class="outline_link" onclick="showxgks()" id="xgks">续购</a></li>
                     {/if}

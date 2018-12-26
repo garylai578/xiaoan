@@ -11,7 +11,7 @@ $action            = 'cost';
 $this1             = 'no4';
 $GLOBALS['frames'] = $this->getNaveMenu($_GPC['schoolid'], $action);
 $schoolid          = intval($_GPC['schoolid']);
-$logo              = pdo_fetch("SELECT logo,title,is_cost FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
+$logo              = pdo_fetch("SELECT logo,title,is_cost,is_printer FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
 $gongneng          = pdo_fetchall("SELECT * FROM " . tablename($this->table_object) . " ");
 
 $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
@@ -22,11 +22,6 @@ if($tid_global != 'founder' && $tid_global != 'owner'){
 	}
 }
 if($operation == 'post'){
-	if($tid_global != 'founder' && $tid_global != 'owner'){
-		if (!(IsHasQx($tid_global,1002002,1,$schoolid)) || $logo['is_cost'] == 2){
-			$this->imessage('非法访问，您无权操作该页面','','error');	
-		}
-	}
     load()->func('tpl');
     $id      = intval($_GPC['id']);
     $payweid = pdo_fetchall("SELECT * FROM " . tablename('account_wechats') . " where level = 4 ORDER BY acid ASC");
@@ -36,10 +31,12 @@ if($operation == 'post'){
             $this->imessage('抱歉，本条信息不存在在或是已经删除！', '', 'error');
         }
     }
-
+	mload()->model('print');
     $banji  = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " where weid = :weid And schoolid = :schoolid And type = :type ORDER BY ssort DESC", array(':weid' => $weid, ':type' => 'theclass', ':schoolid' => $schoolid));
     $uniarr = explode(',', $item['bj_id']);
-
+	$nowprints = explode(',', $item['printarr']);
+	$printers = printers($schoolid);
+	$printer_name = printer_name();
     if(checksubmit('submit')){
         $data = array(
             'weid'         => intval($weid),
@@ -54,6 +51,8 @@ if($operation == 'post'){
             'endtime'      => strtotime($_GPC['endtime']),
             'about'        => intval($_GPC['about']),
             'bj_id'        => implode(',', $_GPC['arr']),
+			'printarr'     => implode(',', $_GPC['printarr']),
+			'is_print'     => intval($_GPC['is_print']),
             'createtime'   => time(),
             'payweid'      => empty($_GPC['payweid']) ? $weid : intval($_GPC['payweid']),
             'description'  => trim($_GPC['description']),
@@ -63,7 +62,9 @@ if($operation == 'post'){
         if(empty($_GPC['dataline']) & empty($_GPC['starttime']) & empty($_GPC['endtiem'])){
             $this->imessage('你必须设置一项时间范围设置方式！', '', 'error');
         }
-
+        if($_GPC['is_print'] == 1  && empty($_GPC['printarr'])){
+            $this->imessage('启用打印情况下必须选择至少一台打印设备,如已添加设备,本页未出现,请千万打印设备设置页查看是否启用！', '', 'error');
+        }
         if(!empty($_GPC['starttime']) || !empty($_GPC['endtiem'])){
             if(strtotime($_GPC['starttime']) > strtotime($_GPC['endtime'])){
                 $this->imessage('时间范围设置错误,开始时间不能大于结束时间！', '', 'error');

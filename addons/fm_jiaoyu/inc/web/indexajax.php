@@ -4,13 +4,58 @@
  *
  * @author 高贵血迹
  */global $_W, $_GPC;
-   $operation = in_array ( $_GPC ['op'], array ('default','checkpass','guanli','getquyulist','getbjlist','createorder','changemactype','checkorder','getloadingorder','delorder','getallteacher','getgkkqr','recreateqr','get_user_qr','reget_user_qr','huifu_mail','getstu_bj','getstu_kc','buy_kc','xugou_kc','get_fzqx_qd','get_fzqx_ht','set_fzqx','get_signupdetail','bjtzfb','mnotpro','xytzfb','notpro', 'zytzfb','znotpro','getkclist','setcheckdate','getcheckholi','changeschooltype','checkverstypeforhtml','getdatesetinfo') ) ? $_GPC ['op'] : 'default';
+   $operation = in_array ( $_GPC ['op'], array ('default','checkpass','guanli','getquyulist','getbjlist','createorder','changemactype','checkorder','getloadingorder','delorder','getallteacher','getgkkqr','recreateqr','get_user_qr','reget_user_qr','huifu_mail','getstu_bj','getstu_kc','buy_kc','xugou_kc','get_fzqx_qd','get_fzqx_ht','set_fzqx','get_signupdetail','bjtzfb','mnotpro','xytzfb','notpro', 'zytzfb','znotpro','getkclist','setcheckdate','getcheckholi','changeschooltype','checkverstypeforhtml','getdatesetinfo','getstu_ap','addTemplate','settemhy') ) ? $_GPC ['op'] : 'default';
 
     if ($operation == 'default') {
 	           die ( json_encode ( array (
 			         'result' => false,
-			         'msg' => '你是傻逼吗'
+			         'msg' => '参数错误'
 	                ) ) );
+    }
+	if ($operation == 'settemhy') {
+		if (empty($_GPC ['weid'])) {
+			$result ['result'] = false;
+			$result ['msg'] = '参数错误';	   
+	    }else{
+			$access_token = $this->getAccessToken2();
+			$postarr = ' {"industry_id1":"16","industry_id2":"17"}';
+			$res = ihttp_post('https://api.weixin.qq.com/cgi-bin/template/api_set_industry?access_token='.$access_token,$postarr);
+			$content = @json_decode($res['content'],true);
+			if($content['errcode'] == 0){
+				$result ['msg'] = '设置成功';
+				$result ['result'] = true;
+			}else{
+				$result ['result'] = false;
+				$result ['msg'] = $content['errmsg'];
+			}
+			$result ['content'] = $content;
+		}
+		die ( json_encode ( $result ) );
+    }
+	if ($operation == 'addTemplate') {
+		if (empty($_GPC ['weid'])) {
+			$result ['result'] = false;
+			$result ['msg'] = '参数错误';	   
+	    }else{
+			mload()->model('sms');
+			$template = $_GPC ['template'];
+			$temp = temp_types($template);
+			$access_token = $this->getAccessToken2();
+			$postarr = '{"template_id_short": "'.$temp['id'].'"}';
+			$res = ihttp_post('https://api.weixin.qq.com/cgi-bin/template/api_add_template?access_token='.$access_token,$postarr);
+			$content = @json_decode($res['content'],true);
+			if($content['errcode'] == 0){
+				$result ['template_id'] = $content['template_id'];
+				$result ['msg'] = '修改成功';
+				$result ['result'] = true;
+			}else{
+				$result ['result'] = false;
+				$result ['msg'] = '自动填充失败，检查公众号APPID及密钥是否正确';
+			}
+			$result ['temp'] = $temp;
+			$result ['content'] = $content;
+		}
+		die ( json_encode ( $result ) );
     }
 	if ($operation == 'changemactype') {
 		if (empty($_GPC ['schoolid']) || empty($_GPC ['weid'])) {
@@ -207,7 +252,7 @@
 		               ) ) );
 	    }else{
 			$data = array();
-			$bjlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$_GPC['schoolid']}' And parentid = '{$_GPC['gradeId']}' And type = 'theclass' ORDER BY ssort DESC");
+			$bjlist = pdo_fetchall("SELECT * FROM " . tablename($this->table_classify) . " where schoolid = '{$_GPC['schoolid']}' And parentid = '{$_GPC['gradeId']}' And type = 'theclass' ORDER BY CONVERT(sname USING gbk) ASC");
    			$data ['bjlist'] = $bjlist;
 			$data ['result'] = true;
 			$data ['msg'] = '成功获取！';
@@ -632,6 +677,7 @@
 				'payweid'=>$kcinfo['payweid'],
 				'status' => 2,
 				'type' => 1,
+				'xufeitype' => 1,
 				'tid' => $tid
 			);
 			
@@ -822,32 +868,33 @@
 		$tname = $_GPC['tname'];
 		
 		$total = $_GPC['total'];
-		$pindex = max(1, intval($_GPC['page']));
+		$pindex = max(1, intval($_GPC['page'])); //当前发送的页数
 		$psize = 2;
 		$tp = ceil($total/$psize);
 		if($pindex <= $tp){
 			if($_GPC['type'] == 1){
 				if($_GPC['muti'] == 1){
-					$list_muti=$_GPC['list_muti'];
+					$list_muti=$_GPC['list_muti']; //发送到第几个班级了
 					if($list_muti >= 0 ){
 						$bj_id = $_GPC['bj_id'][$list_muti];
-						$total_all = $_GPC['total_all'];
-						$total_muti = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id));
-						$tp_muti = ceil($total_muti/$psize);
-						$tp_all = ceil($total_all/$psize);
-						$pindex_muti = $pindex - $tp_all;
+						$total_all = $_GPC['total_all']; //已发送的人数
+						//当前发送的班级的总人数
+						$total_muti = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid And bj_id = :bj_id",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':bj_id'=>$bj_id)); 
+						$tp_muti = ceil($total_muti/$psize); //当前发送班级总人数分成多少页
+						$tp_all = ceil($total_all/$psize); //整个班都完成发送的总人数分成多少页
+						$pindex_muti = $pindex - $tp_all; //距离上一次完成整个班的发送已经多少页
 						$page1 = $pindex_muti + 1;
 						$data['muti'] = 1 ;
 						$data['from'] = $_GPC['from'] ;
 						if($_GPC['from'] == "group"){
 								$this->sendMobileHdtz($notice_id, $schoolid, $weid, $tname, $bj_id,$pindex_muti, $psize);
 							}
-						if($page1<= $tp_muti){
+						if($page1<= $tp_muti){ //下一页也是当前班级
 							$data['list_muti'] = $list_muti;
 							$data['total_all'] = $total_all ;
 							$data['nowid'] = $bj_id;
 							$data['not'] = "de";
-						}elseif($page1>$tp_muti){
+						}elseif($page1>$tp_muti){//下一页不是当前班级（当前班级已在本页发送完成）
 							$list_muti = $list_muti + 1;
 							$data['list_muti'] = $list_muti;
 							$data['total_all'] =$total_all + $total_muti;
@@ -1189,5 +1236,20 @@
 			$result['type'] = $check['type'];
 		 die ( json_encode ( $result ) );
 		}
+    }
+	
+	 if ($operation == 'getstu_ap') { 
+		$schoolid = $_GPC['schoolid'];
+		$bjid = $_GPC['bjId'];
+		$kcid = $_GPC['kcid'];
+		$roomid = $_GPC['roomid'];
+		//更新时记得将两个对调，目前仅用作测试获取所有学生，实际中只获取住校生
+		//$stulist = pdo_fetchall("SELECT id,s_name FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And bj_id = '{$bjid}' and (roomid = 0  or roomid = '{$roomid}') and s_type = 2 "); 
+		$stulist = pdo_fetchall("SELECT id,s_name FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And bj_id = '{$bjid}' and (roomid = 0  or roomid = '{$roomid}') "); 
+		 
+		die(json_encode(array(
+			'result' => true,
+            'stulist' => $stulist
+		)));		
     }
 ?>

@@ -29,7 +29,7 @@
 						</label>
 						{/if}
 						<label class="radio-inline">
-							<input type="radio" value="2" class="printer-type" name="macname" {if $item['macname'] == '2'}checked{/if} id="credit2" {if $item && $item['macname'] != 2}disabled{/if}> 讯贞
+							<input type="radio" value="2" class="printer-type" name="macname" {if $item['macname'] == '2'}checked{/if} id="credit2" {if $item && $item['macname'] != 2}disabled{/if}> 迅贞
 							<span class="label label-success">推荐</span>
 						</label>
 						<label class="radio-inline">
@@ -40,16 +40,17 @@
 							<input type="radio" value="5" class="printer-type" name="macname"{if $item['macname'] == '5'}checked{/if} id="credit5" {if $item && $item['macname'] != 5}disabled{/if}>护校通
 							<span class="label label-success">推荐</span>
 						</label>						
-						<label class="radio-inline">
-							<input type="radio" value="4" class="printer-type" name="macname"{if $item['macname'] == '4'}checked{/if} id="credit4" {if $item && $item['macname'] != 4}disabled{/if}> 安宝贝
-							<span class="label label-success">推荐</span>
-						</label>							
+						<!-- <label class="radio-inline"> -->
+							<!-- <input type="radio" value="4" class="printer-type" name="macname"{if $item['macname'] == '4'}checked{/if} id="credit4" {if $item && $item['macname'] != 4}disabled{/if}> 安宝贝 -->
+							<!-- <span class="label label-success">推荐</span> -->
+						<!-- </label> -->
 					</div>
 				</div>
 				{else}
 				<input type="hidden" name="macname" value="{$item['macname']}" />
 				<input type="hidden" name="id" value="{$id}" />
 				{/if}
+				<!-- 吉联 -->
 				<div id="credit-status0" {if $item['macname'] == 1}style="display:block"{else}style="display:none"{/if}>
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>机器号/设备号</label>
@@ -63,6 +64,8 @@
 							{/if}
 						</div>
 					</div>
+					
+			
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>进离校区分</label>
 						<div class="col-sm-2 col-lg-2">
@@ -93,7 +96,7 @@
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>设备类型</label>
 							<div class="col-sm-9 col-xs-12">
 								<label class="radio-inline">
-									<input type="radio" value="1" class="printer-type credit7" name="is_bobao" {if $item['is_bobao'] == '1' || empty($item['is_bobao'])}checked{/if} {if $item && $item['is_bobao'] != 1}disabled{/if} id="credit7"> 考勤机
+									<input type="radio" value="1" class="printer-type credit7" name="is_bobao" {if ($item['is_bobao'] == '1' || empty($item['is_bobao']))}checked{/if} {if $item && $item['is_bobao'] != 1}disabled{/if} id="credit7"> 考勤机
 								</label>
                                 
                                 
@@ -141,7 +144,9 @@
                                 <!--修改结束-->						
 							</div>
 						</div>	
-						<div id="credit-status67" {if $item['is_bobao'] == 2}style="display:block"{else}style="display:none"{/if}>
+						
+						<!-- 万能 分班播报 -->
+						<div id="credit-status67" {if $item['is_bobao'] == 9}style="display:block"{else}style="display:none"{/if}>
 							<div class="form-group">
 								<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>是否全校播报</label>
 								<div class="col-sm-9 col-xs-12">
@@ -178,13 +183,16 @@
 					<div id="credit-status21" {if $item['macname'] == 2}style="display:block"{else}style="display:none"{/if}>
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>设备类型</label>
-							<div class="col-sm-2 col-lg-2">
+							<div class="col-sm-9 col-xs-12">
 								<label class="radio-inline">
-									<input type="radio" value="1" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '1' || empty($item['is_bobao'])}checked{/if} id="credit11" {if $item && $item['is_bobao'] != 1}disabled{/if}> 考勤机
+									<input type="radio" value="1" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '1' }checked{/if} id="credit11" {if $item && $item['is_bobao'] != 1}disabled{/if}> 考勤机
 								</label>
 								<label class="radio-inline">
 									<input type="radio" value="3" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '3'}checked{/if} id="credit12" {if $item && $item['is_bobao'] != 3}disabled{/if}> 智能班牌
-								</label>						
+								</label>
+								<label class="radio-inline">
+									<input type="radio" value="10" class="printer-type" name="is_bobao" {if $item['is_bobao'] == '10'}checked{/if} id="credit13" {if $item && $item['is_bobao'] != 10}disabled{/if}> 食堂消费机
+								</label>								
 							</div>
 						</div>
 						<div id="credit-status22" {if $item['is_bobao'] == 3}style="display:block"{else}style="display:none"{/if}>
@@ -226,14 +234,23 @@
 								<label class="col-xs-12 col-sm-3 col-md-2 control-label" style="color: red;font-size: 18px;right: -367px;">班级模式基础设置</label>
 							</div>							
 							<div class="form-group">
-								<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>绑定班级</label>
-								<div class="col-sm-2 col-lg-2">
+								<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>{if $schooltype}绑定教室{else}绑定班级{/if}</label>
+								<div class="col-sm-2 col-lg-2">	
+									{if $schooltype}
+									<select style="margin-right:15px;" name="js_id" class="form-control">
+									<option value="0">选择教室</option>
+										{loop $allroom $row}
+										 <option value="{$row['sid']}" {if $row['sid'] ==$item['js_id']} selected="selected"{/if}>{$row['sname']}</option>
+										{/loop}
+									</select>
+									{else}
 									<select style="margin-right:15px;" name="bj_id" class="form-control">
-										<option value="0">选择班级</option>
+									<option value="0">选择班级</option>
 										{loop $class $row}
 										 <option value="{$row['id']}" {if $row['id'] ==$item['bj_id']} selected="selected"{/if}>{$row['classes']}</option>
 										{/loop}
-									</select>
+									</select>			
+									{/if}
 								</div>	
 							</div>
 							<div class="form-group">
@@ -278,6 +295,7 @@
 					</div>	
 					{if  empty($item) || $item['is_bobao'] == 1}	
 					<div id="credit-status68" {if $item['macname'] == 2 || $item['macname'] == 5 || $item['macname'] == 6}style="display:block"{else}style="display:none"{/if}>
+
 						<div class="form-group" id="credit-status78" {if $item['macname'] == 2}style="display:block"{else}style="display:none"{/if}>
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>卡类型</label>
 							<div class="col-sm-2 col-lg-2">
@@ -416,6 +434,8 @@
 					</div>
 					{/if}	
 				</div>
+				
+				<!-- 优米 -->
 				<div id="credit-status2" {if $item['macname'] == 3}style="display:block"{else}style="display:none"{/if}>
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>机器号/设备号</label>
@@ -429,6 +449,34 @@
 							{/if}
 						</div>
 					</div>
+					
+					<div class="form-group">
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>是否楼栋考勤机</label>
+						<div class="col-sm-9 col-xs-12">
+							<label class="radio-inline">
+								<input type="radio" value="1" class="printer-type" name="is_apcheck_ym" {if empty($item['apid'])}checked{/if} id="is_apcheck_No_3"> 否
+							</label>
+							<label class="radio-inline">
+								<input type="radio" value="2" class="printer-type" name="is_apcheck_ym" {if !empty($item['apid'])}checked{/if} id="is_apcheck_Yes_3"> 是
+							</label>	
+							<div class="help-block">若为楼栋考勤机，则进离校判断变更为进出宿舍楼栋判断，不设置进离判断则根据学生最近一次刷卡状态判断，不太准确</div>							
+						</div>
+						
+					</div>	
+					
+					<div class="form-group apset3" {if empty($item['apid'])}style="display:none"{/if}>
+						<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>归属楼栋</label>
+						<div class="col-sm-2 col-lg-2">
+							<select style="margin-right:15px;" name="ap_id_ym" class="form-control">
+								<option value="0">请选择</option>
+								{loop $apartment $row}
+									<option value="{$row['id']}" {if $item['apid'] == $row['id'] } selected="selected"{/if}>{$row['name']}</option>
+								{/loop}
+							</select>
+							<div class="help-block">选择考勤机所属楼栋</div>
+						</div>
+					</div>
+					
 					<div class="form-group">
 						<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require">* </span>进离校区分</label>
 						<div class="col-sm-9 col-xs-12">
@@ -928,7 +976,8 @@ $(function(){
 		$('#credit-status3').hide();
 		$('#credit-status66').hide();
 		$('#credit-status68').show();
-		$('#credit-status78').hide();		
+		$('#credit-status78').hide();	
+		$('#credit-status21').hide();		
 	});
 	$('#credit6').click(function(){
 		$('#credit-status0').hide();
@@ -936,14 +985,15 @@ $(function(){
 		$('#credit-status2').hide();
 		$('#credit-status3').hide();
 		$('#credit-status66').show();
-		$('#credit-status68').hide();
+		$('#credit-status68').show();
 		$('#credit-status78').hide();
 		$('#credit-status21').hide();
 		$('#credit-status22').hide();		
 	});	
-	$('#credit7').click(function(){
+	$('.credit7').click(function(){
 		$('#credit-status67').hide();
 		$('#credit-status68').show();
+	
 	});	
 	$('#credit8').click(function(){
 		$('#credit-status67').show();
@@ -962,7 +1012,27 @@ $(function(){
 	$('#credit12').click(function(){
 		$('#credit-status68').hide();
 		$('#credit-status22').show();
-	});		
+	});	
+	$('#credit13').click(function(){
+		$('#credit-status68').hide();
+		$('#credit-status22').hide();
+	});	
+
+	$('#is_apcheck_Yes_2').click(function(){
+		$('.apset2').show();		
+	});
+	$('#is_apcheck_No_2').click(function(){
+		$('.apset2').hide();		
+	});
+	
+	$('#is_apcheck_Yes_3').click(function(){
+		$('.apset3').show();		
+	});
+	$('#is_apcheck_No_3').click(function(){
+		$('.apset3').hide();		
+	});
+
+	
 });
 </script>
 {elseif $operation == 'display'}
@@ -984,6 +1054,7 @@ $(function(){
 							<th>设备判断</th>
 							<th>大屏广告</th>
 							<th class="qx_2403">远程控制</th>
+							<th class="qx_2403">远程配置</th>
 							<th>机器号</th>
 							<th class="qx_e_d" style="width:150px; text-align:right;">状态/修改/删除</th>
 						</tr>
@@ -992,11 +1063,11 @@ $(function(){
 						{loop $list $item}
 						<tr>
 							{if $_W['isfounder'] || $_W['role'] == 'owner'}<td>
-								<span>{if $item['macname'] == '1'}吉联{/if}{if $item['macname'] == '2'}讯贞{/if}{if $item['macname'] == '3'}优米{/if}{if $item['macname'] == '4'}安宝贝{/if}{if $item['macname'] == '5'}护校通{/if}{if $item['macname'] == '6'}万能考勤机{/if}</span>
+								<span>{if $item['macname'] == '1'}吉联{/if}{if $item['macname'] == '2'}迅贞{/if}{if $item['macname'] == '3'}优米{/if}{if $item['macname'] == '4'}安宝贝{/if}{if $item['macname'] == '5'}护校通{/if}{if $item['macname'] == '6'}万能考勤机{/if}</span>
 							</td>{/if}
 							<td class="qx_2402"><input type="checkbox" value="{$item['is_on']}" name="is_on[]" data-id="{$item['id']}" {if $item['is_on'] == 1}checked{/if}></td>
 							<td>{$item['name']}</td>
-							<td>{if $item['is_bobao'] ==1}{if $item['type'] ==1}进校设备{else if $item['type'] ==2}离校设备{else}单机模式{/if}{else}{if $item['is_bobao'] ==2}播报机{/if}{if $item['is_bobao'] ==3}智能班牌{/if}{/if}</td>
+							<td>{if $item['is_bobao'] ==1}{if $item['type'] ==1}进校设备{else if $item['type'] ==2}离校设备{else}单机模式{/if}{else}{if $item['is_bobao'] ==2}播报机{/if}{if (($item['is_bobao'] ==3 &&  $item['macname'] == '2' ) ||  ($item['is_bobao'] ==8 &&  $item['macname'] == '6' ))}智能班牌{/if}{if $item['is_bobao'] ==10}食堂消费机{/if} {/if}{if !empty($item['apid'])}<span class="label label-info">楼栋考勤</span>{/if}</td>
 							<td>
 							{if !empty($item['banner'])}
 								{if $item['isflow'] == 2}
@@ -1023,7 +1094,18 @@ $(function(){
 								{else}
 									<span class="label label-danger">不支持</span>
 								{/if}
-							</td>							
+							</td>	
+                            <td class="qx_2403">
+                            {if $item['macname'] == '6' }
+                            	{if $item['is_bobao'] ==3 || $item['is_bobao'] ==4 || $item['is_bobao'] ==5}
+                            	<a class="btn btn-default" href="{php echo $this->createWebUrl('remote', array('pid' => $item['id'], 'schoolid' => $schoolid))}"  data-toggle="tooltip" data-placement="top" title="远程配置" >远程配置</a>	
+                                {else}
+                                <span class="label label-danger">不支持</span>
+                                {/if}
+                            {else}
+                            <span class="label label-danger">不支持</span>
+                            {/if}
+                            </td>							
 							<td>{$item['macid']}</td>
 							<td style="text-align:right;">
 								{if $item['macname'] == '2'}

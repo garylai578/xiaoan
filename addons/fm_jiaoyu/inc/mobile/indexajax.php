@@ -215,6 +215,7 @@
 		}
     }	
 	if ($operation == 'bdxs') {
+		$language = $_W['lanconfig']['bangding'];
 		$subjectId = trim($_GPC['subjectId']);
 		$school = pdo_fetch("SELECT bd_type FROM " . tablename($this->table_index) . " WHERE id = {$_GPC['schoolid']} ");
 		if ($school['bd_type'] ==1 || $school['bd_type'] ==4 || $school['bd_type'] ==5 || $school['bd_type'] ==7){
@@ -263,39 +264,41 @@
 	           	  ));
 		if(!empty($user)){
 				$data ['result'] = false;
-				$data ['msg'] = '您已绑定本学生,不可重复绑定！';
+				$data ['msg'] = $language['bangding_jstip1'];
 				die ( json_encode ( $data ) ); 
 		}				  
 		if(empty($stuid)){
 				$data ['result'] = false;
-				$data ['msg'] = '没有找到该生信息,或信息输入有误！';
+				$data ['msg'] = $language['bangding_jstip2'];
 				die ( json_encode ( $data ) ); 
 		}
 		if($subjectId == 2){	
 			if (!empty($item['mom'])){
 				$data ['result'] = false;
-				$data ['msg'] = '绑定失败，此学生母亲已经绑定了其他微信号！';
+				$data ['msg'] = $language['bangding_jstip3'];
 				die ( json_encode ( $data ) ); 
 			}	  
         }
 		if($subjectId == 3){
 			if (!empty($item['dad'])){
 				$data ['result'] = false;
-				$data ['msg'] = '绑定失败，此学生父亲已经绑定了其他微信号！';
+				$data ['msg'] = $language['bangding_jstip4'];
 				die ( json_encode ( $data ) ); 
 			}
         }
 		if($subjectId == 4){
 			if (!empty($item['own'])){
 				$data ['result'] = false;
-				$data ['msg'] = '绑定失败，此学生本人已经绑定了其他微信号！';
+				$data ['msg'] = $language['bangding_jstip5'];
 				die ( json_encode ( $data ) ); 
 			}
+
+                }               
         }
 		if($subjectId == 5){
 			if (!empty($item['other'])){
 				$data ['result'] = false;
-				$data ['msg'] = '绑定失败，此学生家长已经绑定了其他微信号！';
+				$data ['msg'] = $language['bangding_jstip6'];
 				die ( json_encode ( $data ) ); 
 			}
         }		
@@ -365,6 +368,7 @@
     }
 	
 	if ($operation == 'bdls') {
+		$language = $_W['lanconfig']['bangding'];
 		$data = explode ( '|', $_GPC ['json'] );
 		if (! $_GPC ['schoolid'] || ! $_W ['openid']) {
                die ( json_encode ( array (
@@ -403,7 +407,7 @@
 		if ($user['id']) {
                   die ( json_encode ( array (
                     'result' => false,
-                    'msg' => '抱歉,你已经绑定了其他教师信息！' 
+                    'msg' => $language['bangding_jstip7']
 		               ) ) );
 		}				  
 				  
@@ -424,7 +428,7 @@
 		   
 				  die ( json_encode ( array (
                  'result' => false,
-                 'msg' => '绑定失败，此教师已经绑定了其他微信号！' 
+                 'msg' => $language['bangding_jstip8']
 		          ) ) );
 		    
         }else{
@@ -872,6 +876,7 @@
 		}
     }
 	if ($operation == 'signup')  {
+		$language = $_W['lanconfig']['signup'];
 		if (empty($_GPC ['schoolid'])) {
                die ( json_encode ( array (
                     'result' => false,
@@ -881,7 +886,7 @@
 		if (ischeckName($_GPC['s_name']) == false) {
                die ( json_encode ( array (
                     'result' => false,
-                    'msg' => '禁止使用测试,test等为学生姓名' 
+                    'msg' => $language['signup_jstip7'] 
 		               ) ) );
 	    }		
 		$check1 = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " WHERE :weid = weid And :schoolid = schoolid And :s_name = s_name And :mobile = mobile And :xq_id = xq_id ", array(
@@ -894,7 +899,7 @@
 		if (!empty($check1)){
                die ( json_encode ( array (
                     'result' => false,
-                    'msg' => '该生已录入学校,无需重复报名！' 
+                    'msg' => $language['signup_jstip8'] 
 		               ) ) );			
 		}
 		$check2 = pdo_fetch("SELECT * FROM " . tablename($this->table_signup) . " WHERE :weid = weid And :schoolid = schoolid And :name = name And :mobile = mobile And :sex = sex And :nj_id = nj_id ", array(
@@ -908,7 +913,7 @@
 		if (!empty($check2)){
                die ( json_encode ( array (
                     'result' => false,
-                    'msg' => '该生已通过微信端报名,请勿重复报名！' 
+                    'msg' => $language['signup_jstip9'] 
 		               ) ) );			
 		}
 		if(!empty($_GPC['mobilecode'])){
@@ -1584,12 +1589,12 @@
 			
 			$data ['result'] = true;
 			$data ['msg'] = '绑定成功！';
-
+			
             if(!empty($_GPC['sid']))
                 pdo_update($this->table_students, array('createdate'=>time()), array('id'=>$_GPC['sid'])); // 绑定考勤卡后,更新用户的时间戳
             if(!empty($_GPC['tid']))
                 pdo_update($this->table_teachers, array('updatetime'=>time()), array('id'=>$_GPC['tid'])); // 绑定考勤卡后,更新用户的时间戳
-			
+	
           die ( json_encode ( $data ) );
 		  
 		}
@@ -1615,11 +1620,12 @@
 					'spic'=> '',
 					'tpic'=> '',
 			       );
-			pdo_update($this->table_idcard, $temp, array('id' => $_GPC['id']));
-			if(!empty($item['sid']) && $item['sid'] != 0)
+			pdo_update($this->table_idcard, $temp, array('id' => $_GPC['id']));			
+          	if(!empty($item['sid']) && $item['sid'] != 0)
 		    	pdo_update($this->table_students, array('createdate'=>time()), array('id'=>$item['sid'])); // 解绑考勤卡后,更新用户的时间戳
             elseif(!empty($item['tid']) && $item['tid'] != 0)
                 pdo_update($this->table_teachers, array('updatetime'=>time()), array('id'=>$item['tid'])); // 解绑考勤卡后,更新用户的时间戳
+	
 			$data ['result'] = true;
 			$data ['msg'] = '解绑成功！';
 			

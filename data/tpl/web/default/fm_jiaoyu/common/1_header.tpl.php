@@ -5,8 +5,8 @@
 	<nav class="navbar navbar-default" role="navigation">
 		<div class="container <?php  if(!empty($frames['section']['platform_module_menu']['plugin_menu'])) { ?>plugin-head<?php  } ?>">
 			<div class="navbar-header">
-				<a class="navbar-brand" href="<?php  echo url('account/display')?>">
-					<img src="<?php  if(!empty($_W['setting']['copyright']['blogo']) && function_exists('to_global_media')) { ?><?php  echo to_global_media($_W['setting']['copyright']['blogo'])?><?php  } else { ?>./resource/images/logo/logo.png<?php  } ?>" class="pull-left" width="110px" height="35px">
+					<a class="navbar-brand" href="<?php  if($_W['role'] == ACCOUNT_MANAGE_NAME_CLERK) { ?><?php  echo url('module/display');?><?php  } else { ?><?php  echo url('account/display');?><?php  } ?>">
+					<img src="<?php  if(!empty($_W['setting']['copyright']['blogo'])) { ?><?php  echo to_global_media($_W['setting']['copyright']['blogo'])?><?php  } else { ?>./resource/images/logo/logo.png<?php  } ?>" class="pull-left" width="110px" height="35px">
 					<span class="version hidden"><?php echo IMS_VERSION;?></span>
 				</a>
 			</div>
@@ -140,7 +140,7 @@
 <?php  if(!defined('IN_MESSAGE')) { ?>
 <div class="container">
 	<a href="javascript:;" class="js-big-main button-to-big color-gray" title="加宽"><?php  if($_GPC['main-lg']) { ?>正常<?php  } else { ?>宽屏<?php  } ?></a>
-	<?php  if(in_array(FRAME, array('account', 'system', 'advertisement', 'wxapp', 'site', 'store', 'webapp', 'phoneapp', 'xzapp')) && !in_array($_GPC['a'], array('news-show', 'notice-show'))) { ?>
+	<?php  if(defined('FRAME') && in_array(FRAME, array('account', 'system', 'advertisement', 'wxapp', 'site', 'store', 'webapp', 'phoneapp', 'xzapp')) && !in_array($_GPC['a'], array('news-show', 'notice-show'))) { ?>
 	<div class="panel panel-content main-panel-content <?php  if(!empty($frames['section']['platform_module_menu']['plugin_menu'])) { ?>panel-content-plugin<?php  } ?>">
 		<div class="content-head panel-heading main-panel-heading">
 			<?php  if(($_GPC['c'] != 'cloud' && !empty($_GPC['m']) && !in_array($_GPC['m'], array('keyword', 'special', 'welcome', 'default', 'userapi', 'service'))) || defined('IN_MODULE')) { ?>
@@ -149,26 +149,25 @@
 				<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('common/header-' . FRAME, TEMPLATE_INCLUDEPATH)) : (include template('common/header-' . FRAME, TEMPLATE_INCLUDEPATH));?>
 			<?php  } ?>
 		</div>
+
 	<div class="panel-body clearfix main-panel-body <?php  if(!empty($_W['setting']['copyright']['leftmenufixed'])) { ?>menu-fixed<?php  } ?>">
 		<div class="left-menu">
 			<?php  if(empty($frames['section']['platform_module_menu']['plugin_menu'])) { ?>
 			<div class="left-menu-content">
 				<?php  if(is_array($frames['section'])) { foreach($frames['section'] as $frame_section_id => $frame_section) { ?>
+
 				
-				
-				<?php  if(FRAME == 'store' && !($_W['isfounder']) && !empty($frame_section['founder'])) { ?>
-				<?php  continue;?>
-				<?php  } ?>
 				
 
 				<?php  if(!isset($frame_section['is_display']) || !empty($frame_section['is_display'])) { ?>
 				<div class="panel panel-menu">
 					<?php  if($frame_section['title']) { ?>
 					<div class="panel-heading">
-						<span class="no-collapse"><?php  echo $frame_section['title'];?><i class="wi wi-appsetting pull-right setting"></i></span>
+						<span class="no-collapse" data-toggle="collapse" data-target="#frame-<?php  echo $frame_section_id;?>" onclick="util.cookie.set('menu_fold_tag:<?php  echo $frame_section_id;?>', util.cookie.get('menu_fold_tag:<?php  echo $frame_section_id;?>') == 1 ? 0 : 1)"><?php  echo $frame_section['title'];?><i class="wi wi-down-sign-s pull-right setting"></i></span>
 					</div>
 					<?php  } ?>
-					<ul class="list-group">
+
+					<ul class="list-group collapse <?php  if($_GPC['menu_fold_tag:'.$frame_section_id] == 0) { ?>in<?php  } ?>" id="frame-<?php  echo $frame_section_id;?>">
 						<?php  if(is_array($frame_section['menu'])) { foreach($frame_section['menu'] as $menu_id => $menu) { ?>
 							<?php  if(!empty($menu['is_display'])) { ?>
 								<?php  if($menu_id == 'platform_module_more') { ?>
@@ -176,6 +175,7 @@
 										<a href="<?php  echo $menu['url']?>"><span class="label label-more">更多应用</span></a>
 									</li>
 								<?php  } else { ?>
+									<?php  if($menu['active']) { ?><?php  $active_sub_permission = $menu['sub_permission']?><?php  } ?>
 									<?php  if((in_array($_W['role'], array(ACCOUNT_MANAGE_NAME_OWNER, ACCOUNT_MANAGE_NAME_FOUNDER, ACCOUNT_MANAGE_NAME_VICE_FOUNDER)) && $menu_id == 'front_download' || $menu_id != 'front_download') && !($menu_id == 'platform_menu' && $_W['account']['level'] == ACCOUNT_SUBSCRIPTION) || $_W['account']['type'] == ACCOUNT_TYPE_XZAPP_NORMAL) { ?>
 									<li class="list-group-item <?php  if($menu['active']) { ?>active<?php  } ?>">
 										<a href="<?php  echo $menu['url'];?>" class="text-over" <?php  if($frame_section_id == 'platform_module') { ?>target="_blank"<?php  } ?>>

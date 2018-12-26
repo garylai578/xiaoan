@@ -3,7 +3,7 @@
                         <a href="<?php  echo $this->createWebUrl('fenzu', array('op' => 'display'))?>">分组管理</a>
 					</li>	
                     <li <?php  if(($_GPC['do'] == 'manager')) { ?>class="active"<?php  } ?>>
-                        <a href="<?php  echo $this->createWebUrl('manager', array('op' => 'display'))?>">二维码管理</a>
+                        <a href="<?php  echo $this->createWebUrl('manager', array('op' => 'display'))?>">二维码</a>
                     </li>
                     <li <?php  if(($_GPC['do'] == 'banners')) { ?>class="active"<?php  } ?>>
                         <a href="<?php  echo $this->createWebUrl('banners', array('op' => 'display'))?>">平台幻灯片</a>
@@ -19,13 +19,16 @@
                     </li>
 					<?php  if($_W['isfounder']) { ?>
                     <li <?php  if(($_GPC['do'] == 'loginctrl')) { ?>class="active"<?php  } ?>>
-                        <a href="<?php  echo $this->createWebUrl('loginctrl', array('op' => 'display'))?>">学校后台页面</a>
+                        <a href="<?php  echo $this->createWebUrl('loginctrl', array('op' => 'display'))?>">独立后台</a>
                     </li>
 					<?php  } ?>
                     <li <?php  if(($_GPC['do'] == 'binding')) { ?>class="active"<?php  } ?>>
                         <a href="<?php  echo $this->createWebUrl('binding', array('op' => 'display'))?>">统一入口</a>
                     </li>
                     <li <?php  if(($_GPC['do'] == 'sensitive')) { ?>class="active"<?php  } ?>>
-                        <a href="<?php  echo $this->createWebUrl('sensitive', array('op' => 'display'))?>">敏感词设置</a>
+                        <a href="<?php  echo $this->createWebUrl('sensitive', array('op' => 'display'))?>">敏感词</a>
+                    </li>
+                    <li <?php  if(($_GPC['do'] == 'lanset')) { ?>class="active"<?php  } ?>>
+                        <a href="<?php  echo $this->createWebUrl('lanset', array('op' => 'display'))?>">语言包</a>
                     </li>
                 </ul>

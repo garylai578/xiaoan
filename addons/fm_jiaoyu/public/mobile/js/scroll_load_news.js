@@ -23,7 +23,10 @@ new Scroll_load({
 }).load_init();
 */
 common_ajax_callback = false; //全局变量 在公共模板页定义 表示是否用公共的 ajax 成功回调和失败回调 ，这里设置为false 不使用公共回调
-var scroll_load_obj = null;
+if( scroll_load_obj === undefined){
+	var scroll_load_obj = null;	
+}
+
 var index_type_item = '';
 function scroll_list_to_detail() {
     sessionStorage.setItem("cache_html_switch_" + scroll_load_obj.page_name, true);
@@ -40,6 +43,7 @@ function Scroll_load(param) {
     //}
     this.ajax_switch = param.ajax_switch || true;
     this.ul_box = param.ul_box || '.listContent';
+	this.noticeytpe = param.noticeytpe || '';
     this.li_item = param.li_item || '.listContent .leave_main';
     this.ajax_url = param.ajax_url || '';
 	this.bj_id = param.bj_id || '';
@@ -47,7 +51,7 @@ function Scroll_load(param) {
     this.page_name = param.page_name || "";
     //this.post_param = param.post_param || {};
 
-    }
+}
 Scroll_load.prototype.load_init = function () {
     var self = this;
     scroll_load_obj = this;
@@ -88,8 +92,12 @@ function scroll_fun() {
         if (self.ajax_switch) {
             //这里做ajax
             self.ajax_switch = false;  //把ajax锁关了防止不断ajax
-            $(".jzz").removeClass('jzz_over');
-            $('.jzz_text').text('加载中');
+			var datanumb = $(self.ul_box).children('li').length;
+			if(datanumb >= 1){
+				$('.has_show_over').animate({height:"45px"});
+				$(".jzz").removeClass('jzz_over');
+				$('.jzz_text').text('加载中');
+			}
             var search_type='';
             var search_content='';
             if($('#search_input').length>0){
@@ -106,7 +114,8 @@ function scroll_fun() {
                 search_type = index_type_item;
             }
             var post_data = {
-                limit: self.limit,
+                limit: $(self.ul_box).children('li').eq($(self.ul_box).children('li').length-1).attr('time'),
+				noticeytpe: $("#noticeytpe").val(),
                 type: search_type,
                 content: search_content
             };
@@ -122,9 +131,11 @@ function scroll_fun() {
 
                         $(self.ul_box).append(data);
                        // sessionStorage.setItem('cache_html' + self.page_name, $(self.ul_box).html());
-                        self.limit = $(self.ul_box).children('li').eq($(self.ul_box).children('li').length-1).attr('time');
+                        //self.limit = $(self.ul_box).children('li').eq($(self.ul_box).children('li').length-1).attr('time');
                        // sessionStorage.setItem('limit' + self.page_name, self.limit);
-                        if (typeof (self.after_ajax) != 'undefined') { self.after_ajax(); }
+                        if (typeof (self.after_ajax) != 'undefined') {
+							self.after_ajax(); 
+						}
                        
                             $(window).on("scroll", scroll_fun);
                             self.ajax_switch = true;
@@ -133,12 +144,12 @@ function scroll_fun() {
                         $(".jzz").addClass('jzz_over');
                         $('.jzz_text').text('数据已加载完毕');
                         $(window).off("scroll", scroll_fun);
-                        window.setTimeout(function () {
+                   
                             //$('.has_show_over').animate({
                             //    height:0
                             //},300);
-                            $('.has_show_over').fadeOut();
-                        }, 400)
+                           	$('.has_show_over').animate({height:"0"});
+              
                     }
                 },
                 error: function () {

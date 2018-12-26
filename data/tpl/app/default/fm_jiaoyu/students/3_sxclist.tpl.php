@@ -15,7 +15,7 @@
 		<div id="BlackBg" class="BlackBg"></div>
 		<div id="titlebar" class="header mainColor">
 			<div class="l"><a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
-			<div class="m"><span style="font-size: 18px"><?php  echo $bj['sname'];?>相册</span></div>
+			<div class="m"><span style="font-size: 18px"><?php  echo $bj['sname'];?><?php  echo $language['sxclist_title'];?></span></div>
 		</div>
 		<div id="titlebar_bg" class="_header"></div>
 		<div class="titleTop" >
@@ -43,7 +43,7 @@
 					</div>
 					<div class="bg-dark"></div>
 					<div class="bg-tint"></div>
-					<div class="ablumBottom" ><span class="ablumName">班级圈</span><span class="ablumTotal">(<?php  echo $total;?>张)</span></div>
+					<div class="ablumBottom" ><span class="ablumName"><?php  echo $language['sxclist_bjq'];?></span><span class="ablumTotal">(<?php  echo $total;?>张)</span></div>
 				</a>
 			</div>
 			<div class="albumBox albumBox-right">
@@ -53,7 +53,7 @@
 					</div>
 					<div class="bg-dark"></div>
 					<div class="bg-tint"></div>
-					<div class="ablumBottom" ><span class="ablumName">公共相册</span><span class="ablumTotal"><?php  if(!empty($cfrist['picurl'])) { ?>(<?php  echo $ctotal;?>张)<?php  } else { ?>(0张)<?php  } ?></span></div>
+					<div class="ablumBottom" ><span class="ablumName"><?php  echo $language['sxclist_ggxc'];?></span><span class="ablumTotal"><?php  if(!empty($cfrist['picurl'])) { ?>(<?php  echo $ctotal;?>张)<?php  } else { ?>(0张)<?php  } ?></span></div>
 				</a>
 			</div>			
 		</div>		
@@ -68,7 +68,7 @@ setTimeout(function() {
 	if(window.__wxjs_environment === 'miniprogram'){
 		$("#titlebar").hide();
 		$("#titlebar_bg").hide();
-		document.title="<?php  echo $bj['sname'];?>相册";
+		document.title="<?php  echo $bj['sname'];?><?php  echo $language['sxclist_title'];?>";
 	}
 }, 100);
 

@@ -101,6 +101,12 @@
 			}
 			delvioce('school',FM_JIAOYU_HOST);
         } elseif ($operation == 'post') {
+			$allxx  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_index)." WHERE weid = '{$weid}' ");
+			if($set['school_max'] != 0 && !$_W['isfounder']){
+				if($allxx >= $set['school_max']){
+					message('抱歉，学校数量已达到系统上限！', referer(), 'error');
+				}
+			}
             load()->func('tpl');
             $id = intval($_GPC['id']); 
             $reply = pdo_fetch("select * from " . tablename($this->table_index) . " where id=:id and weid =:weid", array(':id' => $id, ':weid' => $weid));
@@ -233,6 +239,12 @@
 						$icon222 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'通讯录','icon' => MODULE_URL.'public/mobile/img/ioc11.png','url' => $_W['siteroot'] .'app/'.$this -> createMobileUrl('tongxunlu', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tongxunlu','ssort' => 22,'status' => 1,);
 						$icon223 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'周计划','icon' => MODULE_URL.'public/mobile/img/link_zjh.png','url' => $_W['siteroot'] .'app/'.$this -> createMobileUrl('tzjhlist', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tzjhlist','ssort' => 23,'status' => 1,);
 						$icon224 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'成长手册','icon' => MODULE_URL.'public/mobile/img/link_zxbx.png','url' => $_W['siteroot'] .'app/'.$this -> createMobileUrl('shoucelist', array('schoolid' => $schoolid)),'place' => 13,'do'=>'shoucelist','ssort' => 24,'status' => 1,);
+						$icon225 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'我的评分','icon' => MODULE_URL.'public/mobile/img/circle_icon4.png','url' =>$_W['siteroot'] .'app/'.$this -> createMobileUrl('tmyscore', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tmyscore','ssort' => 25,'status' => 1,);
+						$icon226 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'评分情况','icon' => MODULE_URL.'public/mobile/img/formal_enroll_icon.png','url' =>$_W['siteroot'] .'app/'.$this -> createMobileUrl('tscoreall', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tscoreall','ssort' => 26,'status' => 1,);
+						if(is_showpf()){
+							$icon227 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'学生评分','icon' => MODULE_URL.'public/mobile/img/circle_icon17.png','url' => $this -> createMobileUrl('tstuscore', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tstuscore','ssort' => 27,'status' => 1,);
+						}
+						$icon230 = array('weid' => $weid,'schoolid' => $schoolid,'name' =>'监控列表','icon' => MODULE_URL.'public/mobile/img/59ddef4d7a25b_88.png','url' => $this -> createMobileUrl('tallcamera', array('schoolid' => $schoolid)),'place' => 13,'do'=>'tallcamera','ssort' => 30,'status' => 1,);
 						pdo_insert($this->table_icon, $icon21);
 						pdo_insert($this->table_icon, $icon22);
 						pdo_insert($this->table_icon, $icon23);
@@ -256,7 +268,13 @@
 						pdo_insert($this->table_icon, $icon221);
 						pdo_insert($this->table_icon, $icon222);
 						pdo_insert($this->table_icon, $icon223);
-						pdo_insert($this->table_icon, $icon224);						
+						pdo_insert($this->table_icon, $icon224);
+						pdo_insert($this->table_icon, $icon225);
+						pdo_insert($this->table_icon, $icon226);
+						if(is_showpf()){
+							pdo_insert($this->table_icon, $icon227);			
+						}							
+						pdo_insert($this->table_icon, $icon230);									
 					}
                 } else {
                     pdo_insert($this->table_index, $data);
@@ -281,6 +299,84 @@
                 }
                 message('操作成功!', $url);
             }
+		} elseif ($operation == 'xznub') {
+			if($_W['isfounder']){
+				if($set){
+					pdo_update($this->table_set, array('school_max' => intval($_GPC['xznumbers'])), array('id' => $set['id']));
+				}else{
+					$data = array();
+					$data['weid']	= $weid;
+					$data['school_max']	= intval($_GPC['xznumbers']);
+					pdo_insert($this->table_set, $data);
+				}
+				$data['reslut'] = true;
+				$data['msg'] = '操作成功';
+			}else{
+				$data['reslut'] = false;
+				$data['msg'] = '您无权操作';
+			}
+			die (json_encode($data));
+		} elseif ($operation == 'copy') {
+			$allxx  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_index)." WHERE weid = '{$weid}' ");
+			if($set['school_max'] != 0 && !$_W['isfounder']){
+				if($allxx >= $set['school_max']){
+					message('抱歉，学校数量已达到系统上限！', referer(), 'error');
+				}
+			}
+			set_time_limit(0);
+			$sid = intval($_GPC['sid']);
+			$options = rtrim($_GPC['options'],',');
+			$option = explode(',',$options);
+			$school = pdo_get($this->table_index, array('id' => $sid));
+			if(empty($school)) {
+				message('门店不存在或已删除', referer(), 'error');
+			}
+			$school['title'] = $school['title'] . "-复制";
+			unset($school['id']);
+			unset($school['dateline']);
+			pdo_insert($this->table_index, $school);
+			$copyid = pdo_insertid();
+			if(in_array('template',$option)){
+				//模版
+				$icons = pdo_getall($this->table_icon, array('weid' => $weid, 'schoolid' => $sid));
+				if(!empty($icons)) {
+					foreach($icons as $row) {
+						unset($row['id']);
+						if(strstr($row['url'],'schoolid='.$row['schoolid'])){
+							$row['url'] = str_replace('schoolid='.$row['schoolid'],'schoolid='.$copyid,$row['url']);
+						}
+						$row['schoolid'] = $copyid;
+						pdo_insert($this->table_icon, $row);
+					}
+				}
+			}
+			if(in_array('classfiy',$option)){
+				//类型设置
+				$classify = pdo_getall($this->table_classify, array('weid' => $weid, 'schoolid' => $sid));
+				if(!empty($classify)) {
+					foreach($classify as $row) {
+						unset($row['sid']);
+						unset($row['tid']);
+						$row['schoolid'] = $copyid;
+						pdo_insert($this->table_classify, $row);
+					}
+				}
+			}
+			if(in_array('banner',$option)){
+				//幻灯片
+				$banners = pdo_getall($this->table_banners, array('weid' => $weid, 'schoolid' => $sid));
+				if(!empty($banners)) {
+					foreach($banners as $row) {
+						unset($row['id']);
+						unset($row['createtime']);
+						$row['schoolid'] = $copyid;
+						pdo_insert($this->table_banners, $row);
+					}
+				}
+			}
+			$urlsss = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';										
+			makcodetype($urlsss,$weid,$copyid,$_W['uniaccount']['name'],$_W['siteroot']);
+			message('复制学校成功，请刷查看列表页面', referer(), 'success');			
         } elseif ($operation == 'delete') {
             $id = intval($_GPC['id']);
             $store = pdo_fetch("SELECT id FROM " . tablename($this->table_index) . " WHERE id = '{$id}' ");
@@ -303,9 +399,7 @@
          	pdo_delete($this->table_teachers, array('schoolid' => $id, 'weid' => $weid));
          	pdo_delete($this->table_kcbiao, array('schoolid' => $id, 'weid' => $weid));
          	pdo_delete($this->table_cook, array('schoolid' => $id, 'weid' => $weid));
-         	pdo_delete($this->table_reply, array('schoolid' => $id, 'weid' => $weid));
          	pdo_delete($this->table_banners, array('schoolid' => $id, 'weid' => $weid));
-         	pdo_delete($this->table_bbsreply, array('schoolid' => $id, 'weid' => $weid));
          	pdo_delete($this->table_user, array('schoolid' => $id, 'weid' => $weid));
          	pdo_delete($this->table_leave, array('schoolid' => $id, 'weid' => $weid));
          	pdo_delete($this->table_notice, array('schoolid' => $id, 'weid' => $weid));

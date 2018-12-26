@@ -5,7 +5,7 @@
  * @author 高贵血迹
  */
    global $_W, $_GPC;
-   $operation = in_array ( $_GPC ['op'], array ('default','get_stu_info','change_msg','delstu','set_stu_info','search_stu_info','jzjb') ) ? $_GPC ['op'] : 'default';
+   $operation = in_array ( $_GPC ['op'], array ('default','get_stu_info','change_msg','delstu','set_stu_info','search_stu_info','jzjb','set_myinfo') ) ? $_GPC ['op'] : 'default';
 
     if ($operation == 'default') {
 	   die ( json_encode ( array (
@@ -341,14 +341,14 @@
 				include $this->template('comtool/newstulist');
 			}
 		}
-    }
+    } 
 	if ($operation == 'search_stu_info')  {
 		$bj_id = trim($_GPC['bj_id']);
 		$kc_id = trim($_GPC['kc_id']);
 		$search = trim($_GPC['search']);
 		$schoolid = trim($_GPC['schoolid']);
 		$condition = " AND (s_name LIKE '%{$search}%' Or mobile = '{$search}' Or numberid = '{$search}') ";	
-		if($_W['schooltype']){
+		if($_GPC['schoolType'] == 1){
 			$thisKcStu = pdo_fetchall("SELECT distinct sid FROM " . tablename($this->table_order) . " where schoolid = '{$schoolid}' And kcid = '{$kc_id}' and type='1' and sid != 0 ORDER BY id DESC ");
 			$Stu_str_temp = '';
 			foreach($thisKcStu as $u){
@@ -356,7 +356,7 @@
 			}
 			$stu_str = trim($Stu_str_temp,",");
 			$leave2 = pdo_fetchall("SELECT id,s_name,numberid,qrcode_id,bj_id,sex,icon FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And FIND_IN_SET(id,'{$stu_str}') $condition ORDER BY id DESC ");
-		}else{
+		}elseif($_GPC['schoolType'] == 2){
 			$leave2 = pdo_fetchall("SELECT id,s_name,numberid,qrcode_id,bj_id,sex,icon FROM " . tablename($this->table_students) . " where schoolid = '{$schoolid}' And bj_id = '{$bj_id}' $condition ORDER BY id DESC ");
 		}
 
@@ -365,6 +365,12 @@
 			$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
 			$leave2[$key]['banji'] = $banji['sname'];
 			$leave2[$key]['pard'] = pdo_fetchall("SELECT pard FROM ".tablename($this->table_user)." WHERE schoolid = '{$schoolid}' And sid = '{$row['id']}' ");
+			$yq = pdo_fetchcolumn("SELECT count(*) FROM " . tablename($this->table_kcsign) . " where schoolid = '{$schoolid}' And sid = {$row['id']} And kcid = '{$kc_id}' And status = 2 ");
+			$buy = pdo_fetchcolumn("SELECT ksnum FROM " . tablename($this->table_coursebuy) . " where schoolid = '{$schoolid}' And sid = {$row['id']} And kcid = '{$kc_id}' ");
+			$leave2[$key]['yq'] = $yq;
+			$leave2[$key]['buy'] =$buy?$buy:0;
+			$rest = $leave2[$key]['buy'] - $yq;
+			$leave2[$key]['rest'] = ($rest>= 0)?$rest:0;
 			if($leave2[$key]['pard']){
 				foreach($leave2[$key]['pard'] as $k => $v){
 					$leave2[$key]['pard'][$k]['pardid'] = $v['pard'];
@@ -377,5 +383,91 @@
 			}
 		}
 		include $this->template('comtool/stulist');		
-	}	
+	}
+
+
+
+	if ($operation == 'set_myinfo')  {
+		if (! $_GPC ['schoolid']) {
+               die ( json_encode ( array (
+                    'result' => false,
+                    'msg' => '非法请求！' 
+		               ) ) );
+	    }else{
+			$data = array(
+				'tname'=>$_GPC['tname'],
+				'sex'  =>$_GPC['sex'],
+				'birthdate' =>strtotime($_GPC['birthdate']),
+				'idcard' =>$_GPC['idcard'],
+				'jiguan' =>$_GPC['jiguan'],
+				'minzu'	 => $_GPC['minzu'],
+				'zzmianmao' =>$_GPC['zzmianmao'],
+				'address' =>$_GPC['address'],
+				'mobile' =>$_GPC['mobile'],
+				'email' =>$_GPC['email'],
+			);
+			$otherinfo = array(
+				'first_xl'     	=> $_GPC['first_xl'],
+				'first_zy'     	=> $_GPC['first_zy'],
+				'first_yx'     	=> $_GPC['first_yx'],
+				'first_bytime' 	=> $_GPC['first_bytime'],
+				'top_xl'       	=> $_GPC['top_xl'],
+				'top_zy'       	=> $_GPC['top_zy'],
+				'top_yx'       	=> $_GPC['top_yx'],
+				'top_bytime'   	=> $_GPC['top_bytime'],
+				'main_study_jl' => $_GPC['main_study_jl'],
+				'time2work' 	=> $_GPC['time2work'],
+				'tea_subject' 	=> $_GPC['tea_subject'],
+				'zhicheng' 		=> $_GPC['zhicheng'],
+				'zc_pstime' 	=> $_GPC['zc_pstime'],
+				'zc_prtime' 	=> $_GPC['zc_prtime'],
+				'zjzhiwu' 		=> $_GPC['zjzhiwu'],
+				'zjzw_pstime' 	=> $_GPC['zjzw_pstime'],
+				'zjzw_prtime' 	=> $_GPC['zjzw_prtime'],
+				'main_work_jl' 	=> $_GPC['main_work_jl'],
+				'jszg_type' 	=> $_GPC['jszg_type'],
+				'jszgzs_num'	=> $_GPC['jszgzs_num'],
+				'pth_level' 	=> $_GPC['pth_level'],
+				'pthzs_num' 	=> $_GPC['pthzs_num'],
+				'yzk1_level' 	=> $_GPC['yzk1_level'],
+				'yzk1_rank' 	=> $_GPC['yzk1_rank'],
+				'yzk1_org' 		=> $_GPC['yzk1_org'],
+				'yzk2_level' 	=> $_GPC['yzk2_level'],
+				'yzk2_rank' 	=> $_GPC['yzk2_rank'],
+				'yzk2_org' 		=> $_GPC['yzk2_org'],
+				'zhbz1_level' 	=> $_GPC['zhbz1_level'],
+				'zhbz1_rank' 	=> $_GPC['zhbz1_rank'],
+				'zhbz1_org' 	=> $_GPC['zhbz1_org'],
+				'zhbz2_level' 	=> $_GPC['zhbz2_level'],
+				'zhbz2_rank' 	=> $_GPC['zhbz2_rank'],
+				'zhbz2_org' 	=> $_GPC['zhbz2_org'],
+				'jky1_level' 	=> $_GPC['jky1_level'],
+				'jky1_rank' 	=> $_GPC['jky1_rank'],
+				'jky1_org' 		=> $_GPC['jky1_org'],
+				'jky2_level' 	=> $_GPC['jky2_level'],
+				'jky2_rank' 	=> $_GPC['jky2_rank'],
+				'jky2_org' 		=> $_GPC['jky2_org'],
+				'qtzs1_level' 	=> $_GPC['qtzs1_level'],
+				'qtzs1_rank' 	=> $_GPC['qtzs1_rank'],
+				'qtzs1_org' 	=> $_GPC['qtzs1_org'],
+				'qtzs2_level' 	=> $_GPC['qtzs2_level'],
+				'qtzs2_rank' 	=> $_GPC['qtzs2_rank'],
+				'qtzs2_org' 	=> $_GPC['qtzs2_org'],
+				'qtzs3_level' 	=> $_GPC['qtzs3_level'],
+				'qtzs3_rank' 	=> $_GPC['qtzs3_rank'],
+				'qtzs3_org' 	=> $_GPC['qtzs3_org'],
+			);
+			$otherinfo_temp = serialize($otherinfo);
+			$data['otherinfo'] = $otherinfo_temp;
+			pdo_update($this->table_teachers, $data, array('id' => $_GPC['tid']));
+			$result['msg'] = "修改成功！！";
+			$result['result'] = $otherinfo;
+			die ( json_encode ( $result ) );
+			
+			
+		}
+		
+	}
+
+	
 ?>

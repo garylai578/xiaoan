@@ -5,7 +5,7 @@
  * @author 高贵血迹
  */
    global $_W, $_GPC;
-   $operation = in_array ( $_GPC ['op'], array ('default', 'CheckNewMsg', 'binding_for_students', 'binding_for_teachers', 'make_code', 'AddGather', 'GetKmList', 'GetAllKm', 'GetKmInfo', 'GetAllData','gasignup','horder','createtodo','DealWithTodo','TodoDeliver','addsk','yy_order','cyy_t_beizhu','reset_stuinfo','get_user_qr','huifu_mail') ) ? $_GPC ['op'] : 'default';
+   $operation = in_array ( $_GPC ['op'], array ('default', 'CheckNewMsg', 'binding_for_students', 'binding_for_teachers', 'make_code', 'AddGather', 'GetKmList', 'GetAllKm', 'GetKmInfo', 'GetAllData','gasignup','horder','createtodo','DealWithTodo','TodoDeliver','addsk','yy_order','cyy_t_beizhu','reset_stuinfo','get_user_qr','huifu_mail','get_stu_score') ) ? $_GPC ['op'] : 'default';
 
     if ($operation == 'default') {
 	   die ( json_encode ( array (
@@ -132,27 +132,7 @@
 			$datas['result'] = false;
 		}
 		die ( json_encode ( $datas ) );
-	}	
-	if ($operation == 'GetAllData') {
-		$sid = $_GPC['sid'];
-		$bj_id = $_GPC['bj_id'];
-		$schoolid = $_GPC['schoolid'];
-		$lists = get_myqh($bj_id,$schoolid);
-		$allkm = array("总分");
-		$i = 0;
-		foreach($lists as $k =>$r){
-			$lists[$i]['name'] = $r['sname'];
-			$lists[$i]['data'] = array(get_my_score($sid,$r['sid'],$schoolid));
-			unset($lists[$i]['sid']);
-			unset($lists[$i]['sname']);				
-			$i ++;	
-		}
-		$kmlists['titles'] = "成绩总揽";
-		$kmlists['subtitles'] = "我的成绩总揽";
-		$kmlists['question_data'] = $lists;
-		$kmlists['all_km_name'] = $allkm;
-		die ( json_encode ( $kmlists ) );
-	}	
+	}		
 	if ($operation == 'GetKmList') {
 		$qh_id = $_GPC['qh_id'];
 		$schoolid = $_GPC['schoolid'];
@@ -206,8 +186,18 @@
 				$i ++;
 			}
 		}
+		
+		$this_info = pdo_fetch("select sid, SUM(my_score) as t_score FROM " . tablename($this->table_score) . " where  schoolid = '{$schoolid}' And   bj_id = '{$_GPC['bj_id']}' and qh_id = '{$qh_id}' and sid = '{$sid}'  " ); 
+			
+		$count_before = pdo_fetchall(" select SUM(my_score)  FROM " . tablename($this->table_score) . "  where  bj_id = '{$_GPC['bj_id']}' and qh_id = '{$qh_id}'   AND schoolid = '{$schoolid}'  group by sid   HAVING SUM(my_score)>'{$this_info['t_score']}'   " );  
+			
+		$bj_rank = count($count_before)+1;
+			 
+		$count_before_nj = pdo_fetchall(" select SUM(my_score)  FROM " . tablename($this->table_score) . "  where  xq_id = '{$_GPC['nj_id']}' and qh_id = '{$qh_id}'   AND schoolid = '{$schoolid}'  group by sid  HAVING SUM(my_score)>'{$this_info['t_score']}'  " );  
+			
+		$nj_rank = count($count_before_nj)+1;
 		$kmlists['titles'] = $qhname['sname'];
-		$kmlists['subtitles'] = "本期成绩情况统计数据";		
+		$kmlists['subtitles'] = "本期总成绩 班级排名：第{$bj_rank}名 年级排名：第{$nj_rank}名 ";		
 		$kmlists['all_km_name'] = $allkm;
 		die ( json_encode ( $kmlists ) );
 	}
@@ -217,6 +207,24 @@
 		$qh_id = $_GPC['qh_id'];
 		$schoolid = $_GPC['schoolid'];
 		if($km_id == 'all_score'){
+			
+			//$this_info = pdo_fetchall("SELECT SUM(my_score) FROM " . tablename($this->table_score) . " where  schoolid = '{$schoolid}'  group by sid  ");
+			
+			//$this_info = pdo_fetch("SELECT SUM(my_score) as  FROM " . tablename($this->table_classify) . " where  schoolid = '{$schoolid}' And   bj_id = '{$_GPC['bj_id']}' and qh_id = '{$qh_id}' and sid = '{$sid}' ");
+			
+			
+			$this_info = pdo_fetch("select sid, SUM(my_score) as t_score FROM " . tablename($this->table_score) . " where  schoolid = '{$schoolid}' And   bj_id = '{$_GPC['bj_id']}' and qh_id = '{$qh_id}' and sid = '{$sid}'  " ); 
+			
+			//HAVING SUM(my_score)>'{$this_info['t_score']}'
+			$count_before = pdo_fetchall(" select SUM(my_score)  FROM " . tablename($this->table_score) . "  where  bj_id = '{$_GPC['bj_id']}' and qh_id = '{$qh_id}'   AND schoolid = '{$schoolid}'  group by sid   HAVING SUM(my_score)>'{$this_info['t_score']}'   " );  
+			
+			$bj_rank = count($count_before)+1;
+			 
+			$count_before_nj = pdo_fetchall(" select SUM(my_score)  FROM " . tablename($this->table_score) . "  where  xq_id = '{$_GPC['nj_id']}' and qh_id = '{$qh_id}'   AND schoolid = '{$schoolid}'  group by sid  HAVING SUM(my_score)>'{$this_info['t_score']}'  " );  
+			
+			$nj_rank = count($count_before_nj)+1;
+
+			
 			$lists = pdo_fetchall("SELECT distinct km_id FROM " . tablename($this->table_score) . " where schoolid = :schoolid And qh_id = :qh_id ORDER BY id ASC", array(
 				':schoolid' => $schoolid,
 				':qh_id'=>$qh_id
@@ -238,13 +246,19 @@
 				}
 			}
 			$kmlists['titles'] = $qhname['sname'];
-			$kmlists['subtitles'] = "本期成绩情况统计数据";				
+			$kmlists['subtitles'] = "本期总成绩 班级排名：第{$bj_rank}名 年级排名：第{$nj_rank}名 ";			
 			$kmlists['all_km_name'] = $allkm;
+			$kmlists['test_bj_all'] = $count_before;
+			$kmlists['test_nj_all'] = $this_info;
 			die ( json_encode ( $kmlists ) );			
 		}else{
 			$kminfo = pdo_fetch("SELECT sid,sname FROM " . tablename($this->table_classify) . " where sid = :sid ", array(':sid' => $km_id));
 			$allkm = array(trim($kminfo['sname']));
-			$lists = pdo_fetchall("SELECT qh_id,my_score FROM " . tablename($this->table_score) . " where schoolid = :schoolid And km_id = :km_id And sid = :sid ORDER BY id ASC", array(':schoolid' => $schoolid,':km_id'=>$km_id,':sid'=>$sid,));
+			$lists = pdo_fetchall("SELECT qh_id,my_score,sid FROM " . tablename($this->table_score) . " where schoolid = :schoolid And km_id = :km_id And sid = :sid ORDER BY id ASC", array(':schoolid' => $schoolid,':km_id'=>$km_id,':sid'=>$sid,));
+			$test_bj = pdo_fetch("select t.sid, t.my_score,(select count(s.my_score)+1 FROM " . tablename($this->table_score) . " as s  where s.my_score+0>t.my_score+0 And s.km_id = '{$km_id}' and s.bj_id = '{$_GPC['bj_id']}' and s.qh_id = '{$qh_id}'   AND s.schoolid = '{$schoolid}') as rank  FROM " . tablename($this->table_score) . " as t where  t.schoolid = '{$schoolid}' And t.km_id = '{$km_id}' and t.bj_id = '{$_GPC['bj_id']}' and t.qh_id = '{$qh_id}' and sid = '{$sid}'  " ); 
+			
+			
+			$test_nj = pdo_fetch("select t.sid, t.my_score,(select count(s.my_score)+1 FROM " . tablename($this->table_score) . " as s  where s.my_score+0>t.my_score+0 And s.km_id = '{$km_id}' and s.xq_id = '{$_GPC['nj_id']}' and s.qh_id = '{$qh_id}'   AND s.schoolid = '{$schoolid}') as rank  FROM " . tablename($this->table_score) . " as t where  t.schoolid = '{$schoolid}' And t.km_id = '{$km_id}' and t.xq_id = '{$_GPC['nj_id']}' and t.qh_id = '{$qh_id}' and sid = '{$sid}'  " ); 
 			$i = 0;
 			$kmlist = array();
 			foreach($lists as $k =>$r){
@@ -259,9 +273,11 @@
 			}
 			//unset($lists[count($lists) - 1]);
 			$kmlists['titles'] = $kminfo['sname'];
-			$kmlists['subtitles'] = "本科目成绩趋势分析";			
+			$kmlists['subtitles'] = "本科本期 班级排名：第{$test_bj['rank']}名 年级排名：第{$test_nj['rank']}名 ";			
 			$kmlists['question_data'] = $kmlist;
 			$kmlists['all_km_name'] = $allkm;
+			
+			
 			die ( json_encode ( $kmlists ) );			
 		}
 	}	
@@ -1208,7 +1224,7 @@
 			die(json_encode($data));
 		}
 	}	
-	  if ($operation == 'huifu_mail') { 
+	if ($operation == 'huifu_mail') { 
 		$huifu = $_GPC['huifu'];
 		$id = $_GPC['id'];
 		$datatemp = array( 
@@ -1222,4 +1238,32 @@
 		)));		
    	
     }
+	
+	if ($operation == 'get_stu_score') { 
+		$schoolid = $_GPC['schoolid'];
+		$this_xueqi = $_GPC['this_xueqi'];
+		$sid = $_GPC['sid'];
+		$student =  pdo_fetch("SELECT s_name FROM ".tablename($this->table_students)." WHERE schoolid = '{$schoolid}' and id = '{$sid}' ");
+		if (empty($schoolid)) {
+			die ( json_encode ( array (
+				'result' => false,
+				'msg' => '非法请求' 
+			) ) );
+		}else{
+			$xueqi = pdo_fetch("SELECT * FROM ".tablename($this->table_classify)." WHERE schoolid = '{$schoolid}' and sid = '{$this_xueqi}' and type='xq_score' ");
+			$score_list = pdo_fetchall("SELECT * FROM ".tablename($this->table_teascore)." WHERE schoolid='{$schoolid}' and sid = '{$sid}'  and scoretime >='{$xueqi['sd_start']}' and scoretime <='{$xueqi['sd_end']}'  and type = 1 order by scoretime DESC ");
+			foreach($score_list as $key_s=>$value_s){
+				$bj_rank = pdo_fetch("select count(score)+1 as rank FROM " . tablename($this->table_teascore) . "  where score>'{$value_s['score']}' AND schoolid = '{$schoolid}' AND scoretime ='{$value_s['scoretime']}' and bj_id = '{$value_s['bj_id']}' ");
+				$nj_rank = pdo_fetch("select count(score)+1 as rank FROM " . tablename($this->table_teascore) . "  where score>'{$value_s['score']}'  AND schoolid = '{$schoolid}' AND scoretime ='{$value_s['scoretime']}' and nj_id = '{$value_s['nj_id']}' ");
+				$score_list[$key_s]['bj_rank'] = $bj_rank['rank'];
+				$score_list[$key_s]['nj_rank'] = $nj_rank['rank'];
+				$score_list[$key_s]['time_out'] = date("Y-m",$value_s['scoretime']);
+			}
+			$result['data'] = $score_list ;
+			$result['xueqiname'] = $xueqi['sname'];
+			$result['sname'] = $student['s_name'];
+			die ( json_encode ($result));
+		}
+    }
+	
 ?>

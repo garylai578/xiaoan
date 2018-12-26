@@ -100,7 +100,7 @@ if($operation == 'display'){
 				),
 			),
 		);
-		$uniacccount = WeAccount::create($weid);
+		$uniacccount = WeAccount::create($_W['acid']);
 		$barcode['action_name'] = 'QR_SCENE';
 		$result = $uniacccount->barCodeCreateDisposable($barcode);
 		if (is_error($result)) {

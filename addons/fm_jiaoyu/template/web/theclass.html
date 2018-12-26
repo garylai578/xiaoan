@@ -63,14 +63,7 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 						</div>
 						<div class="col-sm-2 col-lg-2" style="width: 45px;margin-left: -31px;">	
 							<span class="btn btn-default"><i class="fa fa-search"></i></span>
-						</div>
-						<div class="col-sm-2 col-lg-2">
-							<select style="margin-right:15px;" name="is_temple" class="form-control">
-								<option value="0">班级类型</option>
-								<option value="1" {if $theclass['is_temple'] == 1} selected="selected"{/if}>临时托管班</option>
-							</select>
-							幼儿园选填
-						</div>
+						</div>						
 						<div class="col-sm-2 col-lg-2">
 							<input type="text" name="cost" placeholder="报名费/元" class="form-control" value="{$theclass['cost']}" />
 							报名需要付费,留空不付
@@ -146,7 +139,7 @@ background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-
 							<span class="btn btn-default"><i class="fa fa-search"></i></span>
 						</div>
 						<div class="col-sm-2 col-lg-2">
-							<select style="margin-right:15px;" name="is_temple_new[]" class="form-control">
+                          	<select style="margin-right:15px;" name="is_temple_new[]" class="form-control">
 								<option value="0">班级类型</option>
 								<option value="1" >临时托管班</option>
 							</select>
@@ -205,9 +198,9 @@ $('#custom-url-add').click(function(){
 				'		</div>'+
 				'		<div class="col-sm-2 col-lg-2" style="width: 45px;margin-left: -31px;">'+
 				'			<span class="btn btn-default"><i class="fa fa-search"></i></span>'+
-				'		</div>'+
+				'		</div>'+				
 				'		<div class="col-sm-2 col-lg-2">'+
-				'			<select style="margin-right:15px;" name="is_temple_new[]" class="form-control">'+
+                            <select style="margin-right:15px;" name="is_temple_new[]" class="form-control">'+
 				'				<option value="0">班级类型</option>'+
         		'				<option value="1" >临时托管班</option>'+
         		'			</select>'+
@@ -228,7 +221,7 @@ $('#custom-url-add').click(function(){
 	$('#custom-url').append(html);
 });
 $(document).on('click', '.custom-url-del', function(){
-	$(this).parent().parent().remove();
+	$(this).parent().parent().parent().remove();
 	return false;
 });	
 
@@ -287,7 +280,7 @@ $(document).on('click', '.btn-default', function(){
 						<th>所属年级</th>
                         <th>班级名称</th>
 						<th>班级主任</th>
-						<th>班级类型</th>
+                        <th>班级类型</th>
 						<th>学生人数</th>
 						<th>班级圈消息</th>
 						<th>班级之星</th>
@@ -303,7 +296,7 @@ $(document).on('click', '.btn-default', function(){
 						<td><div class="type-parent">{$row['xueqi']}</div></td>
                         <td><div class="type-parent">{$row['sname']}&nbsp;&nbsp;</div></td>
 						<td><div class="type-parent">{$row['name']}</div></td>
-						<td><div class="type-parent"> {if $row['is_temple'] == 1}临时托管班{/if}</div></td>
+                      	<td><div class="type-parent"> {if $row['is_temple'] == 1}临时托管班{/if}</div></td>
 						<td><span class="label label-danger">{$row['renshu']}人</span></td>
 						<td><span class="label label-info">{$row['bjqsm']}条</span></td>
 						<td><input type="checkbox" value="{$row['is_bjzx']}" name="is_on[]" data-id="{$row['sid']}" {if $row['is_bjzx'] == 1}checked{/if}></td>

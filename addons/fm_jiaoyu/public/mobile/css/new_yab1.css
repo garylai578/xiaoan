@@ -379,7 +379,6 @@ h1 {
 .head_title {
     width: 200px;
     height: 30px;
-    border: 1px solid #30c6e1;
     border-radius: 5px;
     overflow: auto;
     zoom: 1;
@@ -401,15 +400,15 @@ h1 {
             display: block;
             height: 100%;
             color: #000;
-            font-size: 16px;
+            font-size: 13px;
         }
 
         .head_title li:first-child {
-            border-radius: 5px 0 0 5px;
+            border-radius: 25px 0 0 25px;
         }
 
         .head_title li:last-child {
-            border-radius: 0 5px 5px 0;
+            border-radius: 0 25px 25px 0;
         }
 
         .head_title li.act {

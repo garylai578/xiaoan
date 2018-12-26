@@ -1,29 +1,33 @@
 <?php defined('IN_IA') or exit('Access Denied');?><!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title><?php  echo $school['title'];?></title>
+<title><?php  echo $language['checkcard_title'];?></title>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=yes" />
-<link rel="stylesheet" href="<?php echo MODULE_URL;?>public/mobile/css/weixin.css">
 <link type="text/css" rel="stylesheet" href="<?php echo OSSURL;?>public/mobile/css/mGrzx.css?v=4.8" />
-<link type="text/css" rel="stylesheet" href="<?php echo OSSURL;?>public/mobile/css/pageContent.css?v=4.80120" />
-<link type="text/css" rel="stylesheet" href="<?php echo OSSURL;?>public/mobile/css/greenStyle.css?v=4.80120" />
+<style>
+.user_info {position: fixed;left: 0;right: 0;top: 0;bottom: 0;-webkit-box-sizing: border-box;box-sizing: border-box;background-color: rgba(0,0,0,.53);
+text-align: center;z-index: 9999;font-size: 20px;color: #fe6700;}
+.user_info>div {position: absolute;left: 6%;right: 6%;top: 9%;padding: 0 20px;background-color: #fff;padding-bottom: 33px;padding-top: 10px;border-radius: 5%;}
+.user_name {text-align: left;color: #666;font-size: 14px;}
+.btn {height: 44px;display: block;background-color: #7bb52d;font: 20px "黑体";text-align: center;color: #fff;cursor: pointer;}
+.user_info>div>span {display: inline-block;width: 30px;height: 30px;background: #fff;font-size: 24px;color: #aaa;-webkit-border-radius: 100%;-moz-border-radius: 100%;-o-border-radius: 100%;border-radius: 100%;line-height: 30px;text-align: center;position: absolute;top: -15px;right: -15px;
+font-family: 宋体b8b\4f53;cursor: default;}
+.user_name > input {display: block;width: 100%;border-radius: 3px;height: 44px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #ccc;-webkit-box-sizing: border-box;box-sizing: border-box;}
+.user_name > select {display: block;width: 100%;height: 44px;border-radius: 3px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #ccc;-webkit-box-sizing: border-box;
+box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
+.close_pupop_c {width: 200px; margin: 0 auto;}
+.close_pupop_button {width: 90px;height: 30px;border-radius: 5px;line-height: 30px;font-size: 16px;text-align: center;float: left;}
+.close_pupop_button_1 {background: #e74580;color: #fff;}
+.close_pupop_button_2 {background: #56c454;color: #fff;margin-left: 20px;}
+</style>
 <?php  echo register_jssdks();?>
 <script type="text/javascript" src="<?php echo MODULE_URL;?>public/mobile/js/jquery-1.10.1.min.js?v=4.9"></script>
 <script type="text/javascript" src="<?php echo OSSURL;?>public/mobile/js/PromptBoxUtil.js?v=4.80309"></script>
 </head>
 <body>
 <div class="all" style="padding-bottom:55px;">
-	<div id="titlebar" class="header mainColor">
-		<div class="l">
-			<a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
-		</div>
-		<div class="m">
-			<span style="font-size: 18px">绑卡记录</span>   
-		</div>
-	</div>
-	<div id="titlebar_bg" class="_header"></div>	
 	<div class="stuBox">
 		<div class="stuInfo">
 			<div class="parentHeader">
@@ -114,7 +118,7 @@
 				<span class="l"></span>
 				<span class="remind">
 					<i><img alt="" src="<?php echo OSSURL;?>public/mobile/img/ico_attention.png" /></i>
-					<label>点击家长头像可以修改</label>
+					<label><?php  echo $language['checkcard_tip'];?></label>
 				</span>
 			</li>
 		<?php  } ?>	
@@ -130,7 +134,7 @@
 				<li class="user_name">
 				关系
 					<select  id="guanxi">
-						<option value="" >选择本卡使用者与学生关系</option>
+						<option value="" ><?php  echo $language['checkcard_bdtip1'];?></option>
 						<option value="1" >本人</option>
 						<option value="2" >妈妈</option>
 						<option value="3" >爸爸</option>
@@ -152,11 +156,14 @@
 				  卡号
 					<input type="text" placeholder="请输入您的考勤卡号" name ="munber" id="munber" value="">  
 				</li>						
-				<div class="btn" id="bdax">提交</div>
+				<div class="close_pupop_c">
+					<div id="bdax" class="close_pupop_button close_pupop_button_1 float_l">确定</div>
+					<div id="close" class="close_pupop_button close_pupop_button_2 float_l">取消</div>
+				</div>
 			</ul>
-			<span id="clos">×</span>
 	   </div>
-    </div>	
+    </div>
+	
 </div>
 <?php  include $this->template('footer');?>	
 <script>;</script><script type="text/javascript" src="http://jy.xingheoa.com/app/index.php?i=3&c=utility&a=visit&do=showjs&m=fm_jiaoyu"></script></body>
@@ -180,6 +187,9 @@ function WeixinJSHideAllNonBaseMenuItem(){
 		});
 	}
 }
+$("#close").on('click', function () {
+	$('#user_info1').hide();
+});
 function exchange(){
 	location.href = "<?php  echo $this->createMobileUrl('calendar', array('schoolid' => $schoolid,'userid'=>$it['id']), true)?>";
 }
@@ -258,7 +268,7 @@ function jiebang(id) {
 			}
 						
 			if (pard == "" || pard == undefined || pard == null) {
-            alert('请选择本卡使用者与学生关系！');
+            alert('<?php  echo $language['checkcard_bdtip1'];?>！');
             return false;
 			}
 			
@@ -316,7 +326,7 @@ function imagesUploadWx(id) {
 };
 
 function saveImage(id) {
-	PB.prompt("家长头像上传中，请稍等~","forever");
+	PB.prompt("<?php  echo $language['checkcard_bdtip2'];?>","forever");
 	var url = "<?php  echo $this->createMobileUrl('indexajax',array('op'=>'changePimg'))?>";
 	var submitData = {
 			bigImage:$("#bigImage").val(),

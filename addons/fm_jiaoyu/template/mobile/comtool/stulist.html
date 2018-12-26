@@ -31,7 +31,13 @@
 					<div class="JobLeaderBox">未绑定</div>
 				{/if}
 			</div>
-			<p class="notifyCreateTime">{$v['banji']}</p>
+			{if $_W['schooltype']}
+			<span class="teacherInfo" style="color:#da7131;">已签:<span style="color:blue">{$v['yq']}</span>课时</span>	
+			<span class="teacherInfo" style="color:#da7131;">总共:<span style="color:blue">{$v['buy']}</span>课时</span>
+			<span class="teacherInfo" style="color:#da7131;">剩余:<span style="color:blue">{$v['rest']}</span>课时</span>
+			{else}
+				<p class="notifyCreateTime">{$v['banji']}</p>
+			{/if}
 			{if $v['numberid']}<p class="notifyCreateTime">学号:{$v['numberid']}</p>{/if}
 		</div>
 	</div>
@@ -71,7 +77,13 @@
 					<div class="JobLeaderBox">未绑定</div>
 				{/if}
 			</div>
-			<p class="notifyCreateTime">{$v['banji']}</p>
+			{if $_GPC['schoolType'] ==1}
+			<span class="teacherInfo" style="color:#da7131;">已签:<span style="color:blue">{$v['yq']}</span>课时</span>	
+			<span class="teacherInfo" style="color:#da7131;">总共:<span style="color:blue">{$v['buy']}</span>课时</span>
+			<span class="teacherInfo" style="color:#da7131;">剩余:<span style="color:blue">{$v['rest']}</span>课时</span>
+			{else}
+				<p class="notifyCreateTime">{$v['banji']}</p>
+			{/if}
 			{if $v['numberid']}<p class="notifyCreateTime">学号:{$v['numberid']}</p>{/if}
 		</div>
 	</div>

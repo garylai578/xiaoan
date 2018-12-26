@@ -295,22 +295,18 @@
     </div>
     <div class="panel panel-default file-container" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcel" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcel" />
-                <input type="hidden" name="ac" value="uppyk" />
-                <input type="hidden" name="schoolid" value="{$schoolid}" />
-				<input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
-                <a class="btn btn-primary"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcel" id="unload" style="display: none;" onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcel" value="导入数据">
-                <a class="btn btn-primary" href="../addons/fm_jiaoyu/public/example/example_uppyk.xls">下载导入模板</a>
+            <form id="form">
+				<input type="hidden" id="fromtid" value="{$tid_global}">
+                <input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
+                <a class="btn btn-warning"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
+                <input type="file" class="pull-left btn-primary span3" name="file" id="unload" style="display: none;"
+                       onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
+                <a class="btn btn-danger" onclick="submits('input_scpy','form');">导入数据</a>
+				<a class="btn btn-info" href="../addons/fm_jiaoyu/public/example/example_uppyk.xls"><i class="fa fa-download"></i>下载导入模板</a>
             </form>
         </div>
-    </div>	
+    </div>
+	{template 'public/excel_input'}
     <div class="panel panel-default">
         <form action="" method="post" class="form-horizontal form" >
             <input type="hidden" name="schoolid" value="{$schoolid}" />

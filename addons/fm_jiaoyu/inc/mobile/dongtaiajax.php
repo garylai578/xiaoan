@@ -4,7 +4,7 @@
  *
  * @author 高贵血迹
  */global $_W, $_GPC;
-   $operation = in_array ( $_GPC ['op'], array ('default','fabu','mfabu','zfabu','fangxue','sxcfb','xcfb','dellimg','savely','hfavely','UpdateTypeByActiveId','SavePlanWeek','GetDetailByWeekDay','SendPlanWeek','DeleteWeekPlanByPlanUid','updatabypic','savedatabypicforplan','GetAttendData','GetAttendDataforTeacher','CheckSign','DoSign','fzqd','fzqdqr','checklogbyid','qingjialog','videodz','videopl','delmypl','getcook','zhuida','CheckSignForTeacher','DoSignForTeacher','delnotice','send_mail','mnotpro','notpro','znotpro','t_piyue','GetHolidayData','get_noticeuser','get_noticebjtz') ) ? $_GPC ['op'] : 'default';
+   $operation = in_array ( $_GPC ['op'], array ('default','fabu','mfabu','zfabu','fangxue','sxcfb','xcfb','dellimg','savely','hfavely','UpdateTypeByActiveId','SavePlanWeek','GetDetailByWeekDay','SendPlanWeek','DeleteWeekPlanByPlanUid','updatabypic','savedatabypicforplan','GetAttendData','GetAttendDataforTeacher','CheckSign','DoSign','fzqd','fzqdqr','checklogbyid','qingjialog','videodz','videopl','delmypl','getcook','zhuida','CheckSignForTeacher','DoSignForTeacher','delnotice','send_mail','mnotpro','notpro','znotpro','t_piyue','GetHolidayData','get_noticeuser','get_noticebjtz','snotice_qbyd') ) ? $_GPC ['op'] : 'default';
     if ($operation == 'default') {
 	           die ( json_encode ( array (
 			         'result' => false,
@@ -310,7 +310,8 @@
 				$shername = $tname;
 				$is_private = trim($_GPC['is_private']);
 				if($usertype == 'send_class'){
-					$userdatas = explode(',',$_GPC['datas']);
+					$userdatas = rtrim($_GPC['datas'],',');
+					$userdatas = explode(',',$userdatas);
 				}
 				if($usertype == 'student'){
 					$datass = str_replace('&quot;','"',$_GPC['datas']);
@@ -410,6 +411,9 @@
 							'createtime' => time(),
 							'type'=>1
 						);
+						if($usertype == 'send_class'){
+							$temp['userdatas']	= rtrim($_GPC['datas'],',');	
+						}
 						if($schooltype){
 							$temp['kc_id']	= $bj_id;
 						}else{
@@ -658,7 +662,7 @@
 					'type'=>2,
 					'groupid'=>$groupid,
 					'usertype'=>$_GPC['type'],
-					'userdatas'=>$_GPC['datas']
+					'userdatas'=>rtrim($_GPC['datas'],';')
 				);
 				$temp['picarr'] = iserializer($picstr);
 				if($is_private == 'Y'){
@@ -700,7 +704,8 @@
 						$total = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_students)." where weid = :weid And schoolid = :schoolid",array(':weid'=>$weid, ':schoolid'=>$schoolid));
 					}
 				}else{
-					$userdatas = explode(';',$_GPC['datas']);
+					$rtrim = rtrim($_GPC['datas'],';');
+					$userdatas = explode(';',$rtrim);
 					if($_GPC['type'] == 'send_class'){
 						$total = 0;
 						foreach($userdatas as $row){
@@ -724,13 +729,25 @@
 						}
 					}
 					if($_GPC['type'] == 'staff_jsfz'){
-						$total = 0;
+						foreach($userdatas as $row){
+							if($row == 0 || $row != ""){
+								$staff_jsfz[] = $row;
+							}	
+						}
+						mload()->model('tea');
+						$total_temp = TeaInfoByclassArr_BothWay($staff_jsfz,$schoolid);
+						$total = count($total_temp);
+						/* var_dump($total_temp);
+						var_dump($staff_jsfz);
+						var_dump($userdatas);
+						die(); */ 
+						/* $total = 0;
 						foreach($userdatas as $row){
 							if($row == 0 || $row != ""){
 								$nowtotal = pdo_fetchcolumn("SELECT COUNT(1) FROM ".tablename($this->table_teachers)." where fz_id = :fz_id And schoolid = :schoolid",array(':fz_id'=>$row, ':schoolid'=>$schoolid));
 								$total = $total + $nowtotal;
 							}
-						}
+						} */
 					}
 					if($_GPC['type'] == 'staff'){
 						$total = 0;
@@ -778,7 +795,8 @@
 			if($usertype == 'school' || $usertype == 'alltea' || $usertype == 'allstu'){
 				$this->sendMobileXytz($notice_id, $schoolid, $weid, $tname, $groupid, $pindex, $psize);
 			}else{
-				$userdatas = explode(';',$userdatas);
+				$temp_userdatas = trim($userdatas,";");
+				$userdatas = explode(';',$temp_userdatas);
 				session_start();
 				if($usertype == 'send_class'){
 					if($_SESSION['arr'] || $_SESSION['arr'] != ""){
@@ -816,13 +834,15 @@
 					}else{
 						$staff_jsfz = array();
 						foreach($userdatas as $row){
-							if($row == 0 || $row != ""){
+							if($row == 0 || $row != " "){
 								$staff_jsfz[] = $row;
 							}	
 						}
 						mload()->model('tea');
-						$arr = TeaInfoByclassArr($staff_jsfz,$schoolid);
+						//$arr = TeaInfoByclassArr($staff_jsfz,$schoolid);
+						$arr = TeaInfoByclassArr_BothWay($staff_jsfz,$schoolid);
 						$_SESSION['arr'] = $arr;
+						
 					}
 					$this->sendMobileXytzToUserArr($notice_id, $schoolid, $weid, $tname, $arr, 'totea', $pindex, $psize);
 				}
@@ -1009,7 +1029,8 @@
 				);
 				$ansType = iserializer($temp_ans);
 				if($usertype == 'send_class'){
-					$userdatas = explode(',',$_GPC['datas']);
+					$rtrim = rtrim($_GPC['datas'],',');
+					$userdatas = explode(',',$rtrim);
 				}
 				if($usertype == 'student'){
 					$datass = str_replace('&quot;','"',$_GPC['datas']);
@@ -1057,6 +1078,9 @@
 							'type'=>3,
 							'km_id'=>$km_id,
 						);
+						if($usertype == 'send_class'){
+							$temp['userdatas'] = rtrim($_GPC['datas'],',');
+						}
 						if($schooltype){
 							$temp['kc_id']	= $bj_id;
 						}else{
@@ -2404,7 +2428,12 @@ if ($operation == 'fzqd') {
 				$pard = 11;
 				pdo_insert($this->table_checklog, $data);
 				$logid = pdo_insertid();
-				$this ->sendMobileFzqdtx($_GPC['schoolid'],$_W['uniacid'],$_GPC['bj_id'],$row,$type,$_GPC['TimeType'],$logid,$pard);
+				$macid = 'wechatSign';
+				if(is_showyl()){
+					$this->sendMobileJxlxtz_yl($_GPC['schoolid'], $_W['uniacid'],$row, $logid,$macid);
+				}else{
+					$this->sendMobileFzqdtx($_GPC['schoolid'],$_W['uniacid'],$_GPC['bj_id'],$row,$type,$_GPC['TimeType'],$logid,$pard);
+				}
 				$rs ++;
 			}
 		}
@@ -3147,18 +3176,18 @@ if ($operation == 'GetHolidayData') {
 	$array = array();
 	for($i=0;$i<$j;$i++){
 		$array[] = array(
-				'date' => date('Y-m-d',$start_time+$i*86400),//每隔一天赋值给数组
+				'date' => date('Y-n-j',$start_time+$i*86400),//每隔一天赋值给数组
 				'day' => $i +1
 		);
 	}
 	$result = array();
-	$datesetid =  pdo_fetchcolumn("SELECT datesetid FROM " . tablename($this->table_classify) . " WHERE schoolid = '{$_GPC['schoolid']}' and sid = '{$_GPC['bj_id']}' ");
-	if(!empty($datesetid)){
-		$checkdateset      =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdateset) . " WHERE schoolid = {$_GPC['schoolid']} and  id = '{$datesetid}'");
-		$checkdateset_holi =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdatedetail) . " WHERE schoolid = {$_GPC['schoolid']} and  checkdatesetid = '{$datesetid}' and year = '{$nowyear}' ");
+	$dateset =  pdo_fetch("SELECT datesetid FROM " . tablename($this->table_classify) . " WHERE schoolid = '{$_GPC['schoolid']}' and sid = '{$_GPC['bj_id']}' ");
+	if(!empty($dateset)){
+		$checkdateset      =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdateset) . " WHERE schoolid = {$_GPC['schoolid']} and  id = '{$dateset['datesetid']}'");
+		$checkdateset_holi =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdatedetail) . " WHERE schoolid = {$_GPC['schoolid']} and  checkdatesetid = '{$checkdateset['id']}' and year = '{$nowyear}' ");
 		foreach($array as $row){
 			//特殊日子
-			$checktime  =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE  schoolid = {$_GPC['schoolid']} and  checkdatesetid = '{$datesetid}' and date = '{$row['date']}' ");
+			$checktime  =  pdo_fetch("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE  schoolid = {$_GPC['schoolid']} and  checkdatesetid = '{$dateset['datesetid']}' and date = '{$row['date']}' ");
 			//是特殊日子
 			if(!empty($checktime)){
 				if($checktime['type'] == 6 ){
@@ -3194,4 +3223,19 @@ if ($operation == 'GetHolidayData') {
 	}
 	die ( json_encode ( $result ) );
 }  
+if ($operation == 'snotice_qbyd') { //设置通知作业全部已读
+	$recode = pdo_fetchall("SELECT id,readtime,type FROM " . tablename($this->table_record) . " where schoolid = '{$_GPC['schoolid']}' And sid = '{$_GPC['sid']}' And userid = '{$_GPC['userid']}' And type = '{$_GPC['noticetype']}' And readtime < 1");
+	if($recode){
+		$nowtime = time();
+		foreach($recode as $row){
+			pdo_update($this->table_record, array('readtime' => $nowtime), array('id' => $row['id']));
+		}
+		$result ['result'] = true;
+		$result ['msg'] ='设置成功！' ;
+	}else{
+		$result ['result'] = false;
+		$result ['msg'] ='你没有未读消息哦' ;
+	}
+	die ( json_encode ( $result ) );
+} 
 ?>

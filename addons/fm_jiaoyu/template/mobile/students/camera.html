@@ -52,7 +52,7 @@
 .cart-price{font-size:18px;margin-left: 4px; color: #d41f1f;}
 .cart-price1{font-size:20px;margin-left: 4px; color: #d41f1f;line-height:30px;}
 .cart-price2{font-size:13px;margin-left: 4px; color: #333;}
-.one_pay{float:right;width:33%;background-color:#10c178;height:100%;color:#fff;font-size:22px;text-align:center;}
+.one_pay{float:right;width:33%;background-color:{if $school['headcolor']}{$school['headcolor']}{else}#10c178{/if};height:100%;color:#fff;font-size:22px;text-align:center;}
 .one_pays{margin-top: 8%;}
 .reveal-modal-bg {position: fixed;height: 100%;width: 100%;background: #000;background: rgba(0,0,0,.8);z-index: 100;display: none;top: 0;left: 0; }
 .reveal-modal {visibility: hidden;top: 100px; left: 2%;right:2%;background: #fff ;position: absolute;z-index: 101;    padding: 25px 18px 38px;-moz-border-radius: 5px;-webkit-border-radius: 5px;order-radius: 5px;
@@ -72,22 +72,12 @@
 .buy_info .buy_left .pirce{font-size: 13px;}
 .buy_info .buy_left .pirce>span{font-size: 22px;color:red;font-weight: bold;}
 .buy_info .buy_right {width: 35%;float: right;margin-top: 21px;}
-.buy_info .buy_right .buy_btn{width: 80%;height: 37px;vertical-align: middle;text-align: center;line-height: 35px;color: #fff;border-radius: 8px;background-color: #10c178;margin-left: 18px;}
+.buy_info .buy_right .buy_btn{width: 80%;height: 37px;vertical-align: middle;text-align: center;line-height: 35px;color: #fff;border-radius: 8px;background-color: {if $school['headcolor']}{$school['headcolor']}{else}#10c178{/if};margin-left: 18px;}
 </style>
 <title>{$school['title']}</title>
 </head>
 <body>
-<div id="titlebar" class="header mainColor">
-	<div class="l">
-		<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
-	</div>
-	<div class="m">
-		<a id="Changesf">
-			<span style="font-size: 18px">{$school['videoname']}</span>
-		</a>
-	</div>
-</div> 
-<div id="titlebar_bg" class="video_detail_box" style="margin-top:70px;">
+<div id="titlebar_bg" class="video_detail_box" style="margin-top:10px;">
     <div class="main_video_box">
         <div class="til">{$name}</div>
         <div class="blank"></div>
@@ -360,11 +350,9 @@
 </html>
 <script type="text/javascript">
 setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").css("margin-top","5px");
-	}
-}, 100);
+	location.reload();
+	alert('您还在观看吗？');
+}, 1800000);
 </script>
 <script>
 function gopay(price,type){

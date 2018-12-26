@@ -73,11 +73,11 @@
                 <div class="item_left">
                     <img src="<?php echo OSSURL;?>public/mobile/img/SignIn.png">
 
-                    <div class="item_leftSignIn">我要签到</div>
+                    <div class="item_leftSignIn"><?php  echo $language['calendar_wyqd'];?></div>
                 </div>
                 <div class="item_right">
                     <div class="item_right_Ico"></div>
-                    <div class="item_leftSignIn">微信辅助签到</div>
+                    <div class="item_leftSignIn"><?php  echo $language['calendar_wxfzqd'];?></div>
                 </div>
             </a>
         </li>
@@ -86,11 +86,11 @@
             <a href="javascript:;" class="footerItem">
                 <div class="item_left">
                     <img src="<?php echo OSSURL;?>public/mobile/img/leave_Ico.png">
-                    <div class="item_leftSignIn">我要请假</div>
+                    <div class="item_leftSignIn"><?php  echo $language['calendar_wyqj'];?></div>
                 </div>
                 <div class="item_right">
                     <div class="item_right_Ico"></div>
-                    <div class="item_leftSignIn">向老师请假</div>
+                    <div class="item_leftSignIn"><?php  echo $language['calendar_xlsqj'];?></div>
                 </div>
             </a>
         </li>
@@ -98,11 +98,11 @@
 			<a href="javascript:;" class="footerItem">
 				<div class="item_left">
 					<img src="<?php echo OSSURL;?>public/mobile/img/leave_record_Ico.png">
-					<div class="item_leftSignIn">请假记录</div>
+					<div class="item_leftSignIn"><?php  echo $language['calendar_qjjl'];?></div>
 				</div>
 				<div class="item_right">
 					<div class="item_right_Ico"></div>
-					<div class="item_leftSignIn">查看历史考勤记录</div>
+					<div class="item_leftSignIn"><?php  echo $language['calendar_cklskqjl'];?></div>
 				</div>
 			</a>
         </li>
@@ -111,11 +111,11 @@
 			<a href="javascript:;" class="footerItem">
 				<div class="item_left">
 					<img src="<?php echo OSSURL;?>public/mobile/img/check_card.png">
-					<div class="item_leftSignIn">考勤卡</div>
+					<div class="item_leftSignIn"><?php  echo $language['calendar_kqk'];?></div>
 				</div>
 				<div class="item_right">
 					<div class="item_right_Ico"></div>
-					<div class="item_leftSignIn">查看和绑定考勤卡</div>
+					<div class="item_leftSignIn"><?php  echo $language['calendar_ckhbdkqk'];?></div>
 				</div>
 			</a>
         </li>	

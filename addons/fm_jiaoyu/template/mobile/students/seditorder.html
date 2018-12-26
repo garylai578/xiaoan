@@ -55,7 +55,7 @@
 	    <form id="frmAddress" action="{php echo $this->createMobileUrl('getorder',array('schoolid' => $schoolid,'id' => $userid), true)}" method="POST">
 	      
 	        <!--商品信息-->
-	        <div class="phone_number" style="font-weight:900">商品信息</div>
+	        <div class="phone_number" style="font-weight:900">{$language['seditorder_title']}</div>
 	        <div class="name">
 		        <input value="{$good['id']}" id="GoodId" name="GoodId"  type="text" hidden>
 	            <label class="titleDescribe" for="username" style="width:70px !important">商品名：</label>
@@ -206,8 +206,8 @@
 	        </div>
  <div class="phone_number" > <ul class="head_title">
 			
-			<li  id="jdwj" onclick="showaddress()">寄到我家</li>
-			<li  id="dxzq" class="act" onclick="hideaddress()">到校自取</li>
+			<li  id="jdwj" onclick="showaddress()">{$language['seditorder_jdwj']}</li>
+			<li  id="dxzq" class="act" onclick="hideaddress()">{$language['seditorder_dxzq']}</li>
 		</ul></div>
 			<!--收货人信息-->
 	        <div class="phone_number" style="font-weight:900">收货人信息 

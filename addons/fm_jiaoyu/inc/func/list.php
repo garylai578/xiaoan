@@ -4,6 +4,9 @@
  */
 global $_W, $_GPC;
 $weid = $_W['uniacid'];
+
+$state = pdo_fetch("SELECT * FROM ".tablename('uni_account_users')." WHERE uid = :uid And uniacid = :uniacid", array(':uid' => $_W['uid'],':uniacid' => $_W['uniacid']));
+$_W['role']  = $state['role'];
 if($_W['isfounder'] || $_W['role'] == 'owner' || $_W['role'] == 'vice_founder') {
 	$where = "WHERE weid = '{$weid}'";
 }else{
@@ -12,10 +15,6 @@ if($_W['isfounder'] || $_W['role'] == 'owner' || $_W['role'] == 'vice_founder') 
 }
 
 $schoollist = pdo_fetchall("SELECT id,title,logo FROM " . tablename($this->table_index) . " $where   order by ssort DESC");
-
-$state = pdo_fetch("SELECT * FROM ".tablename('uni_account_users')." WHERE uid = :uid And uniacid = :uniacid", array(':uid' => $_W['uid'],':uniacid' => $_W['uniacid']));
-$_W['role']  = $state['role'];
-
 $myadmin = pdo_fetch("SELECT tid,schoolid FROM ".tablename('users')." WHERE uid = :uid And uniacid = :uniacid", array(':uid' => $_W['uid'],':uniacid' => $_W['uniacid']));
 
 $schoolid = intval($_GPC['schoolid']);

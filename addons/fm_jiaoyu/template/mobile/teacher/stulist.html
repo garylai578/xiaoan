@@ -117,7 +117,6 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 .manual_student_list_search .search_text {border: none;height: 22px;line-height: 22px;font-size: 14px;box-sizing: border-box;width: 100%;padding-right: 30px;}
 .manual_student_list_search .search_btn {width: 22px;height: 22px;background: url({OSSURL}public/mobile/img/manual_search_icon.png) no-repeat center;background-size: 22px;position: absolute;right: 10px;
 top: 10px;}
-
 </style>
 {php include $this->template('port');}
 <title>{$school['title']}</title>
@@ -135,7 +134,6 @@ top: 10px;}
 	<input type="text" id="search" value="" placeholder="请输入学生姓名、手机号、学号" class="search_text">
 	<div class="search_btn" onclick="search();"></div>
 </div>
-
 <div id="attendance">
 	<div class="r1">
 		<div class="t">
@@ -194,7 +192,13 @@ top: 10px;}
 							<div class="JobLeaderBox">未绑定</div>
 						{/if}
 					</div>
-					<p class="notifyCreateTime">{$v['banji']}</p>
+					{if $_W['schooltype']}
+					<span class="teacherInfo" style="color:#da7131;">已签:<span style="color:blue">{$v['yq']}</span>课时</span>	
+					<span class="teacherInfo" style="color:#da7131;">总共:<span style="color:blue">{$v['buy']}</span>课时</span>
+					<span class="teacherInfo" style="color:#da7131;">剩余:<span style="color:blue">{$v['rest']}</span>课时</span>
+					{else}
+						<p class="notifyCreateTime">{$v['banji']}</p>
+					{/if}
 					{if $v['numberid']}<p class="notifyCreateTime">学号:{$v['numberid']}</p>{/if}
 				</div>
 			</div>
@@ -493,6 +497,11 @@ function itemEdit(id, e) {
 	});
 }
 $(".F_div").click(function(e) {
+var spic = "{$school['spic']}";
+if(!spic){
+	jTips('请联系管理设置校园学生默认头像');
+	return false;
+}
 	e = window.event;
 	e.stopPropagation();
 	e.preventDefault();

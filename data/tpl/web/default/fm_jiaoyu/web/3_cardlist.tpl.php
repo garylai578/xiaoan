@@ -1,6 +1,199 @@
 <?php defined('IN_IA') or exit('Access Denied');?><?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('public/header', TEMPLATE_INCLUDEPATH)) : (include template('public/header', TEMPLATE_INCLUDEPATH));?>
 <?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('public/comhead', TEMPLATE_INCLUDEPATH)) : (include template('public/comhead', TEMPLATE_INCLUDEPATH));?>
-<?php  if($operation == 'display') { ?>
+<ul class="nav nav-tabs">
+    <li class="<?php  if($operation == 'display') { ?>active<?php  } ?>"><a href="<?php  echo $this->createWebUrl('cardlist', array('op' => 'display', 'schoolid' => $schoolid))?>">卡库</a></li>
+    <li class="<?php  if($operation == 'recording') { ?>active<?php  } ?>"><a href="<?php  echo $this->createWebUrl('cardlist', array('op' => 'recording', 'schoolid' => $schoolid))?>">录卡</a></li>
+</ul>
+<?php  if($operation == 'recording') { ?>
+<div class="main">
+ <style>
+.form-control-excel { height: 34px;padding: 6px 12px;font-size: 14px;line-height: 1.42857143;color: #555;background-color: #fff;background-image: none; border: 1px solid #ccc;border-radius: 4px; -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);box-shadow: inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;}
+.cLine {overflow: hidden;padding: 5px 0;color:#000000;}
+.alert {padding: 8px 35px 0 10px;text-shadow: none;-webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);-moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);background-color: #f9edbe;border: 1px solid #f0c36d;-webkit-border-radius: 2px;-moz-border-radius: 2px;border-radius: 2px;color: #333333;margin-top: 5px;}
+.alert p {margin: 0 0 10px;display: block;}
+.alert .bold{font-weight:bold;}		
+</style>	
+    <div class="panel panel-info">
+        <div class="panel-heading">快速录卡-条件设置</div>
+        <div class="panel-body">
+			<div class="form-group">	
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">按班级</label>
+				<div class="col-sm-2 col-lg-2">
+					<select style="margin-right:15px;" name="bj_id" id="chosebj" class="form-control">
+						<option value="0">请选择班级搜索</option>
+						<?php  if(is_array($allbjlist)) { foreach($allbjlist as $row) { ?>
+						<option value="<?php  echo $row['sid'];?>" <?php  if($row['sid'] == $_GPC['bj_id']) { ?> selected="selected"<?php  } ?>><?php  echo $row['sname'];?><?php  echo $row['info'];?></option>
+						<?php  } } ?>
+					</select>
+				</div>
+				<?php  if($logo['is_cardlist'] != 1 || $_W['isfounder'] || $_W['role'] == 'owner' || $logo['is_cardpay'] != 1) { ?>
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">到期时间</label>
+				<div class="col-sm-2 col-lg-2" id="sever">
+					<?php  echo tpl_form_field_date('severend', date('Y-m-d'))?>
+					<div class="help-block">统一到期时间</div>
+				</div>
+				<?php  } ?>
+				<?php  if($logo['is_cardlist'] != 1 || $_W['isfounder'] || $_W['role'] == 'owner') { ?>
+				<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">导入空卡</label>
+				<div class="col-sm-2 col-lg-2">
+					<div class="input-group">
+						<input class="form-control inupt_empty" id="card_empty" placeholder="刷卡" onpropertychange="OnPropChanged(event)" type="text" value="" />
+					</div>
+					<div class="help-block">注意:已经绑定的卡在此处刷卡将会删除绑定信息</div>
+				</div>
+				<?php  } ?>
+			</div>
+        </div>
+    </div>
+	<div class="cLine">
+		<div class="alert">
+			<p id="empty_cardlist"></p>
+		</div>
+	</div>
+	<div class="cLine">
+		<div class="alert">
+			<p><span class="bold">提示：</span>请连接读卡器使用快速录卡功能</br>   
+			   <?php  if($_W['isfounder'] || $_W['role'] == 'owner') { ?><strong><font color='red'>特别提醒: 要让此卡片库生效必须由管理员在学校考勤设置里设置启用状态!----此句只限管理员查看，其他人看不到</font></strong></br>
+			   <font color='red'>录卡说明: 管理员身份在本页可任意录制卡考给学生，如果不限制学校卡库，学校也可以在此页面任意录制卡号，否则校方只能录入由管理员提供的空卡，且管理已提前录入到本校卡库中</font></strong></br><font color='red'>时间提示: 如本校已经启用考勤卡付费设置、顶部的统一时间将无效，以本校考勤卡付费设置的时间为准</font></strong></br><font color='red'>温馨提示: 如果本校尚未启用考勤卡付费和卡库功能：新卡绑定卡的到期时间以顶部设置为准，如卡已在系统空卡库中，则以空卡设置的服务到期时间为准</font></strong><?php  } ?>
+			</p>
+		</div>
+	</div>		
+    <div class="panel panel-default" style="width:50%">
+        <div class="table-responsive panel-body">
+			<input type="hidden" name="schoolid" value="<?php  echo $schoolid;?>" />
+			<table class="table table-hover">
+				<thead class="navbar-inner">
+					<tr>
+						<th style="width:2%">学生/老师姓名</th>
+						<th style="width:3%">班级</th>
+						<th style="width:10%">已绑卡</th>
+						<th style="width:4%">输入持卡人</th>
+						<th style="width:4%">选择关系</th>
+						<th style="text-align:right; width:8%;">录入新卡</th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php  if($stulist) { ?>
+					<?php  if(is_array($stulist)) { foreach($stulist as $index => $item) { ?>
+					<tr id="stu<?php  echo $item['id'];?>">
+						<td>
+							<img style="width:35px;height:35px;border-radius:50%;" src="<?php  echo $item['icon'];?>" width="50"  style="border-radius: 3px;" /></br><?php  echo $item['s_name'];?>
+						</td>
+						<td><?php  echo $nowbj['sname'];?></td>
+						<td id="cardlist<?php  echo $item['id'];?>">
+						<?php  if($item['cards']) { ?>
+							<?php  if(is_array($item['cards'])) { foreach($item['cards'] as $row) { ?>
+								卡号:<?php  echo $row['idcard'];?>,持卡人:<?php  echo $row['pname'];?>(<?php  echo getpardforkqj($row['pard'])?>)
+								<?php  if($row['severend'] > TIMESTAMP) { ?>
+									<span class="label label-success">服务中</span>
+								<?php  } else { ?>
+									<span class="label label-danger">已过期</span>
+								<?php  } ?>
+								</br>
+							<?php  } } ?>
+						<?php  } ?>
+						</td>
+						<td><div class="input-group"><input placeholder="输入持卡人姓名" type="text" id="pname<?php  echo $item['id'];?>" class="form-control" value="<?php  echo $item['s_name'];?>" /></div></td>
+						<td>
+							<select style="margin-right:15px;" name="pard" id="pard<?php  echo $item['id'];?>" class="form-control">
+							<?php  if(is_array($allguanxi)) { foreach($allguanxi as $key => $row) { ?>
+							<option value="<?php  echo $key;?>"><?php  echo $row;?></option>
+							<?php  } } ?>
+							</select>
+						</td>
+						<td style="text-align:right;float:right">
+							<div class="input-group">
+								<input class="form-control inupt_val" id="card<?php  echo $index;?>" placeholder="刷卡" data_sid="<?php  echo $item['id'];?>" data_key="<?php  echo $index;?>" onpropertychange="OnPropChanged(event)" type="text" value="" />
+							</div>
+						</td>
+					</tr>
+					<?php  } } ?>
+				<?php  } ?>	
+				</tbody>
+			</table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$(".inupt_empty").bind("input propertychange",function(event){
+		   var idcard = $(this).val();
+		   var severend = $("#sever").find('input[name="severend"]').val();
+		   if(idcard.length >= 10){
+				$.ajax({
+					url: "<?php  echo $this->createWebUrl('cardlist', array('schoolid' => $schoolid))?>",
+					type: "post",
+					dataType: "json",
+					data: {
+						op:"writecard",
+						severend,severend,
+						idcard:idcard
+					},
+					success: function (data) {
+						if (data.result) {
+							alert(data.msg);
+							var html = "卡号:"+idcard+"<span class='label label-success'>到期:"+severend+"</span></br>";
+							$("#empty_cardlist").append(html);
+							$("#card_empty").val("");
+							$("#card_empty").focus();
+						}else{
+							alert(data.msg);
+							$("#card_empty").val("");
+							$("#card_empty").focus();
+						}
+					}		
+				});
+
+		   }
+	});
+	$(".inupt_val").bind("input propertychange",function(event){
+		   var idcard = $(this).val();
+		   var severend = $("#sever").find('input[name="severend"]').val();
+		   if(idcard.length >= 10){
+				var sid = $(this).attr('data_sid');
+				var key = $(this).attr('data_key');
+				var nextkey = key*1+1;
+				var pname = $("#pname"+sid).val();
+				var pard = $("#pard"+sid).val();
+				$.ajax({
+					url: "<?php  echo $this->createWebUrl('cardlist', array('schoolid' => $schoolid))?>",
+					type: "post",
+					dataType: "json",
+					data: {
+						op:"getcardinfo",
+						sid: sid,
+						pname:pname,
+						pard:pard,
+						severend,severend,
+						idcard:idcard,
+						bj_id:"<?php  echo $bj_id;?>"
+					},
+					success: function (data) {
+						if (data.result) {
+							var html = "卡号:"+idcard+"持卡人:"+pname+"<span class='label label-success'>服务中</span></br>";
+							$("#cardlist"+sid).append(html);
+							$(this).val("");
+							alert(data.msg);
+							$("#card"+nextkey).focus(); 
+						}else{
+							alert(data.msg);
+							$("#card"+key).val("");
+						}
+					}		
+				});
+		   }
+	});
+	$(document).ready(function() {
+		$("#chosebj").change(function() {
+			var BjId = $("#chosebj option:selected").attr('value');
+			if(BjId != 0){
+				window.location.href="<?php  echo $this->createWebUrl('cardlist', array('op' => 'recording','schoolid' => $schoolid))?>"+'&bj_id='+BjId; 
+			}
+		});		
+	});	
+});
+</script>
+<?php  } else if($operation == 'display') { ?>
 <div class="main">
  <style>
 .form-control-excel { height: 34px;padding: 6px 12px;font-size: 14px;line-height: 1.42857143;color: #555;background-color: #fff;background-image: none; border: 1px solid #ccc;border-radius: 4px; -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);box-shadow: inset 0 1px 1px rgba(0,0,0,.075);-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;}
@@ -91,46 +284,32 @@
 			   <?php  if($_W['isfounder'] || $_W['role'] == 'owner') { ?><strong><font color='red'>特别提醒: 要让此卡片库生效必须由管理员在学校考勤设置里设置启用状态!----此句只限管理员查看，其他人看不到</font></strong></br><?php  } ?>
 			</p>
 		</div>
-	</div>	
+	</div>
     <div class="panel panel-default file-container" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcel" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcel" />
-                <input type="hidden" name="ac" value="cardlist" />
-				<input type="hidden" name="schoolid" value="<?php  echo $schoolid;?>" />
-                <a class="btn btn-primary" href="javascript:location.reload()"><i class="fa fa-refresh"></i> 刷新</a>
+            <form id="form">
                 <input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
                 <a class="btn btn-primary"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcel" id="unload" style="display: none;"
+                <input type="file" class="pull-left btn-primary span3" name="file" id="unload" style="display: none;"
                        onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcel" value="导入数据">
-                <a class="btn btn-primary" href="../addons/fm_jiaoyu/public/example/example_cardlist.xls">下载导入模板</a>
+                <a class="btn btn-primary" onclick="submits('input_card','form');">导入数据</a>
+                <a class="btn btn-info" href="../addons/fm_jiaoyu/public/example/example_cardlist.xls"><i class="fa fa-download"></i>下载导入模板</a>
             </form>
         </div>
     </div>
     <div class="panel panel-default file-container1" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcels" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcels" />
-                <input type="hidden" name="ac" value="cardlistfromschool" />
-                <input type="hidden" name="schoolid" value="<?php  echo $schoolid;?>" />
-				<input name="viewfiles" id="viewfiles" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
-                <a class="btn btn-primary"><label for="unloads" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcels" id="unloads" style="display: none;" onchange="document.getElementById('viewfiles').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcels" value="导入数据">
+            <form id="form1">
+                <input name="viewfile1" id="viewfile1" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
+                <a class="btn btn-warning"><label for="unload1" style="margin: 0px;padding: 0px;">上传...</label></a>
+                <input type="file" class="pull-left btn-primary span3" name="file1" id="unload1" style="display: none;" onchange="document.getElementById('viewfile1').value=this.value;this.style.display='none';">
+                <a class="btn btn-danger" onclick="submits('input_cardschool','form1');">导入数据</a>
 				<a class="btn btn-primary" href="../addons/fm_jiaoyu/public/example/example_cardlist1.xls">下载导入模板</a>
-				<a class="btn btn-info" href="<?php  echo $this->createWebUrl('cardlist', array('out_put' => 'out_put', 'schoolid' => $schoolid))?>"><i class="fa fa-download"></i>下载空卡库</a>				
+				<a class="btn btn-info" href="<?php  echo $this->createWebUrl('cardlist', array('out_put' => 'out_put', 'schoolid' => $schoolid))?>"><i class="fa fa-download"></i>下载空卡库</a>
             </form>
         </div>
-    </div>	
+    </div>
+	<?php (!empty($this) && $this instanceof WeModuleSite || 1) ? (include $this->template('public/excel_input', TEMPLATE_INCLUDEPATH)) : (include template('public/excel_input', TEMPLATE_INCLUDEPATH));?>
     <div class="panel panel-default">
         <div class="table-responsive panel-body">
         <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
@@ -161,11 +340,11 @@
                     </td>
 					<td>
 					<?php  if(!empty($item['pname'])) { ?>
-                        <img style="width:35px;height:35px;border-radius:50%;" src="<?php  if(!empty($item['spic'])) { ?><?php  echo tomedia($item['spic'])?><?php  } else { ?><?php  echo tomedia($logo['spic'])?><?php  } ?>" width="50"  style="border-radius: 3px;" /></br><?php  echo $item['pname'];?>
+                        <img style="width:35px;height:35px;border-radius:50%;" src="<?php  if($item['scardicon']) { ?><?php  echo $item['scardicon'];?><?php  } ?><?php  if($item['tcardicon']) { ?><?php  echo $item['tcardicon'];?><?php  } ?>" width="50"  style="border-radius: 3px;" /></br><?php  echo $item['pname'];?>
 					<?php  } ?>				
 					</td>
-					<td><?php  echo $item['s_name'];?></td>
-					<td><?php  echo $item['tname'];?></td>
+					<td><?php  if($item['s_name']) { ?><img style="width:35px;height:35px;border-radius:50%;" src="<?php  if($item['sid']) { ?><?php  echo $item['sicon'];?><?php  } ?>" width="50"  style="border-radius: 3px;" /></br><?php  echo $item['s_name'];?><?php  } ?></td>
+					<td><?php  if($item['tname']) { ?><img style="width:35px;height:35px;border-radius:50%;" src="<?php  if($item['tid']) { ?><?php  echo $item['ticon'];?><?php  } ?>" width="50"  style="border-radius: 3px;" /></br><?php  echo $item['tname'];?></td><?php  } ?>
 					<td>
 					<?php  if(!empty($item['pard'])) { ?>
 						<span class="label label-success">

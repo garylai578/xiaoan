@@ -28,7 +28,7 @@
                 <input type="hidden" name="m" value="fm_jiaoyu" />
                 <input type="hidden" name="do" value="kcsign" />
                 <input type="hidden" name="TorS" value="{$TorS}" />
-                 <input type="hidden" id="out_excel" name="out_excel" value="No" />
+				<input type="hidden" id="out_excel" name="out_excel" value="No" />
                 <input type="hidden" name="is_confirm" value="{$is_confirm}" />
 				<input type="hidden" name="schoolid" value="{$schoolid}" />	
 				<div class="form-group">
@@ -153,11 +153,13 @@
 </div>
 <script type="text/javascript">
 function GetOut(){
-	 $("#out_excel").val("Yes");
+	$("#out_excel").val("Yes");
 	document.forms.kcsignForm.submit();
 	$("#out_excel").val("No");
-	};
-	var category = {php echo json_encode($children)};
+};
+	
+	
+var category = {php echo json_encode($children)};
 
 $(function(){
 	var e_d = 2 ;

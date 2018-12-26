@@ -43,9 +43,12 @@ $tid_global = $_W['tid'];
 				$toPage = 'week';
 			}
 			if(!(strstr($qxarr,'1000281')) && $toPage == 'week'){
+				$toPage = 'tscoreobject';
+			}
+			if(!(strstr($qxarr,'1000291')) && $toPage == 'tscoreobject'){
 				$toPage = 'jsfz';
 			}
-			if($_W['role'] != 'manager' && $toPage == 'week'){
+			if($_W['role'] != 'manager' && $toPage == 'jsfz'){
 				$toPage = 'NoAccess';
 			}
 

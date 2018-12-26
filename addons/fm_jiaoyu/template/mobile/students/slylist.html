@@ -23,18 +23,10 @@
  .header { width: 100%; height: 50px; line-height: 50px; position: fixed; z-index: 1000; top: 0; left: 0; box-shadow: 0 0 2px 0px rgba(0,0,0,0.3),0 0 6px 2px rgba(0,0,0,0.15); } .header .l { width: 50px; height: 50px; line-height: 50px; color: white; position: absolute; left: 0; top: 0; } .header .m { width: 100%; height: 50px; line-height: 50px; text-align: center; color: white; font-size: 18px; } .header .r { width: 50px; height: 50px; line-height: 50px; position: absolute; right: 0; top: 0; } .mainColor { background: #06c1ae !important; } .header .l a { font-size: 18px; color: white; display: block; width: 100%; height: 100%; text-align: center; }
  .wd{background-color: #ff635b; border: 1px solid #ff635b; color: #fff; border-radius: 3px;font-size: 12px; height: 16px;line-height: 14px;padding: 1px 2px;margin: 0 1px;}
 </style>
-<title>{$school['title']}</title>
+<title>留言消息</title>
 </head>
 <body>
-	<div class="header mainColor" id="titlebar">
-		<div class="l">
-			<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.back(-1);"></a>
-		</div>
-		<div class="m">
-		   <span style="font-size: 18px">留言</span>   
-		</div>
-	</div>
-	<div id="titlebar_bg" class="ADVtips" style="margin-top: 60px">
+	<div id="titlebar_bg" class="ADVtips" style="margin-top: 10px">
 		<div class="ADVtips_title">消息设置</div>
 		<span id="msg_word">{if $it['is_allowmsg'] == 2}接收聊天信息{else}不接收聊天信息{/if}&nbsp;&nbsp;&nbsp;</span>
 		<div class="switch  scale03 {if $it['is_allowmsg'] == 2}switch_off{else}switch_on{/if}">
@@ -91,17 +83,7 @@
 {php include $this->template('face');}	
 {php include $this->template('port');}
 <script type="text/javascript">
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").css("margin-top","10px");
-	}
-}, 100);
-
-</script>
-<script type="text/javascript">
 $(document).ready(function () {
-
 	$(".switch").click(function () {
 		if ($(".switch_on").size() <= 0) {
 			$(".switch").addClass('switch_on');

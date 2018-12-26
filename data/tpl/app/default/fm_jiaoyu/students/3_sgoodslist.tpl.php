@@ -25,26 +25,11 @@
 <link href="<?php echo MODULE_URL;?>public/mobile/css/my_score.css?v=0622" rel="stylesheet">   
 <link type="text/css" rel="stylesheet" href="<?php echo OSSURL;?>public/mobile/css/greenStyle.css?v=4.80120" />
 <link href="<?php echo OSSURL;?>public/mobile/css/style1.css?v=0622" rel="stylesheet">
-<title>商城列表</title>
+<title><?php  echo $language['sgoodslist_title'];?></title>
 </head>
 
 <body>
 <div class="All">
-	<div id="titlebar" class="header mainColor">
-		<div class="l">
-			<?php  if($_GPC['from'] == 'detail') { ?>
-			<a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="<?php  echo $this->createMobileUrl('detail', array('schoolid' => $schoolid,'weid' => $weid), true)?>"></a>
-			<?php  } else { ?>
-			<a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a>
-			<?php  } ?>
-		</div>
-		<div class="m">
-			<span style="font-size: 18px">商城</span>   
-		</div>
-		<div class="r">
-		</div>
-	</div>
-	<div id="titlebar_bg" class="top_head_blank" style="height: 50px !important"></div>
 	<div class="parentIndex">
     	<!--积分分数-->
     	<?php  if($school['Is_point'] == 1) { ?>
@@ -73,15 +58,6 @@
 	    <div class="clear"></div>
 	</div>
 </div>
-<script>
-setTimeout(function() {
-	if(window.__wxjs_environment === 'miniprogram'){
-		$("#titlebar").hide();
-		$("#titlebar_bg").hide();
-	}
-}, 100);
-
-</script>
 <script src="<?php echo MODULE_URL;?>public/mobile/js/jquery-1.10.2.min.js"></script>
 <script src="<?php echo MODULE_URL;?>public/mobile/js/idangerous.swiper-2.1.min.js?v=0622"></script>
 <script src="<?php echo MODULE_URL;?>public/mobile/js/imageview_new.js?v=062220161213"></script>

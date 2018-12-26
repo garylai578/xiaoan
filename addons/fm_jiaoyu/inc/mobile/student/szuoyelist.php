@@ -29,7 +29,7 @@
 		$thistime = trim($_GPC['limit']);
 		if($thistime){
 			$condition = " AND createtime < '{$thistime}'";	
-			$leave1 = pdo_fetchall("SELECT id,bj_id,title,tname,tid,createtime,content,ismobile,km_id,kc_id FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 3 $condition2 $condition ORDER BY createtime DESC LIMIT 0,10 ");
+			$leave1 = pdo_fetchall("SELECT id,bj_id,title,tname,tid,createtime,content,ismobile,km_id,kc_id,usertype,userdatas FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 3 $condition2 $condition ORDER BY createtime DESC LIMIT 0,10 ");
 			foreach($leave1 as $key =>$row){
 				$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
 				if($row['kc_id']){
@@ -44,11 +44,23 @@
 				mload()->model('read');
 				$ydrs = check_readtype($weid,$schoolid,$it['id'],$row['id']);
 				$leave1[$key]['ydrs'] = $ydrs;
-				$leave1[$key]['time'] = date('Y-m-d H:i', $row['createtime']);	
+				$leave1[$key]['time'] = date('Y-m-d H:i', $row['createtime']);
+				if($row['usertype'] == 'student'){
+					$datass = str_replace('&quot;','"',$row['userdatas']);
+					$userdatas = json_decode($datass,true);
+					if($schooltype){
+						$stulist = explode(',',rtrim($userdatas[$row['kc_id']],','));
+					}else{
+						$stulist = explode(',',rtrim($userdatas[$bj_id],','));
+					}
+					if(!in_array($student['id'],$stulist)){
+						unset($leave1[$key]);
+					}
+				}
 			} 
 			include $this->template('comtool/szuoyelist'); 
 		}else{
-			$leave = pdo_fetchall("SELECT id,bj_id,title,tname,tid,createtime,content,ismobile,km_id,kc_id FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 3 $condition2 ORDER BY createtime DESC LIMIT 0,10 ");
+			$leave = pdo_fetchall("SELECT id,bj_id,title,tname,tid,createtime,content,ismobile,km_id,kc_id,usertype,userdatas FROM " . tablename($this->table_notice) . " where weid = '{$weid}' And schoolid = '{$schoolid}' And type = 3 $condition2 ORDER BY createtime DESC LIMIT 0,10 ");
 			foreach($leave as $key =>$row){
 				$banji = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = :sid And schoolid = :schoolid ", array(':schoolid' => $schoolid,':sid' => $row['bj_id']));
 				if($row['kc_id']){
@@ -65,6 +77,18 @@
 				$ydrs = check_readtype($weid,$schoolid,$it['id'],$row['id']);
 				$leave[$key]['ydrs'] = $ydrs;
 				$leave[$key]['time'] = date('Y-m-d H:i', $row['createtime']);	
+				if($row['usertype'] == 'student'){
+					$datass = str_replace('&quot;','"',$row['userdatas']);
+					$userdatas = json_decode($datass,true);
+					if($schooltype){
+						$stulist = explode(',',rtrim($userdatas[$row['kc_id']],','));
+					}else{
+						$stulist = explode(',',rtrim($userdatas[$bj_id],','));
+					}
+					if(!in_array($student['id'],$stulist)){
+						unset($leave[$key]);
+					}
+				}
 			} 
 			include $this->template(''.$school['style2'].'/szuoyelist');
 		}		

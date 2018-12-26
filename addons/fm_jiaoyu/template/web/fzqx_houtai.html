@@ -1,4 +1,4 @@
-
+<!-- 最大ID 1003205 -->
 	<div class="modal-dialog modal-lg" role="document">		
 		<div class="modal-content">			
 			<div class="modal-header" style="color: black;">					
@@ -45,6 +45,9 @@
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input  class="pre" all_id="1002" data_id="00208" type="checkbox" name="qxarr"  value="1000281" style="float: none;" {if in_array(1000281,$qx)} checked="checked" {/if}>查看所有星期设置</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00208" type="checkbox" name="qxarr"  value="1000282" style="float: none;" {if in_array(1000282,$qx)} checked="checked" {/if}>新增/编辑星期设置</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00208" type="checkbox" name="qxarr"  value="1000283" style="float: none;" {if in_array(1000283,$qx)} checked="checked" {/if}>删除星期设置</label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input  class="pre" all_id="1002" data_id="00209" type="checkbox" name="qxarr"  value="1000291" style="float: none;" {if in_array(1000291,$qx)} checked="checked" {/if}>查看教师评分项目</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00209" type="checkbox" name="qxarr"  value="1000292" style="float: none;" {if in_array(1000292,$qx)} checked="checked" {/if}>新增/编辑评分项目</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1002" data_id="00209" type="checkbox" name="qxarr"  value="1000293" style="float: none;" {if in_array(1000293,$qx)} checked="checked" {/if}>删除评分项目</label>
 							{if ($school['is_video']==1 && !empty($school['videoname'])) }
 							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">监控系统&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1003)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1003)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1003" data_id="00301" type="checkbox" name="qxarr"  value="1000301" style="float: none;" {if in_array(1000301,$qx)} checked="checked" {/if}>查看所有{$school['videoname']}</label>
@@ -67,8 +70,17 @@
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1006" data_id="00601" type="checkbox" name="qxarr"  value="1000603" style="float: none;" {if in_array(1000603,$qx)} checked="checked" {/if}>批量导入教师</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1006" data_id="00601" type="checkbox" name="qxarr"  value="1000604" style="float: none;" {if in_array(1000604,$qx)} checked="checked" {/if}>批量绑定班级</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1006" data_id="00601" type="checkbox" name="qxarr"  value="1000605" style="float: none;" {if in_array(1000605,$qx)} checked="checked" {/if}>导出教师绑定码</label>
+							{if is_showpf()}
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1006" data_id="00601" type="checkbox" name="qxarr"  value="1000608" style="float: none;" {if in_array(1000608,$qx)} checked="checked" {/if}>导出教师信息</label>
+							{/if}
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1006" data_id="00601" type="checkbox" name="qxarr"  value="1000606" style="float: none;" {if in_array(1000606,$qx)} checked="checked" {/if}>解绑教师</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1006" data_id="00601" type="checkbox" name="qxarr"  value="1000607" style="float: none;" {if in_array(1000607,$qx)} checked="checked" {/if}>删除教师</label><br/>
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">教师评分&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1031)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1031)">全不选</a></p>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1031" data_id="03101" type="checkbox" name="qxarr"  value="1003101" style="float: none;" {if in_array(1003101,$qx)} checked="checked" {/if}>查看教师评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1031" data_id="03101" type="checkbox" name="qxarr"  value="1003102" style="float: none;" {if in_array(1003102,$qx)} checked="checked" {/if}>编辑教师评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1031" data_id="03101" type="checkbox" name="qxarr"  value="1003103" style="float: none;" {if in_array(1003103,$qx)} checked="checked" {/if}>删除教师评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1031" data_id="03101" type="checkbox" name="qxarr"  value="1003104" style="float: none;" {if in_array(1003104,$qx)} checked="checked" {/if}>导入教师评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1031" data_id="03101" type="checkbox" name="qxarr"  value="1003105" style="float: none;" {if in_array(1003105,$qx)} checked="checked" {/if}>导出教师评分</label><br/>
                         	<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">学生管理&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1007)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1007)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1007" data_id="00701" type="checkbox" name="qxarr"  value="1000701" style="float: none;" {if in_array(1000701,$qx)} checked="checked" {/if}>查看所有学生</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1007" data_id="00701" type="checkbox" name="qxarr"  value="1000702" style="float: none;" {if in_array(1000702,$qx)} checked="checked" {/if}>新增/编辑学生</label>
@@ -78,6 +90,13 @@
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1007" data_id="00701" type="checkbox" name="qxarr"  value="1000706" style="float: none;" {if in_array(1000706,$qx)} checked="checked" {/if}>录入成绩</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1007" data_id="00701" type="checkbox" name="qxarr"  value="1000707" style="float: none;" {if in_array(1000707,$qx)} checked="checked" {/if}>解绑学生</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1007" data_id="00701" type="checkbox" name="qxarr"  value="1000708" style="float: none;" {if in_array(1000708,$qx)} checked="checked" {/if}>删除学生</label><br/>
+							{if is_showpf()}
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">学生评分&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1033)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1033)">全不选</a></p>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1033" data_id="03301" type="checkbox" name="qxarr"  value="1003301" style="float: none;" {if in_array(1003301,$qx)} checked="checked" {/if}>查看学生评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1033" data_id="03301" type="checkbox" name="qxarr"  value="1003302" style="float: none;" {if in_array(1003302,$qx)} checked="checked" {/if}>修改学生评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1033" data_id="03301" type="checkbox" name="qxarr"  value="1003303" style="float: none;" {if in_array(1003303,$qx)} checked="checked" {/if}>删除学生评分</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1033" data_id="03301" type="checkbox" name="qxarr"  value="1003304" style="float: none;" {if in_array(1003304,$qx)} checked="checked" {/if}>导入学生评分</label><br/>
+							{/if}
                         	<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">成绩管理&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1008)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1008)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1008" data_id="00801" type="checkbox" name="qxarr"  value="1000801" style="float: none;" {if in_array(1000801,$qx)} checked="checked" {/if}>查看所有成绩</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1008" data_id="00801" type="checkbox" name="qxarr"  value="1000802" style="float: none;" {if in_array(1000802,$qx)} checked="checked" {/if}>编辑单个成绩</label>
@@ -213,7 +232,16 @@
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1022" data_id="02201" type="checkbox" name="qxarr"  value="1002202" style="float: none;" {if in_array(1002202,$qx)} checked="checked" {/if}>新增/修改充值套餐</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1022" data_id="02201" type="checkbox" name="qxarr"  value="1002203" style="float: none;" {if in_array(1002203,$qx)} checked="checked" {/if}>删除充值套餐</label><br/>
                         	{/if}
-                        	
+							{if $school['is_printer'] ==1}
+                        	<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">小票打印&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1030)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1030)">全不选</a></p>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1030" data_id="03031" type="checkbox" name="qxarr"  value="1003031" style="float: none;" {if in_array(1003031,$qx)} checked="checked" {/if}>打印小票</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1030" data_id="03001" type="checkbox" name="qxarr"  value="1003001" style="float: none;" {if in_array(1003001,$qx)} checked="checked" {/if}>查看记录</label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1030" data_id="03001" type="checkbox" name="qxarr"  value="1003002" style="float: none;" {if in_array(1003002,$qx)} checked="checked" {/if}>删除记录</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1030" data_id="03011" type="checkbox" name="qxarr"  value="1003011" style="float: none;" {if in_array(1003011,$qx)} checked="checked" {/if}>查看设备</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1030" data_id="03011" type="checkbox" name="qxarr"  value="1003012" style="float: none;" {if in_array(1003012,$qx)} checked="checked" {/if}>添加/编辑设备</label>
+                        	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1030" data_id="03011" type="checkbox" name="qxarr"  value="1003013" style="float: none;" {if in_array(1003013,$qx)} checked="checked" {/if}>删除设备</label>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1030" data_id="03021" type="checkbox" name="qxarr"  value="1003021" style="float: none;" {if in_array(1003021,$qx)} checked="checked" {/if}>打印设置</label><br/>
+							{/if}
                         	{/if}
 
                         	{if ($school['is_recordmac'] == 1)}

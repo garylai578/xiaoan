@@ -102,15 +102,32 @@ background-position: center center;background-size: 9px 16px;}
 					</div>
 				</div>
 				<div class="form-group">	
-					<label class="col-xs-12 col-sm-3 col-md-2 control-label">班级圈风格</label>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">班级圈模式</label>
 					<div class="col-sm-2 col-lg-2">
-						<select class="form-control" name="bjqstyle">
-							<option value="old" {if $logo['bjqstyle']== 'old'}selected{/if}>旧版风格</option>
-							<option value="new" {if $logo['bjqstyle']== 'new'}selected{/if}>新版风格</option>
+						<select class="form-control" name="bjqstyle" id="bjqstyle">
+							<option value="old" id="old" {if $logo['bjqstyle']== 'old'}selected{/if}>校园模式</option>
+							<option value="new" id="new" {if $logo['bjqstyle']== 'new'}selected{/if}>班级模式</option>
 						</select>
-						<div class="help-block">新版班级圈风格支持语音视频</br>系统默认为旧版个人旧版样式</br></div>
+						<div class="help-block">建议培训机构使用校园模式</div>
 					</div>
-				</div>						
+				</div>
+				<div class="form-group" id="shteachers" {if $logo['bjqstyle']== 'new'}style="display:none"{/if}>
+					<label class="col-xs-12 col-sm-3 col-md-2 control-label">选择信息审核人</label>
+					<div class="col-sm-8">			
+						<div class="row row-fix">
+							<div class="col-xs-8 col-sm-8" style="width: 800px;">
+								<div class="input-group">
+									<input id="sh_teacherids" name="sh_teacherids" type="hidden" value="{$shteahcers}"/>
+									<input class="form-control" id="sh_teachers" type="text" value="{$sh_tealist}"/>
+									<span class="input-group-btn">
+										<a class="btn btn-primary" href="javascript::;" data-toggle="tooltip" data-placement="top" onclick="xxxz();"><i class="fa fa-anchor"></i> 选择老师</a>
+									</span>
+								</div>
+							</div>
+						</div>
+						<span class="help-block">选择校园模式下负责审核班级圈内容的老师，班级模式下由各班级管理或班主任审核无需在此处设置</span>
+					</div>
+				</div>
 			</div>
 		</div>
         <div class="form-group col-sm-12">
@@ -119,6 +136,148 @@ background-position: center center;background-size: 9px 16px;}
         </div>
     </form>
 </div>
+<div class="modal fade" style="min-width: 583px!important;" id="Modal3" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static">
+	<div class="modal-dialog">
+		<div class="modal-content" style="border-radius: 20px;">
+			<div class="modal-header">
+				<h4 class="modal-title" style="text-align:center;color:#333;font-size: 17px;">选择校园模式下负责审核人员</h4>
+			</div>
+			<div class="modal-body" style="width: 100%;">
+				<div class="js-menu-container" ng-controller="MenuCtrl" ng-cloak>
+					<div class="panel we7-panel">
+						<div class="panel-body system-menu-list">
+							<ul class="one">
+								{loop $list $menu}
+								<li class="menu-item">
+									<div class="table-div table-div-menu" style="padding: 12px 37px;">
+										<div class="table-div__item name">{$menu['sname']}</div>
+										<div class="table-div__item name"></div>
+										<div class="table-div__item action">
+											<div class="link-group">
+												<a href="javascript:;" class="toggle"></a>
+											</div>
+										</div>
+									</div>
+									<ul class="two">
+										<li class="menu-item">
+											<div class="input-group text-info">
+											{loop $menu['alltea'] $r}
+												<label class="checkbox-inline" style="width:80px;margin-left: 10px"><input class="pre idss" data-name="{$r['tname']}" type="checkbox" value="{$r['id']}" style="float: none;"/>{$r['tname']}</label>
+											{/loop}
+											</div>
+										</li>
+									</ul>
+								</li>
+								{/loop}
+								<li class="menu-item">
+									<div class="table-div table-div-menu" style="padding: 12px 37px;">
+										<div class="table-div__item name">未分组({php echo count($list2)}人)</div>
+										<div class="table-div__item name"></div>
+										<div class="table-div__item action">
+											<div class="link-group">
+												<a href="javascript:;" class="toggle"></a>
+											</div>
+										</div>
+									</div>
+									<ul class="two">
+										<li class="menu-item">
+											<div class="input-group text-info">
+											{loop $list2 $row}
+												<label class="checkbox-inline" style="width:80px;margin-left: 10px"><input class="pre idss" data-name="{$row['tname']}" type="checkbox" value="{$row['id']}" style="float: none;"/>{$row['tname']}</label>
+											{/loop}
+											</div>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<script>
+						$('.toggle').click(function () {
+							$(this).parent().parent().parent().parent().toggleClass('menu-open')
+						})
+					</script>
+				</div>
+				<script type="text/javascript">
+					$(function(){
+						angular.bootstrap($('.js-menu-container'), ['systemApp']);
+					});
+				</script>
+			</div>
+			<div class="modal-footer" style="border-radius: 6px;">
+				<input type="submit" onclick="tijiao()" class="btn btn-success" value="确定">
+				<button type="button" class="btn btn-danger" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+$(document).ready(function() {
+	$("#bjqstyle").change(function() {
+		var bjqstyle = $("#bjqstyle option:selected").attr('value');
+		showbox(bjqstyle, function() {
+		});
+	});	
+});
+function showbox(bjqstyle){
+	if(bjqstyle == 'new'){
+		$("#shteachers").hide();
+	}
+	if(bjqstyle == 'old'){
+		$("#shteachers").show();
+	}
+}
+function xxxz(){
+	$('#Modal3').modal('toggle');
+	var chosed = $('#sh_teacherids').val();
+	if(chosed.indexOf(',')>= 1){
+		var chosedsarr= new Array(); //定义一数组 
+		choseds= chosed.split(','); //字符分割 
+		for(var i=0;i<choseds.length;i++){
+			if(choseds[i] > 0){
+				chosedsarr[i] = parseInt(choseds[i]);
+			}	
+		}
+		$(".pre").each(function() {
+			var index = $.inArray(parseInt($(this).val()), chosedsarr);
+			if(index >= 0){
+				$(this).prop("checked",true);
+			}else{
+				$(this).prop("checked",false);
+			}
+		});
+		console.log(chosedsarr)
+	}else{
+		$(".pre").each(function() {
+			if (parseInt(chosed) == $(this).val()){
+				$(this).prop("checked",true);
+			}else{
+				$(this).prop("checked",false);
+			}
+		});
+	}
+}
+function tijiao(){
+	var all_select_id = '';
+	var all_select_text = '';
+	var len = $("input:checkbox:checked").length; 
+	$(".idss").each(function(i) {
+		if($(this).is(':checked')){
+			if(i == len-1){
+				all_select_id += $(this).val();
+				all_select_text += $(this).attr("data-name");
+			}else{
+				all_select_id += $(this).val() + ',';
+				all_select_text += $(this).attr("data-name") + ',';
+			}
+		}
+	});
+	$("#sh_teacherids").val(all_select_id);
+	$("#sh_teachers").val(all_select_text);
+	
+$('#Modal3').modal('toggle');
+}
+</script>
 {elseif $operation == 'display1'}
 <div class="main">
 	<div class="form-group">

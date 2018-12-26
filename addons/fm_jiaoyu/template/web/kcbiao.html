@@ -110,10 +110,10 @@
 						<a class="btn btn-success" href="javascript:;" onclick="$('.file-container').slideToggle()">批量导入课表</a>
                     </div>	-->				
 				</div>
-				<div class="form-group clearfix">
-					<label class="col-xs-12 col-sm-3 col-md-1 control-label">授课时间</label>
+				<div class="form-group">
+					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">授课时间</label>
 					<div class="col-sm-2 col-lg-2">
-						{php echo tpl_form_field_daterange('kstime', array('start' => date('Y-m-d', $starttime), 'end' => date('Y-m-d', $endtime)));}
+						{php echo tpl_form_field_daterange('kstime', array('start' => date('Y-m-d'), 'end' => date('Y-m-d')));}
 					</div>
 					<div class="col-sm-2 col-lg-2" style="margin-left:50px">
 						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
@@ -124,27 +124,20 @@
             {/if}
         </div>
     </div>
-    <div class="panel panel-default file-container file-container" style="display:none;">
+    <div class="panel panel-default file-container" style="display:none;">
         <div class="panel-body">
-            <form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
-                <input type="hidden" name="leadExcel" value="true">
-                <input type="hidden" name="c" value="site" />
-                <input type="hidden" name="a" value="entry" />
-                <input type="hidden" name="m" value="fm_jiaoyu" />
-                <input type="hidden" name="do" value="UploadExcel" />
-                <input type="hidden" name="ac" value="kcbiao" />
-				<input type="hidden" name="schoolid" value="{$schoolid}" />
-
-                <a class="btn btn-primary" href="javascript:location.reload()"><i class="fa fa-refresh"></i> 刷新</a>
+            <form id="form">
+				<input type="hidden" id="fromtid" value="{$tid_global}">
                 <input name="viewfile" id="viewfile" type="text" value="" style="margin-left: 40px;" class="form-control-excel" readonly>
-                <a class="btn btn-primary"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
-                <input type="file" class="pull-left btn-primary span3" name="inputExcel" id="unload" style="display: none;"
+                <a class="btn btn-warning"><label for="unload" style="margin: 0px;padding: 0px;">上传...</label></a>
+                <input type="file" class="pull-left btn-primary span3" name="file" id="unload" style="display: none;"
                        onchange="document.getElementById('viewfile').value=this.value;this.style.display='none';">
-                <input type="submit" class="btn btn-primary" name="btnExcel" value="导入数据">
-                <a class="btn btn-primary" href="../addons/fm_jiaoyu/public/example/example_kcbiao.xls">下载导入模板</a>
+                <a class="btn btn-danger" onclick="submits('input_ks','form');">导入数据</a>
+				<a class="btn btn-info" href="../addons/fm_jiaoyu/public/example/example_kcbiao.xls"><i class="fa fa-download"></i>下载导入模板</a>
             </form>
         </div>
-    </div>	
+    </div>
+	{template 'public/excel_input'}
     <div class="panel panel-default">
         <div class="table-responsive panel-body">
         <table class="table table-hover">
@@ -152,8 +145,7 @@
 				<tr>
                     <th class='with-checkbox' style="width: 2%;"><input type="checkbox" class="check_all" /></th>
 					<th style="width:6%">授课教师</th>
-					<th style="width:11%;">课程名称</th>	
-					<th style="width:10%;">授课科目</th>	
+					<th style="width:11%;">课程名称</th>		
 					<th style="width:8%;">授课星期</th>
 					<th style="width:10%;">课节或时段</th>						
 					<th style="width:8%;">授课教室</th>
@@ -170,8 +162,6 @@
                     <td class="with-checkbox"><input type="checkbox" name="check" value="{$item['id']}"></td>
 					<td style="overflow:visible; word-break:break-all; text-overflow:auto;white-space:normal">{$item['tname']}</td>
 					<td style="overflow:visible; word-break:break-all; text-overflow:auto;white-space:normal"> <div> {$item['kcname']}</br> <span class="label label-info">{php echo date('Y年m月d日 H:i',$item['date'])}</span> </div> </td>
-                   
-                    <td> {if !empty($category[$item['km_id']])}{$category[$item['km_id']]['sname']}{/if}</td>
                     <td>{$item['week']}</td>
                     <td> {if !empty($category[$item['sd_id']])}{$category[$item['sd_id']]['sname']}{/if}</td>
                     <td> {if !empty($category[$item['adrr']])}{$category[$item['adrr']]['sname']}{/if}</td>

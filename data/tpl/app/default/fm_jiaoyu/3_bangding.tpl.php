@@ -20,14 +20,14 @@
 <div id="titlebar" class="header mainColor">
 	<div class="l"><a class="backOff" style="background:url(<?php echo OSSURL;?>public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="javascript:history.go(-1);"></a></div>
 	<div class="m">
-		<span>账号绑定</span>
+		<span><?php  echo $language['bangding_title'];?></span>
 	</div>
 </div>
 <div id="titlebar_bg" class="_header"></div>
 		<div class="bangdingForm">
 			<div class="bangdingTab">
-				<div class="changeTab leftPosition activeTab" onclick="changeTab(this,'parent');">绑定学生</div>
-				<div class="changeTab rightPosition" onclick="changeTab(this,'teacher');">绑定老师</div>
+				<div class="changeTab leftPosition activeTab" onclick="changeTab(this,'parent');"><?php  echo $language['bangding_wxbd_stutitle'];?></div>
+				<div class="changeTab rightPosition" onclick="changeTab(this,'teacher');"><?php  echo $language['bangding_wxbd_teatitle'];?></div>
 			</div>
 			<div class="bangdingBox">
 				<div class="headerBox">
@@ -40,13 +40,13 @@
 					</div>
 					<div class="rightHeader">
 						<img style="height:80px;" src="<?php echo OSSURL;?>public/mobile/img/default_babyHeader.png" />
-						<span>学生</span>
+						<span><?php  echo $language['bangding_wxbd_stuico'];?></span>
 					</div>
 				</div>				
 				<div id="parentBox" class="changeBox activeBox">
 					<ul>
 						<li>
-							<span class="l">学生姓名：</span>
+							<span class="l"><?php  echo $language['bangding_wxbd_stuname'];?>：</span>
 							<span class="r">
 								<input id="s_name" type="text" value="" />
 							</span>
@@ -89,15 +89,17 @@
 						</li>
 						<?php  } ?>						
 						<li>
-							<span class="l">关&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;系：</span>
+							<span class="l"><?php  echo $language['bangding_wxbd_guanxi'];?>：</span>
 							<span class="r">
 								<label>请选择</label>
 									<select id="subjectId">
 										<option value="">请选择</option>
-										<option value="2">母亲</option>
-										<option value="3">父亲</option>
-										<option value="4">本人</option>
-										<option value="5">家长</option>
+										<?php  if(getoauthurl() != 'wxzlh360.com') { ?>
+										<option value="2"><?php  echo $language['bangding_wxbd_mq'];?></option>
+										<option value="3"><?php  echo $language['bangding_wxbd_fq'];?></option>
+										<option value="5"><?php  echo $language['bangding_wxbd_jz'];?></option>
+										<?php  } ?>
+										<option value="4"><?php  echo $language['bangding_wxbd_br'];?></option>
 									</select>
 								<i></i>
 							</span>
@@ -107,7 +109,7 @@
 							<span class="l"></span>
 							<span class="remind">
 								<i><img alt="" src="<?php echo OSSURL;?>public/mobile/img/ico_attention.png" /></i>
-								<label>请输入报名时预留的手机号，一次绑定一个学生</label>
+								<label><?php  echo $language['bangding_bottip'];?></label>
 							</span>
 						</li>
 						<?php  } ?>
@@ -117,7 +119,7 @@
 				<div id="teacherBox" class="changeBox">
 					<ul>
 						<li>
-							<span class="l">老师姓名：</span>
+							<span class="l"><?php  echo $language['bangding_wxbd_teaname'];?>：</span>
 							<span class="r">
 								<input id="tname" type="text" value="" />
 							</span>
@@ -273,10 +275,10 @@ function changeTab(obj,tabName){
 	var bangdingStr = "";
 	var imgSrc = "";
 	if(tabName == "parent"){
-		bangdingStr = "我的孩子";
+		bangdingStr = "<?php  echo $language['bangding_wxbd_stuico'];?>";
 		imgSrc = "../addons/fm_jiaoyu/public/mobile/img/default_babyHeader.png";
 	}else if(tabName == "teacher"){
-		bangdingStr = "我的校园";
+		bangdingStr = "<?php  echo $language['bangding_wxbd_teaico'];?>";
 		imgSrc = "../addons/fm_jiaoyu/public/mobile/img/default_school.png";
 	}else{
 		bangdingStr = "未知绑定";
@@ -289,7 +291,7 @@ function bangDing(){
 	var activeBoxID = $(".bangdingBox").find(".activeBox").attr("id");
 	if(activeBoxID == "parentBox"){
 		if($("#s_name").val() == null || $("#s_name").val() == ""){
-			jTips("学生姓名不能为空！");
+			jTips("<?php  echo $language['bangding_wxbd_stuname'];?>不能为空！");
 			return;
 		}
  		<?php  if($school['bd_type'] ==1 || $school['bd_type'] ==4 || $school['bd_type'] ==5 || $school['bd_type'] ==7) { ?>
@@ -363,7 +365,7 @@ function bangDing1(){
 	var activeBoxID = $(".bangdingBox").find(".activeBox").attr("id");
     if(activeBoxID == "teacherBox"){
 		if($("#tname").val() == null || $("#tname").val() == ""){
-			jTips("老师姓名不能为空！");
+			jTips("<?php  echo $language['bangding_wxbd_teaname'];?>不能为空！");
 			return;
 		}
 		if($("#tcode").val() == null || $("#tcode").val() == ""){

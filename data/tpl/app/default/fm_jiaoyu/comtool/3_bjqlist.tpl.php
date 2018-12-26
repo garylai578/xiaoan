@@ -10,7 +10,7 @@
 				<?php  if($item['msgtype'] ==3) { ?><span class="diary_tag_recipe">视频</span>&nbsp;&nbsp;&nbsp;<?php  } ?>
 				<?php  if($item['msgtype'] ==4) { ?><span class="diary_tag_activity">分享</span>&nbsp;&nbsp;&nbsp;<?php  } ?>
 				<?php  if($item['msgtype'] ==5) { ?><span class="diary_tag_work">多媒体</span>&nbsp;&nbsp;&nbsp;<?php  } ?>
-				<?php  if($bzj || $teachers['status'] ==1 || $bnjzr) { ?><?php  if($item['isopen'] == 1) { ?><span style="color: #9C2B44;font-weight:400;float: right;" class="shenhe_btn" diaryid="<?php  echo $item['id'];?>">审核</span><?php  } ?><?php  } ?>
+				<?php  if($bzj || $teachers['status'] ==1 || $bnjzr || $manger) { ?><?php  if($item['isopen'] == 1) { ?><span style="color: #9C2B44;font-weight:400;float: right;" class="shenhe_btn" diaryid="<?php  echo $item['id'];?>">审核</span><?php  } ?><?php  } ?>
             </div>
             <div class="user_text">
                 <div class="inside_user_text"><?php  echo $item['content'];?><?php  echo $item['linkdesc'];?><?php  if($item['link']) { ?><a href="<?php  echo $item['link'];?>"><?php  echo $item['linkdesc'];?></a><?php  } ?></div>

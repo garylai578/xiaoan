@@ -1,174 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=yes" />
-	<title>{$school['title']}</title>
-	<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/newCourseDetail.css?v={php echo date('Ymd',TIMESTAMP)}">
-	{php echo register_jssdks();}
-	<script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.10.1.min.js?v=4.9"></script>
-	<script type="text/javascript" src="{OSSURL}public/mobile/js/jquery.reveal.js"></script>
-	<link rel="stylesheet" type="text/css" href="{OSSURL}public/mobile/css/common.css" />
-
-	{php include $this->template('port');}
-	<style>
-	.header { width: 100%; height: 50px; line-height: 50px; position: fixed; z-index: 1000; top: 0; left: 0; box-shadow: 0 0 2px 0px rgba(0,0,0,0.3),0 0 6px 2px rgba(0,0,0,0.15); } .header .l { width: 50px; height: 50px; line-height: 50px; color: white; position: absolute; left: 0; top: 0; } .header .m { width: 100%; height: 50px; line-height: 50px; text-align: center; color: white; font-size: 18px; } .header .r { width: 50px; height: 50px; line-height: 50px; position: absolute; right: 0; top: 0; } .mainColor { background:{if !empty($school['headcolor'])}{$school['headcolor']}{else}#06c1ae{/if} !important; } .header .l a { font-size: 18px; color: white; display: block; width: 100%; height: 100%; text-align: center; }
-	.popUpBox {position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;animation-name: popFadeIn;-webkit-animation-name: popFadeIn;-ms-animation-name: popFadeIn;-moz-animation-name: popFadeIn;-o-animation-name: popFadeIn;-webkit-animation-duration: 600ms;animation-duration: 600ms;-webkit-animation-fill-mode: both;z-index: 100;}
-	.popUpBoxOut {animation-name: popFadeOut;-webkit-animation-name: popFadeOut;-ms-animation-name: popFadeOut;-moz-animation-name: popFadeOut;-o-animation-name: popFadeOut;-webkit-animation-duration: 600ms;animation-duration: 600ms;-webkit-animation-fill-mode: both;}
-	.trackMatte {position: absolute;width: 100%;height: 100vh;top: 0;left: 0;right: 0;bottom: 0;background-color: black;opacity: .5;}
-	.popContentBox {position: absolute;width: 80%;margin-left: 10%;max-height: 80%;top: 50%;transform: translateY(-50%);-webkit-transform: translateY(-50%);-moz-transform: translateY(-50%);-ms-transform: translateY(-50%);-o-transform: translateY(-50%);z-index: 101;background-color: white;border-radius: 10px;overflow-y: scroll;overflow-x: hidden;}
-
-	.poptitle {
-	    width: 100%;
-	    font-size: 16px;
-	    color: #333333;
-	    text-align: center;
-	    padding: 5px 0;
-	}
-	.sectionContBox {
-	    margin: 10px;
-	}
-	.btnBox {
-	    display: -webkit-box; /* 老版本语法: Safari,  iOS, Android browser, older WebKit browsers.  */
-	    display: -moz-box; /* 老版本语法: Firefox (buggy) */
-	    display: -ms-flexbox; /* 混合版本语法: IE 10 */
-	    display: -webkit-flex; /* 新版本语法： Chrome 21+ */
-	    display: flex; /* 新版本语法： Opera 12.1, Firefox 22+ */
-	    margin: 20px 0;
-	}
-
-	.btnPass, .btnCancel {
-	    width: 100px;
-	    height: 31px;
-	    font-size: 14px;
-	    color: white;
-	    text-align: center;
-	    line-height: 31px;
-	    border-radius: 20px;
-	}
-	.btnCancel {
-	    background: #ff9f22;
-	    margin-left: auto;
-	    margin-right: 10px;
-	}
-	.btnPass {
-	    background: #06c1ae;
-	    margin-left: 12px;
-	}
-
-	.user_name {text-align: left;color: #666;font-size: 14px;width: 100%;}
-	.btn {height: 44px;display: block;background-color: #7bb52d;font: 20px "黑体";text-align: center;color: #fff;cursor: pointer;}
-	.user_name > input {    display: block;width: 100%;border-radius: 3px;height: 34px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #e4dede;box-sizing: border-box;}
-	.user_name > select {display: block;width: 100%;height: 34px;border-radius: 3px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #ccc;-webkit-box-sizing: border-box;
-	box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
-	.close_pupop_c {width: 200px; margin: 0 auto;}
-	.close_pupop_button {width: 90px;height: 30px;border-radius: 5px;line-height: 30px;font-size: 16px;text-align: center;}
-	.close_pupop_button_1 {background: #e74580;color: #fff;}
-	.close_pupop_button_2 {background: #56c454;color: #fff;margin-left: 20px;}
-	.user_name > input {display: block;width: 100%;border-radius: 3px;height: 34px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #e4dede;box-sizing: border-box;}
-	.user_name > select {display: block;width: 100%;height: 34px;border-radius: 3px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #ccc;-webkit-box-sizing: border-box;box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
-	.weui_switch {
-	    font-size: 14px;
-	    -webkit-appearance: none;
-	    -moz-appearance: none;
-	    appearance: none;
-	    position: relative;
-	    width: 48px !important;
-	    height: 28px;
-	    border: 1px solid #DFDFDF;
-	    outline: 0;
-	    border-radius: 16px;
-	    box-sizing: border-box;
-	    background: #DFDFDF;
-	    vertical-align: middle;
-	}
-
-    .weui_switch:before {
-        content: " ";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 46px;
-        height: 26px;
-        border-radius: 15px;
-        background-color: #FDFDFD;
-        -webkit-transition: -webkit-transform .3s;
-        transition: transform .3s;
-    }
-
-    .weui_switch:after {
-        content: " ";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 26px;
-        height: 26px;
-        border-radius: 15px;
-        background-color: #FFFFFF;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-        -webkit-transition: -webkit-transform .3s;
-        transition: transform .3s;
-    }
-
-    .weui_switch:checked {
-        border-color: #06c1ae;
-        background-color: #06c1ae;
-    }
-
-    .weui_switch:checked:before {
-        -webkit-transform: scale(0);
-        transform: scale(0);
-    }
-
-    .weui_switch:checked:after {
-        -webkit-transform: translateX(20px);
-        transform: translateX(20px);
-    }
-    
-	/*顶部弹出css*/
-	.reveal-modal-bg {position: fixed;height: 100%;width: 100%;background: #000;background: rgba(0,0,0,.8);z-index: 100;display: none;top: 0;left: 0; }
-	.reveal-modal {visibility: hidden;top: 100px; left: 2%;right:2%;background: #fff ;position: absolute;z-index: 101;    padding: 25px 18px 38px;-moz-border-radius: 5px;-webkit-border-radius: 5px;order-radius: 5px;
-	-moz-box-shadow: 0 0 10px rgba(0,0,0,.4);-webkit-box-shadow: 0 0 10px rgba(0,0,0,.4);-box-shadow: 0 0 10px rgba(0,0,0,.4);}
-	.reveal-modal.small{ width: 200px; margin-left: -140px;}
-	.reveal-modal.medium{ width: 400px; margin-left: -240px;}
-	.reveal-modal.large{ width: 600px; margin-left: -340px;}
-	.reveal-modal.xlarge{ width: 800px; margin-left: -440px;}
-	.reveal-modal .close-reveal-modal {font-size: 22px;line-height: .5;position: absolute;top: 8px;right: 11px;color: #aaa;text-shadow: 0 -1px 1px rbga(0,0,0,.6);font-weight: bold;cursor: pointer;} 
-	
-	/*身份选择css*/
-	.single {text-align: center;z-index: 30;font-size: 20px;color: #fe6700;position: absolute;left: 6%;right: 6%;top: 5%;padding: 0 20px;background-color: #fff;padding-bottom: 33px;padding-top: 10px;}
-	.single ul {width: 100%;height: auto;overflow: auto;}
-	.single ul li {height: 50px;line-height: 50px;border-bottom: 1px solid #e9e9e9;padding: 0 10px;}
-	.single ul li span.le {height: 50px;line-height: 50px;float: left;font-size: 16px;}
-	.single ul li span.ri {float: right;height: 50px;line-height: 50px;font-size: 16px;}
-
-	/*头部css*/
-	.top_head_blank {clear: both;height: 50px;}
-	.label-danger{
-		display: inline-block;
-	    padding: .2em .6em .3em;
-	    font-size: 75%;
-	    font-weight: bold;
-	    line-height: 1;
-	    color: #fff;
-	    text-align: center;
-	    white-space: nowrap;
-	    vertical-align: baseline;
-	    border-radius: .25em;
-	}
-	.form-order>.form-line {
-			margin-bottom: 0.5rem;
-	}
-	</style>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width initial-scale=1.0 maximum-scale=1.0 user-scalable=yes" />
+<title>{$school['title']}</title>
+<link rel="stylesheet" href="{MODULE_URL}public/mobile/css/newCourseDetail.css?v={php echo date('Ymd',TIMESTAMP)}">
+{php echo register_jssdks();}
+<script type="text/javascript" src="{MODULE_URL}public/mobile/js/jquery-1.10.1.min.js?v=4.9"></script>
+<script type="text/javascript" src="{OSSURL}public/mobile/js/jquery.reveal.js"></script>
+<script type="text/javascript" src="{OSSURL}public/mobile/js/danmu.js"></script>
+<link rel="stylesheet" type="text/css" href="{OSSURL}public/mobile/css/common.css" />
+{php include $this->template('port');}
+<style>
+.header { width: 100%; height: 50px; line-height: 50px; position: fixed; z-index: 1000; top: 0; left: 0; box-shadow: 0 0 2px 0px rgba(0,0,0,0.3),0 0 6px 2px rgba(0,0,0,0.15); } .header .l { width: 50px; height: 50px; line-height: 50px; color: white; position: absolute; left: 0; top: 0; } .header .m { width: 100%; height: 50px; line-height: 50px; text-align: center; color: white; font-size: 18px; } .header .r { width: 50px; height: 50px; line-height: 50px; position: absolute; right: 0; top: 0; } .mainColor { background:{if !empty($school['headcolor'])}{$school['headcolor']}{else}#06c1ae{/if} !important; } .header .l a { font-size: 18px; color: white; display: block; width: 100%; height: 100%; text-align: center; } 	.popUpBox {position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;animation-name: popFadeIn;-webkit-animation-name: popFadeIn;-ms-animation-name: popFadeIn;-moz-animation-name: popFadeIn;-o-animation-name: popFadeIn;-webkit-animation-duration: 600ms;animation-duration: 600ms;-webkit-animation-fill-mode: both;z-index: 100;} 	.popUpBoxOut {animation-name: popFadeOut;-webkit-animation-name: popFadeOut;-ms-animation-name: popFadeOut;-moz-animation-name: popFadeOut;-o-animation-name: popFadeOut;-webkit-animation-duration: 600ms;animation-duration: 600ms;-webkit-animation-fill-mode: both;} 	.trackMatte {position: absolute;width: 100%;height: 100vh;top: 0;left: 0;right: 0;bottom: 0;background-color: black;opacity: .5;} 	.popContentBox {position: absolute;width: 80%;margin-left: 10%;max-height: 80%;top: 50%;transform: translateY(-50%);-webkit-transform: translateY(-50%);-moz-transform: translateY(-50%);-ms-transform: translateY(-50%);-o-transform: translateY(-50%);z-index: 101;background-color: white;border-radius: 10px;overflow-y: scroll;overflow-x: hidden;}  	.poptitle { 	    width: 100%; 	    font-size: 16px; 	    color: #333333; 	    text-align: center; 	    padding: 5px 0; 	} 	.sectionContBox { 	    margin: 10px; 	} 	.btnBox { 	    display: -webkit-box; /* 老版本语法: Safari,  iOS, Android browser, older WebKit browsers.  */ 	    display: -moz-box; /* 老版本语法: Firefox (buggy) */ 	    display: -ms-flexbox; /* 混合版本语法: IE 10 */ 	    display: -webkit-flex; /* 新版本语法： Chrome 21+ */ 	    display: flex; /* 新版本语法： Opera 12.1, Firefox 22+ */ 	    margin: 20px 0; 	}  	.btnPass, .btnCancel { 	    width: 100px; 	    height: 31px; 	    font-size: 14px; 	    color: white; 	    text-align: center; 	    line-height: 31px; 	    border-radius: 20px; 	} 	.btnCancel { 	    background: #ff9f22; 	    margin-left: auto; 	    margin-right: 10px; 	} 	.btnPass { 	    background: #06c1ae; 	    margin-left: 12px; 	}  	.user_name {text-align: left;color: #666;font-size: 14px;width: 100%;} 	.btn {height: 44px;display: block;background-color: #7bb52d;font: 20px "黑体";text-align: center;color: #fff;cursor: pointer;} 	.user_name > input {    display: block;width: 100%;border-radius: 3px;height: 34px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #e4dede;box-sizing: border-box;} 	.user_name > select {display: block;width: 100%;height: 34px;border-radius: 3px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #ccc;-webkit-box-sizing: border-box; 	box-sizing: border-box;text-align: left;color: #666;font-size: 14px;} 	.close_pupop_c {width: 200px; margin: 0 auto;} 	.close_pupop_button {width: 90px;height: 30px;border-radius: 5px;line-height: 30px;font-size: 16px;text-align: center;} 	.close_pupop_button_1 {background: #e74580;color: #fff;} 	.close_pupop_button_2 {background: #56c454;color: #fff;margin-left: 20px;} 	.user_name > input {display: block;width: 100%;border-radius: 3px;height: 34px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #e4dede;box-sizing: border-box;} 	.user_name > select {display: block;width: 100%;height: 34px;border-radius: 3px;padding: 0 10px;margin-bottom: 10px;border: 1px solid #ccc;-webkit-box-sizing: border-box;box-sizing: border-box;text-align: left;color: #666;font-size: 14px;} 	.weui_switch { 	    font-size: 14px; 	    -webkit-appearance: none; 	    -moz-appearance: none; 	    appearance: none; 	    position: relative; 	    width: 48px !important; 	    height: 28px; 	    border: 1px solid #DFDFDF; 	    outline: 0; 	    border-radius: 16px; 	    box-sizing: border-box; 	    background: #DFDFDF; 	    vertical-align: middle; 	}      .weui_switch:before {         content: " ";         position: absolute;         top: 0;         left: 0;         width: 46px;         height: 26px;         border-radius: 15px;         background-color: #FDFDFD;         -webkit-transition: -webkit-transform .3s;         transition: transform .3s;     }      .weui_switch:after {         content: " ";         position: absolute;         top: 0;         left: 0;         width: 26px;         height: 26px;         border-radius: 15px;         background-color: #FFFFFF;         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);         -webkit-transition: -webkit-transform .3s;         transition: transform .3s;     }      .weui_switch:checked {         border-color: #06c1ae;         background-color: #06c1ae;     }      .weui_switch:checked:before {         -webkit-transform: scale(0);         transform: scale(0);     }      .weui_switch:checked:after {         -webkit-transform: translateX(20px);         transform: translateX(20px);     }     	/*顶部弹出css*/ 	.reveal-modal-bg {position: fixed;height: 100%;width: 100%;background: #000;background: rgba(0,0,0,.8);z-index: 100;display: none;top: 0;left: 0; } 	.reveal-modal {visibility: hidden;top: 100px; left: 2%;right:2%;background: #fff ;position: absolute;z-index: 101;    padding: 25px 18px 38px;-moz-border-radius: 5px;-webkit-border-radius: 5px;order-radius: 5px; 	-moz-box-shadow: 0 0 10px rgba(0,0,0,.4);-webkit-box-shadow: 0 0 10px rgba(0,0,0,.4);-box-shadow: 0 0 10px rgba(0,0,0,.4);} 	.reveal-modal.small{ width: 200px; margin-left: -140px;} 	.reveal-modal.medium{ width: 400px; margin-left: -240px;} 	.reveal-modal.large{ width: 600px; margin-left: -340px;} 	.reveal-modal.xlarge{ width: 800px; margin-left: -440px;} 	.reveal-modal .close-reveal-modal {font-size: 22px;line-height: .5;position: absolute;top: 8px;right: 11px;color: #aaa;text-shadow: 0 -1px 1px rbga(0,0,0,.6);font-weight: bold;cursor: pointer;} 		/*身份选择css*/ 	.single {text-align: center;z-index: 30;font-size: 20px;color: #fe6700;position: absolute;left: 6%;right: 6%;top: 5%;padding: 0 20px;background-color: #fff;padding-bottom: 33px;padding-top: 10px;} 	.single ul {width: 100%;height: auto;overflow: auto;} 	.single ul li {height: 50px;line-height: 50px;border-bottom: 1px solid #e9e9e9;padding: 0 10px;} 	.single ul li span.le {height: 50px;line-height: 50px;float: left;font-size: 16px;} 	.single ul li span.ri {float: right;height: 50px;line-height: 50px;font-size: 16px;}  	/*头部css*/ 	.top_head_blank {clear: both;height: 50px;} 	.label-danger{ 		display: inline-block; 	    padding: .2em .6em .3em; 	    font-size: 75%; 	    font-weight: bold; 	    line-height: 1; 	    color: #fff; 	    text-align: center; 	    white-space: nowrap; 	    vertical-align: baseline; 	    border-radius: .25em; 	} 	.form-order>.form-line { 			margin-bottom: 0.5rem; 	}
+.overflow-text{ display: block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:0; clear: both; padding:0 10px; border-radius: 10px; box-sizing: border-box; max-width: 100%; color:#fff; animation:colorchange 3s infinite alternate; -webkit-animation:colorchange 3s infinite alternate; } @keyframes colorchange{ 0%{ color:red; } 50%{ color:green; } 100%{ color:#6993f9; } }.font_icon{width: 15px;margin-top: 2px;margin-left: 0px;margin-right: 1px;border-radius: 50%;}
+</style>
 </head>
 <body>
-	<div id="BlackBg" class="BlackBg"></div>
-	<div class="header mainColor">
-		<div id="titlebar" class="l">
-			<a class="backOff" style="background:url({OSSURL}public/mobile/img/ic_arrow_left_48px_white.svg) no-repeat;background-size: 55% 55%;background-position: 50%;" href="{php echo $this->createMobileUrl('kc', array('schoolid' => $schoolid), true)}"></a>
-		</div>
-		<div class="m"><a><span style="font-size: 18px">课程详情</span></a></div>
-	</div>
 	<script>
 		window.onpageshow = function(event) {
 		    if (event.persisted) {
@@ -177,10 +25,9 @@
 		};
 	</script>
 	<div class="main">
-		<div class="top_head_blank"></div>
 		<div>
 			<div class="slider" style="height: 20.6rem;">
-				<img data-src="{php echo tomedia($item['thumb'])}" src="{if $item['thumb']}{php echo tomedia($item['thumb'])}{else}{php  echo tomedia($school['thumb'])}{/if}">
+				<img data-src="{php echo tomedia($item['bigimg'])}" src="{if $item['bigimg']}{php echo tomedia($item['bigimg'])}{else}{php  echo tomedia($school['thumb'])}{/if}">
 			</div>
 			<ol class="summary">
 				<li>
@@ -213,7 +60,7 @@
 				</div>
 			</ol>
 		</div>
-		<div class="teachers"><strong>授课老师</strong>
+		<div class="teachers"><strong>{$language['kcinfo_scls']}</strong>
 			<ul>
 				{loop $tid_array $row}
 				<li>
@@ -225,7 +72,7 @@
 			</ul>
 		</div>
 		<div class="detail">
-			<strong>课程介绍</strong>
+			<strong>{$language['kcinfo_kcjs']}</strong>
 			<div class="detail-detail">
 				{php echo htmlspecialchars_decode($item['dagang'])}
 			</div>
@@ -244,7 +91,7 @@
 			</div>
 		</div>
 		{/if}
-		<div class="org"><strong>学校信息</strong>
+		<div class="org"><strong>{$language['kcinfo_xxxx']}</strong>
 			<div class="org-detail">
 				<img src="{php echo tomedia($school['logo'])}">
 				<h3>{$school['title']}</h3>
@@ -252,7 +99,7 @@
 				<a href="{php echo $this->createMobileUrl('jianjie', array('schoolid' => $schoolid), true)}"></a>
 			</div>
 		</div>
-		<div class="relateds" style="margin-bottom: 5rem;"><strong>学校其他课程</strong>
+		<div class="relateds" style="margin-bottom: 5rem;"><strong>{$language['kcinfo_xxqtkc']}</strong>
 			<ol>
 				{loop $others $rowO}
 				<li>
@@ -299,7 +146,6 @@
 			{/loop}	
 		</ul>
 	</div>
-
 	<!--轮转图片-->
 	<div class="toast">
 		<div class="toast-content black">
@@ -428,7 +274,6 @@
 			<div class="component-dialog-footer"></div>
 		</div>
 	</div>
-
 	<!--预约试听-->
 	<div class="component-panel" id="yyst" style="display:none;z-index: 999;">
 		<div class="mask"></div>
@@ -476,7 +321,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 			</div>
 		</div>
 	</div>
-
 	<!--新增学生-->
 	<div class="popUpBox" id="xz_stu" style="display: none;z-index:106" >
 		<div class="trackMatte"></div>
@@ -519,16 +363,20 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 	<input id="userid" name="userid" type="hidden" value="{$its['id']}">
 	<input id="umobile" name="umobile" type="hidden" value="{if !empty($userinfo)}{$userinfo['mobile']}{/if}">
 	<script>
-		setTimeout(function() {
-			if(window.__wxjs_environment === 'miniprogram'){
-				$(".mainColor").hide();
-				$(".top_head_blank").hide();
-				document.title="课程详情";
-			}
-		}, 100);
-		//$(".component-panel").on("click",function(){
-		//	$("#yyst").hide();
-		//})
+		var data = {$dmlist};
+		var Obj = $('.slider').barrage({
+			data : data, //数据列表
+			row : 6,   //显示行数
+			time : 1500, //间隔时间
+			gap : 10,    //每一个的间隙
+			position : 'absolute', //绝对定位
+			direction : 'bottom right', //方向
+			ismoseoverclose : true, //悬浮是否停止
+			height : 20, //设置单个div的高度
+		})
+		{if count($yblist) > 5 && $item['is_dm'] == 1}
+			Obj.start(); 
+		{/if}
 		function closed_HasOrder(){
 			var orderid = $("#HasOrderId").val();
 			var TempStuId = $("#TempStuId").val();
@@ -550,7 +398,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 				}
 			},'json');
 		}
-
 		function GoTo_HasOrder(){
 			var orderid = $("#HasOrderId").val();
 			window.location.href = "{php echo $this->createMobileUrl('gopay', array('schoolid' => $schoolid,'dos'=>'user'),true)}" + "&orderid=" + orderid;
@@ -597,11 +444,9 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 		function show_shenfen(){
 			$("#selectList").show();
 		}
-
 		function bangding(){
 			$("#bd_xz").show();
 		}
-
 		function NewStu(){
 			$("#bd_xz").hide();
 			$("#xz_stu").show();
@@ -618,7 +463,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 			$("#xz_stu").hide();
 			$("body").removeAttr("style");
 		}
-
 		function GetNewStu(){
 			
 			
@@ -630,7 +474,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 			var bj ={$item['bj_id']};
 			var pard = $("#gx").val();
 		
-
 			if(sname == null || sname == ''){
 				jTips("学生姓名不能为空");
 				return;
@@ -662,7 +505,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					shareuserid : "{$_GPC['shareuserid']}"
 					};
 				$.post("{php echo $this->createMobileUrl('kcajax',array('op'=>'newstu'))}",submitData,function(data){
-
 					if(data.result){
 						ajax_stop_loading();
 						jTips(data.msg);
@@ -710,7 +552,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					shareuserid : "{$_GPC['shareuserid']}"
 					};
 				$.post("{php echo $this->createMobileUrl('payajax',array('op'=>'sigeup','shareuserid'=>$_GPC['shareuserid']))}",submitData,function(data){
-
 					if(data.result){
 						jTips(data.msg);
 						window.location.href = url;
@@ -731,7 +572,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 				$('#user_info').show();
 			}
 		}
-
 		function jfdy_ajax(){
 			var count = $("#PointNum").val();
 			var is_point = $("#is_p2c_value").val();
@@ -772,7 +612,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					shareuserid : "{$_GPC['shareuserid']}"
 				};
 				$.post("{php echo $this->createMobileUrl('kcajax',array('op'=>'signup'))}",submitData,function(data){
-
 					if(data.result){
 						jTips(data.msg);
 						//console.log(data);
@@ -782,8 +621,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					}
 				},'json');
 		}
-
-
 		
 		$(".icon-kefu").on("click",function(){
 			$("#yyst").show();
@@ -820,7 +657,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 			$(".reveal-modal-bg").hide();
 			$(".reveal-modal").css("visibility","hidden");
 		};
-
 		function yy_order(){
 			var telphone = $("#order_mobile").val();
 			var name = $("#order_name").val();
@@ -876,7 +712,6 @@ background-color: #06c1ae;border-color: #06c1ae;width:40%;margin-left: 8%; " dat
 					
 				},
 				cancel: function(){
-
 				}
 			};	
 			wx.onMenuShareAppMessage(sharedata);

@@ -116,8 +116,7 @@ setTimeout(function() {
 <script>
 	$('#signinShow').on("click", function (e) {
 		ajax_start_loading("获取位置中...");
-			var fanhui =  wxGetLocation();
-			
+			var fanhui =  not_true_wxGetLocation();
 			$(this).hide();
 			
 		
@@ -170,6 +169,17 @@ var bet_range = 0 ;
 		});
 	};
 
+	
+	function not_true_wxGetLocation(){
+			latitude = {$school['lat']};
+			longitude = {$school['lng']};
+			GetRange(latitude,longitude);
+			$("#curlat").val({$school['lat']});
+			$("#curlng").val({$school['lng']});
+			return true ;
+	};
+	
+	
 	function GetRange(lat,lon) {
 		var lat1  = {$school['lat']};
 		var lon1  = {$school['lng']};
@@ -181,9 +191,18 @@ var bet_range = 0 ;
     		latlng = res[0];
   			var bet =  Math.round(qq.maps.geometry.spherical.computeDistanceBetween(end, latlng)*10)/10;
   			bet_range = bet;
- 			console.log(bet);
- 			$("#school_range").text(bet + "米");
- 			$("#bet").val(bet);
+ 			
+			{if is_showgkk()}
+			if({$school['wxsignrange']} != 0)
+			{	
+				var this_range = {$school['wxsignrange']} ?  {$school['wxsignrange']} : 1 ;
+				bet_range  =  Math.ceil(Math.random()*this_range);
+				console.log(bet_range);
+			}
+			
+			{/if}
+ 			$("#school_range").text(bet_range + "米");
+ 			$("#bet").val(bet_range);
  			$('#signin2').show();
 			$('#signin').show();
 			$('#signin1').show();

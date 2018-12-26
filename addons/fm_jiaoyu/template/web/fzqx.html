@@ -89,6 +89,18 @@
 							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1018" data_id="01801" type="checkbox" name="qxarr"  value="2001802" style="float: none;" {if in_array(2001802,$qx)} checked="checked" {/if}>回复校长信箱</label>
 							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">一键放学</p>
 							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" data_id="01901" type="checkbox" name="qxarr"  value="2001901" style="float: none;" {if in_array(2001901,$qx)} checked="checked" {/if}>一键放学</label>
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">我的评分</p>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" data_id="02001" type="checkbox" name="qxarr"  value="2002001" style="float: none;" {if in_array(2002001,$qx)} checked="checked" {/if}>查看我的评分</label>
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">评分情况</p>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" data_id="02101" type="checkbox" name="qxarr"  value="2002101" style="float: none;" {if in_array(2002101,$qx)} checked="checked" {/if}>查看评分情况</label>
+							{if is_showpf()}
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">学生评分</p>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" data_id="02201" type="checkbox" name="qxarr"  value="2002201" style="float: none;" {if in_array(2002201,$qx)} checked="checked" {/if}>查看学生评分情况</label> 
+							{/if}
+							{if !$_W['schooltype']}
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">监控列表</p>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" data_id="02501" type="checkbox" name="qxarr"  value="2002501" style="float: none;" {if in_array(2002501,$qx)} checked="checked" {/if}>查看监控列表</label>
+							{/if}							
 						</div>
 					</div>
 				</div>			

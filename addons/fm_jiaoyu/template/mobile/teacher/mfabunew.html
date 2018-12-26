@@ -44,22 +44,8 @@
 <div id="titlebar_bg" class="top_head_blank"></div>
 <div class="feedback_box">
     <div class="blank"></div>
-	<!-- <div class="feedback_title_box"> -->
-        <!-- <select class="feedback_title" id="master_select_box"> -->
-            <!-- <option value="1">@全体师生</option> -->
-            <!-- <option value="2">@全体教师</option> -->
-            <!-- <option value="3">@全体学生</option> -->
-            <!-- <option value="student">指定班级</option> -->
-            <!-- <option value="staff">指定职工</option> -->
-			<!-- {if $alljsfz} -->
-				<!-- {loop $alljsfz $row} -->
-					<!-- <option value="{$row['sid']}">@{$row['sname']}(教师)</option> -->
-				<!-- {/loop} -->
-			<!-- {/if}			 -->
-        <!-- </select> -->
-    <!-- </div> -->
     <div class="feedback_title_box">
-        <div class="feedback_title feedback_title_teacher" id="feedback_title" select_id=''>@全体师生</div>
+        <div class="feedback_title feedback_title_teacher" id="feedback_title" select_id=''>请选择</div>
         <select id="master_select_box">
 			<option value="">请选择</option>
             <option value="school">@全体师生</option>
@@ -697,13 +683,12 @@ setTimeout(function() {
 			wxsdkcheckForm: function () {
 				// 1.这里先做校验文本框不能为空
 				var typessss = $("#master_select_box").find(":selected").val();	
-				if (typessss == "send_class" || typessss == "student" || typessss == "staff_jsfz" || typessss == "staff") {
-					var typedatasss = $('#feedback_title').attr('select_id');
-					if(typedatasss == '' || typedatasss == null){
-						jAlert("请选择接收对象");
-						return false;
-					}
+
+				if(typessss == '' || typessss == null){
+					jAlert("请选择接收对象");
+					return false;
 				}
+				
 				var title = $.trim($("#title").val());
 				if (title.replace(/(#)[0-9a-zA-Z\u4e00-\u9fa5]{0,255}(#)/g, '$1$2').replace(/[#]/g, "") == "") {
 					jAlert("请先输入标题");

@@ -2,8 +2,9 @@
 		<li class="main" time="{$v['createtime']}" id="{$v['id']}" style="display: block;">
 			<div class="tongzhi">
 				<span class="tongzhiTitle">{$v['title']}</span>
+				{if $v['ydrs']}<span class="redtip"></span>{/if}
 				<span class="common_audit_status">{$v['ydrs']}</span>
-				{if $v['tzlx'] =="班级通知"}
+				{if $v['tzlx'] ==$language['snoticelist_bjtz']}
 				<div class="audit_statusPass">{$v['tzlx']}</div>
 				{else}
 				<div class="audit_statusNew">{$v['tzlx']}</div>

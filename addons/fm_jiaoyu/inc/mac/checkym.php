@@ -300,10 +300,18 @@
 								$overtime = $school['send_overtime']*60;
 								$timecha = $times - $signTime;
 								if($overtime >= $timecha){
-									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									if(is_showyl()){
+										$this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
+									}else{
+										$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+									}
 								}
 							}else{
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								if(is_showyl()){
+									$this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
+								}else{
+									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								}
 							}
 							$fstype = true;	
 						}					
@@ -331,10 +339,18 @@
 							$overtime = $school['send_overtime']*60;
 							$timecha = $times - $signTime;
 							if($overtime >= $timecha){
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								if(is_showyl()){
+									$this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
+								}else{
+									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+								}
 							}
 						}else{
-							$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+							if(is_showyl()){
+								$this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
+							}else{
+								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+							}
 						}					
 						$fstype = true;
 					}

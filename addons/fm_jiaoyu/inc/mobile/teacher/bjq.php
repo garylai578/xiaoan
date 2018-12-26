@@ -68,14 +68,23 @@
 		}		
 		$thistime = strtotime($_GPC['limit']);
 		$lasttime = strtotime($_GPC['lasttime']);
+		$condition = '';
+		$manger = false;
+		if($school['bjqstyle'] =='new'){
+			$condition .= " And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}') ";
+			$sh_teacherids = explode(',',$school['sh_teacherids']);
+			if(in_array($it['tid'],$sh_teacherids)){
+				$manger = true;
+			}
+		}
 		if($thistime || $lasttime){
 			if($thistime){
-				$condition = " AND createtime < '{$thistime}'";
+				$condition .= " AND createtime < '{$thistime}'";
 				if(is_showgkk())
 				{
-						$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And ((type = 0) Or ( type = 2 ))  And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $condition ORDER BY createtime DESC LIMIT 0,10");
+						$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And ((type = 0) Or ( type = 2 )) $condition ORDER BY createtime DESC LIMIT 0,10");
 				}else{
-						$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $condition ORDER BY createtime DESC LIMIT 0,10");
+						$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 $condition ORDER BY createtime DESC LIMIT 0,10");
 				}
 				foreach ($list1 as $index => $v) {
 					if (!empty($v['sherid'])) {
@@ -83,12 +92,11 @@
 						$list1[$index]['znames'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_dianzan) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY createtime ASC LIMIT 0,4", array(':sherid'=>$v['sherid']));
 						$num = count($list1[$index]['zname']);
 						$list1[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid =:sherid  ORDER BY createtime ASC", array(':sherid'=>$v['sherid']));
-						$list1[$index]['isdianz'] = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where :schoolid = schoolid And :weid = weid  And :uid = uid And :sherid = sherid", array(
-						  ':weid' => $weid,
-						  ':schoolid' => $schoolid,
-						  ':uid' => $it['uid'],
-						  ':sherid' => $v['id']
-						   ));
+						$list1[$index]['isdianz'] = false;
+						$isdianz = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where schoolid = '{$schoolid}' And sherid = '{$v['id']}' And ( userid = '{$it['id']}' Or uid = '{$it['uid']}')");
+						if($isdianz){
+							$list1[$index]['isdianz'] = true;
+						}
 					} 
 					$members = pdo_fetch("SELECT avatar FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ORDER BY uid ASC", array(':uniacid' => $weid, ':uid' => $v['uid']));
 					$list1[$index]['avatar'] = $members['avatar'];
@@ -96,20 +104,19 @@
 				}
 			}
 			if($lasttime){
-				$condition = " AND createtime > '{$lasttime}'";
-				$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $condition ORDER BY createtime DESC LIMIT 0,10");
+				$condition .= " AND createtime > '{$lasttime}'";
+				$list1 = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0  $condition ORDER BY createtime DESC LIMIT 0,10");
 				foreach ($list1 as $index => $v) {
 					if (!empty($v['sherid'])) {
 						$list1[$index]['picurl'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY id ASC", array(':sherid'=>$v['sherid']));
 						$list1[$index]['znames'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_dianzan) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY createtime ASC LIMIT 0,4", array(':sherid'=>$v['sherid']));
 						$num = count($list1[$index]['zname']);
 						$list1[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid =:sherid  ORDER BY createtime ASC", array(':sherid'=>$v['sherid']));
-						$list1[$index]['isdianz'] = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where :schoolid = schoolid And :weid = weid  And :uid = uid And :sherid = sherid", array(
-						  ':weid' => $weid,
-						  ':schoolid' => $schoolid,
-						  ':uid' => $it['uid'],
-						  ':sherid' => $v['id']
-						   ));
+						$list1[$index]['isdianz'] = false;
+						$isdianz = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where schoolid = '{$schoolid}' And sherid = '{$v['id']}' And ( userid = '{$it['id']}' Or uid = '{$it['uid']}')");
+						if($isdianz){
+							$list1[$index]['isdianz'] = true;
+						}
 					} 
 					$members = pdo_fetch("SELECT avatar FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ORDER BY uid ASC", array(':uniacid' => $weid, ':uid' => $v['uid']));
 					$list1[$index]['avatar'] = $members['avatar'];
@@ -118,42 +125,28 @@
 			}			
 			include $this->template('comtool/bjqlist');
 		}else{
-			if($bj_id != 0){
-					if($school['bjqstyle'] =='old'){
-						$tj = " ORDER BY createtime DESC";
-					}
-					if($school['bjqstyle'] =='new'){
-						$tj = " ORDER BY createtime DESC LIMIT 0,10";
-					}
-					if(is_showgkk())
-					{
-						$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And ((type = 0) Or ( type = 2 )) And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $tj ");
-					}else{
-						$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 And ( bj_id1 = '{$bj_id}' Or bj_id2 = '{$bj_id}' Or bj_id3 = '{$bj_id}' ) $tj ");
-					} 					
-				   // $children = array();
-					foreach ($list as $index => $row) {
-						if (!empty($row['sherid'])) {
-							$list[$index]['picurl'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY id ASC", array(':sherid'=>$row['sherid']));
-							$list[$index]['zname'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_dianzan) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY createtime ASC LIMIT 0,4", array(':sherid'=>$row['sherid']));
-							$list[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid =:sherid  ORDER BY createtime ASC", array(':sherid'=>$row['sherid']));
-							$list[$index]['isdianz'] = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where :schoolid = schoolid And :weid = weid  And :uid = uid And :sherid = sherid", array(
-							  ':weid' => $weid,
-							  ':schoolid' => $schoolid,
-							  ':uid' => $it['uid'],
-							  ':sherid' => $row['id']
-							   ));								
-						} 
-						$member = pdo_fetch("SELECT * FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ORDER BY uid ASC", array(':uniacid' => $weid, ':uid' => $row['uid']));
-						$list[$index]['avatar'] = $member['avatar'];
-						$list[$index]['time'] = sub_day($row['createtime']);
-					}					
-			}
-			if($school['bjqstyle'] =='old'){
-				include $this->template(''.$school['style3'].'/bjq');
-			}
-			if($school['bjqstyle'] =='new'){
-				include $this->template(''.$school['style3'].'/bjqnew');
-			}							
+			if(is_showgkk())
+			{
+				$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And ((type = 0) Or ( type = 2 ))  $condition ORDER BY createtime DESC LIMIT 0,10 ");
+			}else{
+				$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " where schoolid = '{$schoolid}' And weid = '{$weid}' And type = 0 $condition ORDER BY createtime DESC LIMIT 0,10 ");
+			} 					
+		   // $children = array();
+			foreach ($list as $index => $row) {
+				if (!empty($row['sherid'])) {
+					$list[$index]['picurl'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_media) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY id ASC", array(':sherid'=>$row['sherid']));
+					$list[$index]['zname'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_dianzan) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND sherid =:sherid  ORDER BY createtime ASC LIMIT 0,4", array(':sherid'=>$row['sherid']));
+					$list[$index]['contents'] = pdo_fetchall("SELECT * FROM " . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type=1 AND sherid =:sherid  ORDER BY createtime ASC", array(':sherid'=>$row['sherid']));
+					$list[$index]['isdianz'] = false;
+					$isdianz = pdo_fetch("SELECT id FROM " . tablename($this->table_dianzan) . " where schoolid = '{$schoolid}' And sherid = '{$row['id']}' And ( userid = '{$it['id']}' Or uid = '{$it['uid']}')");
+					if($isdianz){
+						$list[$index]['isdianz'] = true;
+					}								
+				} 
+				$member = pdo_fetch("SELECT * FROM " . tablename ( 'mc_members' ) . " where uniacid = :uniacid And uid = :uid ORDER BY uid ASC", array(':uniacid' => $weid, ':uid' => $row['uid']));
+				$list[$index]['avatar'] = $member['avatar'];
+				$list[$index]['time'] = sub_day($row['createtime']);
+			}					
+			include $this->template(''.$school['style3'].'/bjqnew');						
 		}        
 ?>

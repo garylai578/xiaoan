@@ -10,7 +10,7 @@
 	body > a:first-child,body > a:first-child img{ width: 0px !important; height: 0px !important; overflow: hidden; position: absolute}
 	body{padding-bottom: 0 !important;}
 </style>
-<title>缴费中心</title>
+<title><?php  echo $language['title'];?></title>
 <link rel="stylesheet" href="<?php echo MODULE_URL;?>public/mobile/css/reset.css">
 <?php  echo register_jssdks();?>
 <script type="text/javascript" src="<?php echo MODULE_URL;?>public/mobile/js/jquery-1.11.3.min.js?v=4.6"></script>
@@ -26,10 +26,10 @@
     <div id="wrap" class="user_order">
         <header id="header">
             <ul class="order">
-				<li class="order_li all_g"><a href="javascript:void(0)">全部</a></li>
-                <li class="order_li no_g"><a href="javascript:void(0)" <?php  if($rest != 0) { ?>value = "<?php  echo $rest;?>"<?php  } ?> id="no_g">待缴费</a></li>
-                <li class="order_li yes_g"><a href="javascript:void(0)">已缴费</a></li>
-                <li class="order_li cancel_g"><a href="javascript:void(0)">已退费</a></li>
+				<li class="order_li all_g"><a href="javascript:void(0)"><?php  echo $language['user_qb'];?></a></li>
+                <li class="order_li no_g"><a href="javascript:void(0)" <?php  if($rest != 0) { ?>value = "<?php  echo $rest;?>"<?php  } ?> id="no_g"><?php  echo $language['user_djf'];?></a></li>
+                <li class="order_li yes_g"><a href="javascript:void(0)"><?php  echo $language['user_yjf'];?></a></li>
+                <li class="order_li cancel_g"><a href="javascript:void(0)"><?php  echo $language['user_ytf'];?></a></li>
             </ul>			
         </header>
         <section id="order_list">
@@ -43,7 +43,6 @@
 								<dl class="order_cnt">
 									<dt><div style="background-image:url(<?php  echo tomedia($item['ticon']);?>)"></div><?php  echo $item['tname'];?></dt>
 									<dd><?php  echo $item['kcname'];?><?php  if($item['ksnum']) { ?>【含<?php  echo $item['ksnum'];?>课时】<?php  } ?></dd>
-									<dd><?php  echo $item['adrr'];?></dd>
 									<dd>金额:<?php  echo $item['cose'];?>元&nbsp;订单号:<?php  echo $item['id'];?></dd>
 									<dd>课程开始:<?php  echo date('Y-m-d',$item['kcstart'])?></dd>
 									<dd>课程结束:<?php  echo date('Y-m-d',$item['kcend'])?></dd>
@@ -219,7 +218,6 @@
                                 <!-- value中是剩余名额 -->
 								<?php  $datas = pdo_fetchcolumn("select count(*) FROM ".tablename('wx_school_order')." WHERE kcid = '".$item['id']."' And status = 2 "); $rest = $item['minge'] - $datas - $item['yibao'];?>
                                 <dd value="<?php  if($rest > 0) { ?><?php  echo $rest;?>个名额<?php  } else { ?>0个名额<?php  } ?>"><?php  echo $item['cose'];?></dd>
-                                <dd><?php  echo $item['adrr'];?></dd>
 								<dd>下单人:<?php  echo $item['pard'];?></dd>
                                 <dd>开始:<?php  echo date('Y-m-d',$item['kcstart'])?></dd>
                                 <dd>结束:<?php  echo date('Y-m-d',$item['kcend'])?></dd>
@@ -529,14 +527,14 @@
             </div>
             <div class="dialoge" id="dialoge_inf" style="display:none">
                 <div class="dialog_close"></div>
-                <span>您还没有在读班级哦</span>        		
+                <span><?php  echo $language['jstip1'];?></span>        		
             </div>
         </div>		
     </div>
     <div class="user_info" id="user_info" style="display:none;">
 	   <div style="border-radius: 5%;">
             <ul>
-				<p>请完善联系方式</p>
+				<p><?php  echo $language['jstip2'];?></p>
                     <li class="user_name">
                         <input type="text" placeholder="请输入您的姓名" name ="name" id="name" value="<?php  if(!empty($userinfo['name'])) { ?><?php  echo $userinfo['name'];?><?php  } ?>">
                         真实姓名
@@ -545,7 +543,7 @@
                         <input type="text" placeholder="请输入您的手机号" name ="mobile" id="mobile" value="<?php  if(!empty($userinfo['mobile'])) { ?><?php  echo $userinfo['mobile'];?><?php  } ?>">
                         手机号
                     </li>
-					<li class="user_name">是否接收其他家长发送的信息
+					<li class="user_name"><?php  echo $language['jstip3'];?>
 						<select id="is_allowmsg">
 							<option value="1">允许</option>
 							<option value="2">拒绝</option>
@@ -752,7 +750,7 @@ function Tijiao() {
 		return false;
 		}
 		if (is_allowmsg == "" || is_allowmsg == undefined || is_allowmsg == null) { 
-		jTips('请选择是否接收其他家长私聊');
+		jTips("<?php  echo $language['jstip4'];?>");
 		return false;
 		}		
 		if (mobile == "" || mobile == undefined || mobile == null || !reg.test(mobile)) {

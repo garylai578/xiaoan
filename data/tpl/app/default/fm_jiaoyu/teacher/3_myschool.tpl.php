@@ -48,6 +48,7 @@ position: relative;}
 	height:16px;
 	background:url("<?php echo MODULE_URL;?>public/mobile/img/star_show_red.png") no-repeat;
 }
+.click {content: "";width: 20px;height: 30px;position: absolute;right: 15px;top: 60px;background: url(<?php echo MODULE_URL;?>public/mobile/img/right_arrow.png) no-repeat;background-position: center center;background-size: 18px 32px;}
 </style>
 </head>
 <body>		
@@ -94,7 +95,9 @@ position: relative;}
 					<div class="stuCampusAndBjname">
 						<span class="campus"><?php  echo $teacher['Ttitle'];?></span>
 					</div>
-				</div>	
+				</div>
+				<?php  if(is_showpf()) { ?>
+				<a class="click" href="<?php  echo $this->createMobileUrl('myinfodetail', array('schoolid' => $schoolid), true)?>"></a><?php  } ?>				
 			</div>				
 			<div class="stuServer">
 				<label>服务</label>
