@@ -90,6 +90,15 @@ if($operation == 'display'){
         $list[$index]['mac']     = $mac['name'];
         $list[$index]['pname']   = $idcard['pname'];
         $list[$index]['bj_name'] = $banji['sname'];
+        //将请假信息放入map中
+        if(strpos($row['type'],"请假")!==false){
+            $sql = "SELECT startime1, endtime1 FROM " . tablename($this->table_leave) . " WHERE sid={$row['sid']} And {$row['createtime']}>startime1 AND {$row['createtime']}<endtime1  ";
+            $leave = pdo_fetch($sql);
+            if(!empty($leave)){
+                $leaveMsg[$row['sid']] = '请假时间段：'.date('Y年m月d日 H:i:s',$leave['startime1'])." 至 ".date('Y年m月d日 H:i:s',$leave['endtime1']);
+            }
+        }
+
 		if (preg_match('/(http:\/\/)|(https:\/\/)/i', $row['pic'])) {
 			if (preg_match('/wmpickq/i', $row['pic']) || preg_match('/kaoqin/i', $row['pic'])) {
 				if (preg_match('/wmpickq/i', $row['pic'])) {

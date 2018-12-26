@@ -35,48 +35,63 @@ if($signMode == 65 || $signMode == 66 || $signMode == 1 || $signMode == 2){
 			$leixing = 2;
 			$lx = "离校";
 		}		
-	}	
-	if ($jxstart <= $now & $now <= $jxend){
-		$type = "早上".$lx;
 	}
-	if ($lxstart <= $now & $now <= $lxend){
-		$type = "下午".$lx;
-	}
-	if ($jxstart1 <= $now & $now <= $jxend1){
-		$type = "午间".$lx;
-	}
-	if ($lxstart1 <= $now & $now <= $lxend1){
-		$type = "午间".$lx;
-	}
-	if ($jxstart2 <= $now & $now <= $jxend2){
-		$type = "晚间".$lx;
-	}
-	if ($lxstart2 <= $now & $now <= $lxend2){
-		$type = "晚间".$lx;
-	}	
+
+	$sql2 = "SELECT * FROM " . tablename($this->table_leave) . " WHERE sid = ".$ckuser['sid']." And schoolid = ".$schoolid." And startime1 <= ".time()." And endtime1 >= ".time();
+    $hasLeave = pdo_fetch($sql2);
+//    $hasLeave = pdo_fetch("SELECT * FROM " . tablename($this->table_leave) . " WHERE sid = :sid And schoolid = :schoolid And startime1 <= :nowUTime1 And endtime1 >= :nowUTime2 ", array(':sid' =>$ckuser['sid'], ':schoolid' =>$schoolid, ':nowUTime1'=>time(), ':nowUTime2'=>time()));
+    if(!empty($hasLeave)){
+        $type = "正常请假".$lx;
+    }else {
+        if ($jxstart <= $now & $now <= $jxend) {
+            $type = "早上" . $lx;
+        }
+        if ($lxstart <= $now & $now <= $lxend) {
+            $type = "下午" . $lx;
+        }
+        if ($jxstart1 <= $now & $now <= $jxend1) {
+            $type = "午间" . $lx;
+        }
+        if ($lxstart1 <= $now & $now <= $lxend1) {
+            $type = "午间" . $lx;
+        }
+        if ($jxstart2 <= $now & $now <= $jxend2) {
+            $type = "晚间" . $lx;
+        }
+        if ($lxstart2 <= $now & $now <= $lxend2) {
+            $type = "晚间" . $lx;
+        }
+    }
 }else{
+    $sql2 = "SELECT * FROM " . tablename($this->table_leave) . " WHERE sid = ".$ckuser['sid']." And schoolid = ".$schoolid." And startime1 <= ".time()." And endtime1 >= ".time();
+    $hasLeave = pdo_fetch($sql2);
+    if(!empty($hasLeave)){
+        $type = "正常请假";
+    }else{
+        $type = "";
+    }
 	if ($jxstart <= $now & $now <= $jxend){
-		$type = "早上进校";
+		$type = $type."早上进校";
 		$leixing = 1;
 	}
 	if ($lxstart <= $now & $now <= $lxend){
-		$type = "下午离校";
+		$type = $type."下午离校";
 		$leixing = 2;
 	}
 	if ($jxstart1 <= $now & $now <= $jxend1){
-		$type = "午间进校";
+		$type = $type."午间进校";
 		$leixing = 1;
 	}
 	if ($lxstart1 <= $now & $now <= $lxend1){
-		$type = "午间离校";
+		$type = $type."午间离校";
 		$leixing = 2;
 	}
 	if ($jxstart2 <= $now & $now <= $jxend2){
-		$type = "晚间进校";
+		$type = $type."晚间进校";
 		$leixing = 1;
 	}
 	if ($lxstart2 <= $now & $now <= $lxend2){
-		$type = "晚间离校";
+		$type = $type."晚间离校";
 		$leixing = 2;
 	}
 }
