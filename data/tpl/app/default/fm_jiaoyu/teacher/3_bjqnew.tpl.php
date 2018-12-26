@@ -24,13 +24,16 @@
             <img src="<?php echo OSSURL;?>public/mobile/img/selectMean.png" class="img-responsive">
         </a>
     </div>
-    <div class="headerContent"><?php  echo $nowbj['sname'];?></div>
+    <div class="headerContent"><?php  if($school['bjqstyle'] =='new') { ?><?php  echo $nowbj['sname'];?><?php  } else { ?>校园动态<?php  } ?></div>
+	<?php  if($school['bjqstyle'] =='new') { ?>
     <div class="hederRightBox">
         <a class="choice_baby" id="choice_baby">
             <img src="<?php echo OSSURL;?>public/mobile/img/selectMean.png" class="img-responsive">
         </a>
     </div>
+	<?php  } ?>
 </header>
+<?php  if($school['bjqstyle'] =='new') { ?>
 <div class="slide_left_menu_bg" id="bjlist">
     <div class="slide_left_menu">
         <div class="slide_left_menu_til">班级列表</div>
@@ -75,6 +78,7 @@
         </ul>
     </div>
 </div>
+<?php  } ?>
 <div class="slide_left_menu_bg" id="schoollist">
     <div class="slide_left_menu">
         <div class="slide_left_menu_til">学校列表</div>
@@ -108,6 +112,7 @@
 		<?php  if($mallsetinfo['isShow'] == 1 ) { ?><a class="honor" href="<?php  echo $this->createMobileUrl('goodslist', array('schoolid' => $schoolid,'tid' => $teachers['id']), true)?>">赚积分?</a><?php  } ?>
     </div>
 </div>
+<?php  if($school['bjqstyle'] =='new') { ?>
 <?php  if($nowbj['is_bjzx'] ==1) { ?>
 <div class="myCrowns">
 	<p>班级之星</p>
@@ -152,7 +157,8 @@
 </div>
 <?php  } else { ?>
 <div class="top_height_blank50"></div>
-<?php  } ?> 
+<?php  } ?>
+<?php  } ?>
 <!--积分计算的前四名学生-->
 <div class="empty_content_data">
     <img src="<?php echo OSSURL;?>public/mobile/img/new_empty_icon3.png" />
@@ -174,7 +180,7 @@
 				<?php  if($item['msgtype'] ==4) { ?><span class="diary_tag_activity">分享</span>&nbsp;&nbsp;&nbsp;<?php  } ?>
 				<?php  if($item['msgtype'] ==5) { ?><span class="diary_tag_work">多媒体</span>&nbsp;&nbsp;&nbsp;<?php  } ?>
 				<?php  if($item['msgtype'] ==7) { ?><span class="diary_tag_life">班级通知</span>&nbsp;&nbsp;&nbsp;<?php  } ?>
-				<?php  if($bzj || $teachers['status'] ==1 || $bnjzr) { ?><?php  if($item['isopen'] == 1) { ?><span style="color: #9C2B44;font-weight:400;float: right;" class="shenhe_btn" diaryid="<?php  echo $item['id'];?>">审核</span><?php  } ?><?php  } ?>
+				<?php  if($bzj || $teachers['status'] ==1 || $bnjzr || $manger) { ?><?php  if($item['isopen'] == 1) { ?><span style="color: #9C2B44;font-weight:400;float: right;" class="shenhe_btn" diaryid="<?php  echo $item['id'];?>">审核</span><?php  } ?><?php  } ?>
             </div>
             <div class="user_text">
                 <div class="inside_user_text"><?php  echo $item['content'];?><?php  if($item['type'] == 2 ) { ?> 点击查看<?php  } else { ?><?php  echo $item['linkdesc'];?><?php  } ?><?php  if($item['link']) { ?><a href="<?php  echo $item['link'];?>"><?php  echo $item['linkdesc'];?></a><?php  } ?></div>

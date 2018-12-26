@@ -10,7 +10,11 @@
 	<form action="" method="post" class="form-horizontal form" enctype="multipart/form-data">
         <div class="panel panel-default">
             <div class="panel-heading">
-                模版消息通知
+                模版消息通知 
+				<span style="color:red">当前行业：</span>
+				<span class="label label-info"><?php  echo $first_class;?> -<?php  echo $second_class;?></span>,
+				<span class="label label-info"><?php  echo $first_class1;?> -<?php  echo $second_class1;?></span>
+				<?php  if($second_class1 != '院校' && $second_class != '培训') { ?><span class="btn btn-success" onclick="settemp(this)"><i class="fa fa-edit"></i>一键重设</span><?php  } ?>
             </div>
 			<?php  if($_W['isfounder'] || $state == 'owner') { ?>	
             <div class="panel-body">
@@ -51,6 +55,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="xsqingjia" value="<?php  if(!empty($xsqingjia['xsqingjia'])) { ?><?php  echo $xsqingjia['xsqingjia'];?><?php  } else { ?><?php  echo $setting['xsqingjia'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$xsqingjia['xsqingjia']) { ?><span class="label label-info" onclick="addtemp('xsqingjia',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">学生请假申请</span>”编号为TM00190的模板
 							</div>
@@ -76,6 +81,7 @@
                      <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="xsqjsh" value="<?php  if(!empty($xsqjsh['xsqjsh'])) { ?><?php  echo $xsqjsh['xsqjsh'];?><?php  } else { ?><?php  echo $setting['xsqjsh'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$xsqjsh['xsqjsh']) { ?><span class="label label-info" onclick="addtemp('xsqjsh',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">请假审核通知</span>”编号为OPENTM200864357的模板
 							</div>
@@ -101,6 +107,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="jsqingjia" value="<?php  if(!empty($jsqingjia['jsqingjia'])) { ?><?php  echo $jsqingjia['jsqingjia'];?><?php  } else { ?><?php  echo $setting['jsqingjia'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$jsqingjia['jsqingjia']) { ?><span class="label label-info" onclick="addtemp('jsqingjia',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">请假审核提醒</span>”编号为OPENTM203328559的模板
 							</div>
@@ -126,6 +133,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="jsqjsh" value="<?php  if(!empty($jsqjsh['jsqjsh'])) { ?><?php  echo $jsqjsh['jsqjsh'];?><?php  } else { ?><?php  echo $setting['jsqjsh'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$jsqjsh['jsqjsh']) { ?><span class="label label-info" onclick="addtemp('jsqjsh',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">请假审批结果通知</span>”编号为OPENTM207256255的模板
 							</div>
@@ -151,6 +159,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="xxtongzhi" value="<?php  if(!empty($xxtongzhi['xxtongzhi'])) { ?><?php  echo $xxtongzhi['xxtongzhi'];?><?php  } else { ?><?php  echo $setting['xxtongzhi'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$xxtongzhi['xxtongzhi']) { ?><span class="label label-info" onclick="addtemp('xxtongzhi',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">学校通知</span>”编号为OPENTM204845041的模板
 							</div>
@@ -176,6 +185,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="bjtz" value="<?php  if(!empty($bjtz['bjtz'])) { ?><?php  echo $bjtz['bjtz'];?><?php  } else { ?><?php  echo $setting['bjtz'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$bjtz['bjtz']) { ?><span class="label label-info" onclick="addtemp('bjtz',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">班级通知</span>”编号为OPENTM204533457的模板
 							</div>
@@ -201,6 +211,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="liuyan" value="<?php  if(!empty($liuyan['liuyan'])) { ?><?php  echo $liuyan['liuyan'];?><?php  } else { ?><?php  echo $setting['liuyan'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$liuyan['liuyan']) { ?><span class="label label-info" onclick="addtemp('liuyan',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">家长意见回复通知</span>”编号为OPENTM205211081的模板
 							</div>
@@ -227,6 +238,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="liuyanhf" value="<?php  if(!empty($liuyanhf['liuyanhf'])) { ?><?php  echo $liuyanhf['liuyanhf'];?><?php  } else { ?><?php  echo $setting['liuyanhf'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$liuyanhf['liuyanhf']) { ?><span class="label label-info" onclick="addtemp('liuyanhf',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">家长意见回复通知</span>”编号为OPENTM205211081的模板
 							</div>
@@ -253,6 +265,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="zuoye" value="<?php  if(!empty($zuoye['zuoye'])) { ?><?php  echo $zuoye['zuoye'];?><?php  } else { ?><?php  echo $setting['zuoye'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$zuoye['zuoye']) { ?><span class="label label-info" onclick="addtemp('zuoye',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">作业消息提醒</span>”编号为OPENTM207873178的模板
 							</div>
@@ -278,6 +291,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="bjqshjg" value="<?php  if(!empty($bjqshjg['bjqshjg'])) { ?><?php  echo $bjqshjg['bjqshjg'];?><?php  } else { ?><?php  echo $setting['bjqshjg'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$bjqshjg['bjqshjg']) { ?><span class="label label-info" onclick="addtemp('bjqshjg',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">审核结果通知</span>”编号为OPENTM400501478的模板
 							</div>
@@ -304,6 +318,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="bjqshtz" value="<?php  if(!empty($bjqshtz['bjqshtz'])) { ?><?php  echo $bjqshtz['bjqshtz'];?><?php  } else { ?><?php  echo $setting['bjqshtz'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$bjqshtz['bjqshtz']) { ?><span class="label label-info" onclick="addtemp('bjqshtz',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">审核提醒</span>”编号为OPENTM400047769的模板
 							</div>
@@ -330,6 +345,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="jxlxtx" value="<?php  if(!empty($jxlxtx['jxlxtx'])) { ?><?php  echo $jxlxtx['jxlxtx'];?><?php  } else { ?><?php  echo $setting['jxlxtx'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$jxlxtx['jxlxtx']) { ?><span class="label label-info" onclick="addtemp('jxlxtx',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">到校离校提醒</span>”编号为TM00188的模板
 							</div>
@@ -355,6 +371,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="jfjgtz" value="<?php  if(!empty($jfjgtz['jfjgtz'])) { ?><?php  echo $jfjgtz['jfjgtz'];?><?php  } else { ?><?php  echo $setting['jfjgtz'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$jfjgtz['jfjgtz']) { ?><span class="label label-info" onclick="addtemp('jfjgtz',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－院校</span>，搜索“<span style="color:red;">校园缴费结果通知</span>”编号为OPENTM401619319的模板
 							</div>
@@ -380,6 +397,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="sykstx" value="<?php  if(!empty($sykstx['sykstx'])) { ?><?php  echo $sykstx['sykstx'];?><?php  } else { ?><?php  echo $setting['sykstx'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$sykstx['sykstx']) { ?><span class="label label-info" onclick="addtemp('sykstx',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－培训</span>，搜索“<span style="color:red;">课程签到通知</span>”编号为OPENTM405457608的模板
 							</div>
@@ -405,6 +423,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="kcyytx" value="<?php  if(!empty($kcyytx['kcyytx'])) { ?><?php  echo $kcyytx['kcyytx'];?><?php  } else { ?><?php  echo $setting['kcyytx'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$kcyytx['kcyytx']) { ?><span class="label label-info" onclick="addtemp('kcyytx',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－培训</span>，搜索“<span style="color:red;">课程预约通知</span>”编号为OPENTM400233342的模板
 							</div>
@@ -430,6 +449,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="kcqdtx" value="<?php  if(!empty($kcqdtx['kcqdtx'])) { ?><?php  echo $kcqdtx['kcqdtx'];?><?php  } else { ?><?php  echo $setting['kcqdtx'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$kcqdtx['kcqdtx']) { ?><span class="label label-info" onclick="addtemp('kcqdtx',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－培训</span>，搜索“<span style="color:red;">课程签到提醒</span>”编号为OPENTM406123046的模板
 							</div>
@@ -455,6 +475,7 @@
                     <div class="col-sm-2 col-lg-2">
 						<div class="input-group">
 							<input type="text" name="sktxls" value="<?php  if(!empty($sktxls['sktxls'])) { ?><?php  echo $sktxls['sktxls'];?><?php  } else { ?><?php  echo $setting['sktxls'];?><?php  } ?>" class="form-control"/>
+							<?php  if(!$sktxls['sktxls']) { ?><span class="label label-info" onclick="addtemp('sktxls',this)"><i class="fa fa-edit"></i>点击获取</span><?php  } ?>
 							<div class="help-block">
 								在模板库选择<span style="color:red;">教育－培训</span>，搜索“<span style="color:red;">上课提醒通知</span>”编号为OPENTM206931431的模板
 							</div>
@@ -477,6 +498,40 @@
                 </div>				
             </div>
         </div>
+		<script>
+			function addtemp(template,node){
+				var url = "<?php  echo $this->createWebUrl('indexajax', array('op' => 'addTemplate','weid' => $weid))?>";
+				$.post(
+					url,
+					{template:template},
+					function(data){
+						if(data.result){
+							$("input[name="+template+"]").val(data.template_id);
+							$(node).hide();
+						}else{
+							alert(data.msg);
+						}
+					},'json'
+				);
+			}
+			function settemp(node){
+				var url = "<?php  echo $this->createWebUrl('indexajax', array('op' => 'settemhy','weid' => $weid))?>";
+				$.post(
+					url,
+					{weid:'<?php  echo $weid;?>'},
+					function(data){
+						if(data.result){
+							$(node).hide();
+							alert(data.msg);
+							location.reload();
+						}else{
+							alert(data.msg);
+						}
+						
+					},'json'
+				);
+			}
+		</script>
 		<?php  if($_W['isfounder'] && getoauthurl() != 'b.yuntuijia.com') { ?>
 		<div class="panel panel-default">
 			<div class="panel-heading">
