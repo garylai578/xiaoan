@@ -588,7 +588,7 @@
 			die (json_encode($result));
 		}	
 	}
-	if($operation == 'input_card'){ //管理导卡
+	if($operation == 'input_card' || $operation == 'input_cardschool'){ //管理导卡
 		$weid = $_W['uniacid'];
 		$strs = json_decode(str_replace('&quot;','"',$_GPC['execl']),true);
 		$line = "";
@@ -682,12 +682,16 @@
 		$insert['pard'] = empty($strs[5]) ? 0 : intval($strs[5]);
 		$insert['pname'] = empty($strs[6]) ? 0 : trim($strs[6]);
 		pdo_insert($this->table_idcard, $insert);
+        if($insert['sid'] != 0)
+            pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$insert['sid']));
+        if($insert['tid'] != 0)
+            pdo_update($this->table_teachers, array("updatetime"=>time()), array('id'=>$insert['tid']));
 		$result ['strs'] = rtrim($strss,',');
 		$result ['result'] = true;
 		die (json_encode($result));
 			
 	}
-	if($operation == 'input_cardschool'){ //管理导卡
+	/*if($operation == 'input_cardschool'){ //管理导卡
 		$weid = $_W['uniacid'];
 		$strs = json_decode(str_replace('&quot;','"',$_GPC['execl']),true);
 		$line = "";
@@ -791,5 +795,5 @@
 		$result ['result'] = true;
 		die (json_encode($result));
 			
-	}
+	}*/
 ?>
