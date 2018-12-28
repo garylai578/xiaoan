@@ -52,6 +52,11 @@ if($operation == 'post'){
             $this->imessage('抱歉，本条信息不存在在或是已经删除！', '', 'error');
         }else{
             pdo_update($this->table_idcard, $data, array('id' => $id));
+            $idcard = pdo_fetch("SELECT sid, tid FROM " . tablename($this->table_idcard) . " WHERE id= :id", array(':id' => $id));
+            if($idcard['sid'] != 0)
+                pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$idcard['sid']));
+            elseif($idcard['tid'] != 0)
+                pdo_update($this->table_teachers, array("updatetime"=>time()), array('id'=>$idcard['tid']));
         }
         $this->imessage('修改成功！', $this->createWebUrl('cardlist', array('op' => 'display', 'schoolid' => $schoolid)), 'success');
     }
@@ -273,8 +278,10 @@ if($operation == 'post'){
 	);
 	if(empty($checkcard['id'])){
 		pdo_insert($this->table_idcard, $temp);
+        pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$sid));
 	}else{
 		pdo_update($this->table_idcard, $temp, array('id' => $checkcard['id']));
+        pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$sid));
 	}
 	$data['msg'] = "录卡成功";
 	$data['result'] = true;
@@ -307,9 +314,12 @@ if($operation == 'post'){
 		$data['msg'] = "录卡成功,清除旧卡信息成功";
 		$data['result'] = true;
 		pdo_update($this->table_idcard, $temp, array('id' => $checkcard['id']));
+        $res = pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$checkcard['sid']));
+        $data['msg'] .= ". res:".$res;
 	}else{
 		pdo_insert($this->table_idcard, $temp);
-		$data['msg'] = "录卡成功";
+        $res = pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$checkcard['sid']));
+		$data['msg'] = "录卡成功"."dfe:".$res;
 		$data['result'] = true;
 	}
 	die (json_encode($data));
@@ -322,6 +332,10 @@ if($operation == 'post'){
 		$checkcard = pdo_fetch("SELECT * FROM " . tablename($this->table_idcard) . " WHERE id = :id", array(':id' => $id));
 		if($checkcard){
 			pdo_update($this->table_idcard, array('severend' => $setendtime), array('id' => $id));
+            if($checkcard['sid'] != 0)
+                pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$checkcard['sid']));
+            elseif($checkcard['tid'] != 0)
+                pdo_update($this->table_teachers, array("updatetime"=>time()), array('id'=>$checkcard['tid']));
 			$rowcount++;
 		}else{
 			$notrowcount++;
@@ -334,7 +348,7 @@ if($operation == 'post'){
 	exit;
 }elseif($operation == 'jiebang'){
     $id  = intval($_GPC['id']);
-    $row = pdo_fetch("SELECT sid FROM " . tablename($this->table_idcard) . " WHERE id = :id", array(':id' => $id));
+    $row = pdo_fetch("SELECT sid,tid FROM " . tablename($this->table_idcard) . " WHERE id = :id", array(':id' => $id));
     if(empty($row)){
         $this->imessage('抱歉，本卡不存在或是已经被删除！');
     }
@@ -352,13 +366,24 @@ if($operation == 'post'){
     );
     pdo_delete($this->table_checklog, array('sid' => $row['sid']));
     pdo_update($this->table_idcard, $temp, array('id' => $id));
+    if($row['sid'] != 0)
+        pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$row['sid']));
+    elseif($row['tid'] != 0)
+        pdo_update($this->table_teachers, array("updatetime"=>time()), array('id'=>$row['tid']));
+
     $this->imessage('解绑成功！', referer(), 'success');
 }elseif($operation == 'delete'){
     $id = intval($_GPC['id']);
     if(empty($id)){
         $this->imessage('抱歉，本条信息不存在在或是已经被删除！');
     }
+    $row = pdo_fetch("SELECT sid,tid FROM " . tablename($this->table_idcard) . " WHERE id = :id", array(':id' => $id));
     pdo_delete($this->table_idcard, array('id' => $id));
+    if($row['sid'] != 0)
+        pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$row['sid']));
+    elseif($row['tid'] != 0)
+        pdo_update($this->table_teachers, array("updatetime"=>time()), array('id'=>$row['tid']));
+
     $this->imessage('删除成功！', referer(), 'success');
 }elseif($operation == 'deleteall'){
     $rowcount    = 0;
@@ -372,6 +397,10 @@ if($operation == 'post'){
                 continue;
             }
             pdo_delete($this->table_idcard, array('id' => $id, 'weid' => $weid));
+            if($goods['sid'] != 0)
+                pdo_update($this->table_students, array("createdate"=>time()), array('id'=>$goods['sid']));
+            elseif($goods['tid'] != 0)
+                pdo_update($this->table_teachers, array("updatetime"=>time()), array('id'=>$goods['tid']));
             $rowcount++;
         }
     }
