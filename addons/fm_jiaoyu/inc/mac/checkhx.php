@@ -5,7 +5,7 @@
 
 global $_GPC, $_W;
 
-$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','getleave', 'qrcode') ) ? $_GPC ['op'] : 'default';
+$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','getleave', 'qrcode', 'identify') ) ? $_GPC ['op'] : 'default';
 $weid = $_GPC['i'];
 $schoolid = $_GPC['schoolid'];
 $macid = $_GPC['macid'];
@@ -19,6 +19,83 @@ if(empty($school)){
     echo("找不到本校");
     exit;
 }
+
+// 身份证读卡器接口
+if($operation == 'identify'){
+    $idnum = trim($_GPC['idnum']);
+    $gender = trim($_GPC['gender']);
+    $pic = $_GPC['pic'];
+
+    if(empty($idnum) || !checkIdCard($idnum)){
+        $result['data'] = "身份证格式不正确";
+        $result['code'] = 300;
+        $result['msg'] = "fails";
+        $result['ServerTime'] = date('Y-m-d H:i:s',time());
+        echo json_encode($result);
+        exit;
+    }
+    if(empty($_GPC['checkintime'])){
+        $result['data'] = "缺少刷卡时间";
+        $result['code'] = 100;
+        $result['msg'] = "fails";
+        $result['ServerTime'] = date('Y-m-d H:i:s',time());
+        echo json_encode($result);
+        exit;
+    }
+
+    if($gender=='男')
+        $gender = 1;
+    elseif($gender=='女')
+        $gender = 2;
+
+    if($pic) {
+        load()->func('file');
+        $path = "images/fm_jiaoyu/check/". date('Y/m/d/');
+        if (!is_dir(IA_ROOT."/attachment/". $path)) {
+            mkdirs(IA_ROOT."/attachment/". $path, "0777");
+        }
+        $rand = random(30);
+        if(!empty($pic)) {
+            $picurl = $path.$rand."_1.jpg";
+            $pic_url = base64_decode(str_replace(" ","+",$pic));
+            file_write($picurl,$pic_url);
+            $pic = $picurl;
+        }
+    }
+
+    $data = array(
+        'schoolid' => $schoolid,
+        'gname' => trim($_GPC['gname']),
+        'birthday' => trim($_GPC['birthday']),
+        'gender' => $gender,
+        'idnum' => trim($_GPC['idnum']),
+        'nation' => trim($_GPC['nation']),
+        'signedby' => trim($_GPC['signedby']),
+        'address' => trim($_GPC['address']),
+        'issueddate' => trim($_GPC['issueddate']),
+        'validdate' => trim($_GPC['validdate']),
+        'pic' => $pic,
+        'checkintime' => trim($_GPC['checkintime']),
+    );
+    $res = pdo_insert($this->table_guest, $data);
+
+    if (!empty($res)){
+        $result['data'] = $res;
+        $result['code'] = 1000;
+        $result['msg'] = "success";
+        $result['ServerTime'] = date('Y-m-d H:i:s',time());
+        echo json_encode($result);
+        exit;
+    }else{
+        $result['data'] = "";
+        $result['code'] = 300;
+        $result['msg'] = "lose:".$res;
+        $result['ServerTime'] = date('Y-m-d H:i:s',time());
+        echo json_encode($result);
+        exit;
+    }
+}
+
 if(empty($ckmac)){
     echo("没找到设备");
     exit;
@@ -36,6 +113,7 @@ if (!empty($_W['setting']['remote']['type'])) {
 } else {
     $urls = $_W['siteroot'].'attachment/';
 }
+
 if ($operation == 'login') {
     if(!empty($ckmac)){
         $class = pdo_fetchall("SELECT sid as classId, sname as className  FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And (type = 'theclass' OR type = 'jsfz') And schoolid = {$school['id']} ORDER BY sid DESC");
@@ -109,6 +187,7 @@ if ($operation == 'login') {
 if ($operation == 'classinfo') {
     $classid = $_GPC['classId'];
     $isfz = pdo_fetch("SELECT type,datesetid  FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' And schoolid = '{$school['id']}' And sid = '{$classid}'");
+    $isface = pdo_fetch("SELECT is_face FROM " . tablename($this->table_index) . " WHERE weid = '{$weid}' And id = '{$school['id']}'");
     if ($isfz['type'] == 'theclass'){
         if(!empty($ckmac)){
             $nowdate = date("Y-n-j",time());
@@ -193,12 +272,22 @@ if ($operation == 'classinfo') {
                 if ($num > 1){
                     foreach($card as $k =>$r){
                         if(!empty($r['idcard'])){
-                            $class[$key]['signId'] .= "#" . $r['idcard'];
+                           $class[$key]['signId'] .= "#" . $r['idcard'];
                         }
                     }
                 }else{
                     $class[$key]['signId'] = $card['0']['idcard'];
                 }
+                //  是否启用人脸识别。人脸识别的id卡号取关系是10（其他家长）的卡号
+                if($isface['is_face'] == 1){
+                    $faceid = pdo_fetch("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE sid = '{$row['childId']}' and pard=10");
+                    if(!empty($faceid))
+                        $class[$key]['faceid'] = $faceid['idcard'];
+                    else
+                        $class[$key]['faceid'] = $card['0']['idcard'];
+                }else
+                    $class[$key]['faceid'] = -1;
+
                 $class[$key]['fingerid1'] = "-1";
                 $class[$key]['fingerid2'] = "-1";
                 $class[$key]['fingerid3'] = "-1";
@@ -218,8 +307,14 @@ if ($operation == 'classinfo') {
             }else
                 $checkdatesetid = $isfz['datesetid'];
 
-            if (empty($checkdatesetid)) {
-                $timeset = '';
+            if (empty($checkdatesetid)) {//如果没有设置时间，则全天运行通行
+                $todaytimeset = array(array('startTime'=>"00:00", 'endTime'=>"23:59"));
+                for($i=0; $i<7; ++$i)
+                    $week[$i] = array('weekno'=>$i, 'groups'=>$todaytimeset);
+                $timeset1[0] = array('id'=>0, 'weeks'=>$week);
+                $timeset1[1] = array('id'=>1, 'weeks'=>$week);
+                $timeset1[2] = array('id'=>2, 'weeks'=>$week);
+                $timeset1[3] = array('id'=>3, 'weeks'=>$week);
             } else {
                 $sunday = date("Y-n-j",(time()-$nowweek*3600*24));
                 $checkdateset      =  pdo_fetch("SELECT * FROM " . tablename($this->table_checkdateset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  id = '{$checkdatesetid}'");
@@ -282,38 +377,11 @@ if ($operation == 'classinfo') {
                     $week2[$k] =array('weekno'=>$k, 'groups'=>$todaytimeset2);
                     $week3[$k] =array('weekno'=>$k, 'groups'=>$todaytimeset3);
                 }
-                $timeset1[0] = array('id'=>0, 'weeks'=>$week2);
+                $timeset1[0] = array('id'=>0, 'weeks'=>$week1);
                 $timeset1[1] = array('id'=>1, 'weeks'=>$week1);
                 $timeset1[2] = array('id'=>2, 'weeks'=>$week2);
                 $timeset1[3] = array('id'=>3, 'weeks'=>$week3);
             }
-
-            /*  $time1 = array('startTime'=>"00:00", 'endTime'=>"00:00");
-              $time2 = array('startTime'=>"00:00", 'endTime'=>"24:00");
-              $time3 = array('startTime'=>"06:00", 'endTime'=>"08:00");
-              $time4 = array('startTime'=>"11:50", 'endTime'=>"14:00");
-              $time5 = array('startTime'=>"17:00", 'endTime'=>"24:00");
-              $time6 = array('startTime'=>"21:25", 'endTime'=>"24:00");
-              $time7 = array($time3, $time4, $time6);
-              $time8 = array($time3, $time4, $time5);
-              $time9 = array($time3, $time6);
-              $time10 = array($time3, $time5);
-
-              $weeks0['id'] = 0;
-              $weeks0['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>array($time1)), array('weekno'=>2,  'groups'=>array($time1)), array('weekno'=>3,  'groups'=>array($time1)), array('weekno'=>4,  'groups'=>array($time1)), array('weekno'=>5,  'groups'=>array($time5)), array('weekno'=>6,  'groups'=>array($time2)));
-              $timeset[0] = $weeks0;
-
-              $weeks1['id'] = 1;
-              $weeks1['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>$time7), array('weekno'=>2,  'groups'=>$time7), array('weekno'=>3,  'groups'=>$time7), array('weekno'=>4,  'groups'=>$time7), array('weekno'=>5,  'groups'=>$time8), array('weekno'=>6,  'groups'=>array($time2)));
-              $timeset[1] = $weeks1;
-
-              $weeks2['id'] = 2;
-              $weeks2['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>array($time1)), array('weekno'=>2,  'groups'=>array($time1)), array('weekno'=>3,  'groups'=>array($time1)), array('weekno'=>4,  'groups'=>array($time1)), array('weekno'=>5,  'groups'=>array($time5)), array('weekno'=>6,  'groups'=>array($time2)));
-              $timeset[2] = $weeks2;
-
-              $weeks3['id'] = 3;
-              $weeks3['weeks'] = array(array('weekno'=>0, 'groups'=>array($time2)), array('weekno'=>1,  'groups'=>$time9), array('weekno'=>2,  'groups'=>$time9), array('weekno'=>3,  'groups'=>$time9), array('weekno'=>4,  'groups'=>$time9), array('weekno'=>5,  'groups'=>$time10), array('weekno'=>6,  'groups'=>array($time2)));
-              $timeset[3] = $weeks3;*/
 
             $result['data']['timeset'] = $timeset1;
             $result['data']['leave'] = $leaves;
@@ -334,6 +402,7 @@ if ($operation == 'classinfo') {
                 $class[$key]['childId'] = "909".$row['TID'];
                 $class[$key]['name'] = $row['name'];
                 $class[$key]['signId'] = "";
+                $class[$key]['s_type'] = "909"; //如果是老师，则s_type=909，通行不受限制
                 $card = pdo_fetchall("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE tid = '{$row['TID']}' ORDER BY id DESC");
                 $num = count($card);
                 if ($num > 1){
@@ -345,6 +414,11 @@ if ($operation == 'classinfo') {
                 }else{
                     $class[$key]['signId'] = $card['0']['idcard'];
                 }
+                //  是否启用人脸识别
+                if($isface['is_face'] == 1){
+                    $class[$key]['faceid'] = $card['0']['idcard'];
+                }else
+                    $class[$key]['faceid'] = -1;
             }
             $result['data']['childs'] = $class;
             $result['code'] = 1000;
@@ -970,6 +1044,32 @@ function transTimeset4T3($checktime){
         }
     }
     return $time;
+}
+
+/** 验证身份证号码是否正确
+ * @param $value 身份证号码
+ * @return bool 正确true，错误false
+ */
+function checkIdCard($value){
+    if (!preg_match('/^\d{17}[0-9xX]$/', $value)) { //基本格式校验
+        return false;
+    }
+
+    $parsed = date_parse(substr($value, 6, 8));
+    if (!(isset($parsed['warning_count']) && $parsed['warning_count'] == 0)) { //年月日位校验
+        return false;
+    }
+    $base = substr($value, 0, 17);
+    $factor = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+    $tokens = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
+    $checkSum = 0;
+    for ($i=0; $i<17; $i++) {
+        $checkSum += intval(substr($base, $i, 1)) * $factor[$i];
+    }
+    $mod = $checkSum % 11;
+    $token = $tokens[$mod];
+    $lastChar = strtoupper(substr($value, 17, 1));
+    return ($lastChar === $token); //最后一位校验位校验
 }
 
 ?>
