@@ -1,0 +1,315 @@
+{template 'public/header'}
+{template 'public/comhead'}
+<meta http-equiv="refresh" content="60"> <!-- 每隔10秒自动更新一次-->
+<script type="text/javascript" src="{MODULE_URL}public/web/js/jquery.magnific-popup.js"></script>
+<link rel="stylesheet" href="{MODULE_URL}public/web/css/magnific-popup.css">
+<!-- <script src="{$_W['siteroot']}addons/fm_jiaoyu/public/web/js/jquery.easypiechart.js"></script> -->
+{if $operation == 'display'}
+<style>
+    .pull-left{margin-right: 10% !important; width: 66px;height: 66px;text-align: center;line-height: 65px;}
+    .icon-rounded {color: #ffffff;border-radius: 50px; -webkit-border-radius: 50px; -moz-border-radius: 50px; -o-border-radius: 50px;-ms-border-radius: 50px;font-size: 25px;}
+    .text-succ{
+        color:#11c8cb;
+    }
+    .text-dang{
+        color:#f45021;
+    }
+    .text-infoo{
+        color:#fb8327;
+    }
+</style>
+{template 'mobile/face'}
+<style>
+    .modal-body {width: 50%;float: left;  border-bottom: 1px solid #F1F3F5;border-right: 1px solid #F1F3F5;}
+    .form=group { position: relative;padding: 0}.form-group img{width:129px;width:129px;} .form-group .mask .wi-right:before {content: "\e6c1";}
+    .form-group .mask{position: absolute;font-family: we7icon!important;top: 29px;left: 28%;width: 129px;height: 129px;border-radius: 50%;background: rgba(0,0,0,.5);color: #fff;
+        line-height: 129px;text-align: center;display: none;}
+</style>
+<div class="modal fade" style="min-width: 583px!important;" id="Modal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="static"></div>
+<input type="hidden" id="nowms" value="">
+<input type="hidden" id="changemsurl" value="{$rlsrll}">
+<div class="clearfix">
+    <style>
+        .span_8 {text-align: center;padding-left: 15px;}
+        @media (min-width: 992px)
+            .col-md-4 {width: 33.33333333%;}
+            .activity_box {background: #fff;min-height: 392px;box-shadow: 0 1px 3px 0px rgba(0, 0, 0, 0.2);}
+            .scrollbar {height: 392px;background: #fff;overflow-y: scroll;padding: 2em 1em;}
+            .activity-row {margin-bottom: 2em;}
+            .activity-row, .activity-row1 {text-align: left;}
+            .graphs {padding: 2em 1em;background: #f2f4f8;font-family: 'Roboto', sans-serif;}
+            .col-md-4{position: relative;min-height: 1px;padding-right: 15px;padding-left: 15px;}
+    </style>
+    <script src="{OSSURL}public/mobile/js/faceMap.js?v=5.61" type="text/javascript"></script>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default" style="position: relative;">
+                <div class="chart-title ng-binding" style="padding: 4px 10px;">{if !empty($_GPC['addtime'])}{php echo date('Y-m-d', $starttime)}至{php echo date('Y-m-d', $endtime)}{else}今日{/if}各校学生出勤情况</div>
+                <div style="min-height: 357px;">
+                    <!-- ngIf: charts.gradeAttendance.loading -->
+                    <div class="slimScrollDiv" style="position: relative; width: auto; height: 338px;">
+                        <div style="overflow-y: scroll;width: auto; height: 335px;">
+                            <table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+                                <thead>
+                                <tr>
+                                    <th>学校</th>
+                                    <th>学生人数</th>
+                                    {if !empty($_GPC['addtime'])}<th>出勤人次</th>{else}<th>出勤人数</th>{/if}
+                                    {if !empty($_GPC['addtime'])}<th>请假人次</th>{else}<th>请假人数</th>{/if}
+                                    {if !empty($_GPC['addtime'])}<th>缺勤人次</th>{else}<th>缺勤人数</th>{/if}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {loop $schoolCheckLog1 $row}
+                                <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+                                    <td>
+                                        <div class="text-ellipsis ng-binding">{$row['title']}</div>
+                                    </td>
+                                    <td class="ng-binding">{$row['xxzrs']}</td>
+                                    <td class="ng-binding">{$row['xxcqzs']}</td>
+                                    <td class="ng-binding">{$row['xxqjrs']}</td>
+                                    <td class="ng-binding">{$row['qqzrs']}</td>
+
+                                </tr>
+                                {/loop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default" style="position: relative;">
+                <div class="chart-title ng-binding" style="padding: 4px 10px;">{if !empty($_GPC['addtime'])}{php echo date('Y-m-d', $starttime)}至{php echo date('Y-m-d', $endtime)}{else}今日{/if}各校学生出勤情况</div>
+                <div style="min-height: 357px;">
+                    <!-- ngIf: charts.gradeAttendance.loading -->
+                    <div class="slimScrollDiv" style="position: relative; width: auto; height: 338px;">
+                        <div style="overflow-y: scroll;width: auto; height: 335px;">
+                            <table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+                                <thead>
+                                <tr>
+                                    <th>学校</th>
+                                    <th>学生人数</th>
+                                    {if !empty($_GPC['addtime'])}<th>出勤人次</th>{else}<th>出勤人数</th>{/if}
+                                    {if !empty($_GPC['addtime'])}<th>请假人次</th>{else}<th>请假人数</th>{/if}
+                                    {if !empty($_GPC['addtime'])}<th>缺勤人次</th>{else}<th>缺勤人数</th>{/if}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {loop $schoolCheckLog2 $row}
+                                <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+                                    <td>
+                                        <div class="text-ellipsis ng-binding">{$row['title']}</div>
+                                    </td>
+                                    <td class="ng-binding">{$row['xxzrs']}</td>
+                                    <td class="ng-binding">{$row['xxcqzs']}</td>
+                                    <td class="ng-binding">{$row['xxqjrs']}</td>
+                                    <td class="ng-binding">{$row['qqzrs']}</td>
+
+                                </tr>
+                                {/loop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default" style="position: relative;">
+                <div class="chart-title ng-binding" style="padding: 4px 10px;">今日各校保安上岗情况</div>
+                <div style="min-height: 357px;">
+                    <!-- ngIf: charts.gradeAttendance.loading -->
+                    <div class="slimScrollDiv" style="position: relative; width: auto; height: 338px;">
+                        <div style="overflow-y: scroll;width: auto; height: 335px;">
+                            <table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+                                <thead>
+                                <tr>
+                                    <th>学校</th>
+                                    <th>出勤人数</th>
+                                    <th>出勤名单</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {loop $schoolCheckLog1 $row}
+                                <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+                                    <td>
+                                        <div class="text-ellipsis ng-binding">{$row['title']}</div>
+                                    </td>
+                                    <td class="ng-binding">{$row['guardsnum']}</td>
+                                    <td class="ng-binding">{$row['guardcheck']}</td>
+                                </tr>
+                                {/loop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default" style="position: relative;">
+                <div class="chart-title ng-binding" style="padding: 4px 10px;">今日各校保安上岗情况</div>
+                <div style="min-height: 357px;">
+                    <!-- ngIf: charts.gradeAttendance.loading -->
+                    <div class="slimScrollDiv" style="position: relative; width: auto; height: 338px;">
+                        <div style="overflow-y: scroll;width: auto; height: 335px;">
+                            <table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+                                <thead>
+                                <tr>
+                                    <th>学校</th>
+                                    <th>保安人数</th>
+                                    <th>出勤名单</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {loop $schoolCheckLog2 $row}
+                                <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+                                    <td>
+                                        <div class="text-ellipsis ng-binding">{$row['title']}</div>
+                                    </td>
+                                    <td class="ng-binding">{$row['guardsnum']}</td>
+                                    <td class="ng-binding">{$row['guardcheck']}</td>
+                                </tr>
+                                {/loop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <div class="panel panel-default" style="position: relative;">
+                <div class="chart-title ng-binding" style="padding: 4px 10px;">今日巡逻人员签到情况</div>
+                <div style="min-height: 357px;">
+                    <!-- ngIf: charts.gradeAttendance.loading -->
+                    <div class="slimScrollDiv" style="position: relative; width: auto; height: 338px;">
+                        <div style="overflow-y: scroll;width: auto; height: 335px;">
+                            <table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+                                <thead>
+                                <tr>
+                                    <th>学校</th>
+                                    <th>巡检入场时间</th>
+                                    <th>巡检出场时间</th>
+                                    <th>巡检人员</th>
+                                    <th>巡检入场照片</th>
+                                    <th>巡检出场照片</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {loop $partolCheckLog $row}
+                                <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+                                    <td>
+                                        <div class="text-ellipsis ng-binding">{$row['school']}</div>
+                                    </td>
+                                    <td class="ng-binding">{$row['ptlCheckInTime']}</td>
+                                    <td class="ng-binding">{$row['ptlCheckOutTime']}</td>
+                                    <td class="ng-binding">{$row['partolName']}</td>
+
+                                    <td class="ng-binding">
+                                        {if !empty($row['ptlCheckInPic'])}
+                                        <a href="{php echo tomedia($row['ptlCheckInPic'])}" target="_blank" class="gallery-link">
+                                            <img src="{php echo tomedia($row['ptlCheckInPic'])}" alt="image" style="width:50px;height:50px;">
+                                        </a>
+                                        {/if}
+                                    </td>
+                                    <td class="ng-binding">
+                                        {if !empty($row['ptlCheckOutPic'])}
+                                        <a href="{php echo tomedia($row['ptlCheckOutPic'])}" target="_blank" class="gallery-link">
+                                            <img src="{php echo tomedia($row['ptlCheckOutPic'])}" alt="image" style="width:50px;height:50px;">
+                                        </a>
+                                        {/if}</td>
+                                </tr>
+                                {/loop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div>
+            <div class="panel panel-default" style="position: relative;">
+                <div class="chart-title ng-binding" style="padding: 4px 10px;">今日来访人员情况</div>
+                <div style="min-height: 357px;">
+                    <!-- ngIf: charts.gradeAttendance.loading -->
+                    <div class="slimScrollDiv" style="position: relative; width: auto; height: 338px;">
+                        <div style="overflow-y: scroll;width: auto; height: 335px;">
+                            <table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+                                <thead>
+                                <tr>
+                                    <th>学校</th>
+                                    <th>来访人</th>
+                                    <th>性别</th>
+                                    <th>年龄</th>
+                                    <th>身份证号</th>
+                                    <th>来访时间</th>
+                                    <th>照片</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {loop $guestCheckLog $row}
+                                <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+                                    <td>
+                                        <div class="text-ellipsis ng-binding">{$row['school']}</div>
+                                    </td>
+                                    <td class="ng-binding">{$row['guestName']}</td>
+                                    <td class="ng-binding">{$row['guestGender']}</td>
+                                    <td class="ng-binding">{$row['guestAge']}</td>
+                                    <td class="ng-binding">{$row['guestId']}</td>
+                                    <td class="ng-binding">{$row['guestCheckInTime']}</td>
+                                    <td class="ng-binding">
+                                        {if !empty($row['guestPic'])}
+                                        <a href="{php echo tomedia($row['guestPic'])}" target="_blank" class="gallery-link">
+                                            <img src="{php echo tomedia($row['guestPic'])}" alt="image" style="width:50px;height:50px;">
+                                        </a>
+                                        {/if}</td>
+                                </tr>
+                                {/loop}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{$_W['siteroot']}addons/fm_jiaoyu/public/web/js/jquery.flot.js?v=2.1.4"></script>
+<script src="{$_W['siteroot']}addons/fm_jiaoyu/public/web/js/echarts-all.js?v=2.1.4"></script>
+{/if}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.gallery-link').magnificPopup({type:'image'});
+    });
+
+    function overShow(id, msg,e) {
+        var evn = window.event||e;
+        var showDiv = document.getElementById('showDiv_'+id);
+        showDiv.style.left = evn.clientX;
+        showDiv.style.top = evn.clientY;
+        showDiv.style.display = 'block';
+        showDiv.innerHTML = msg;
+    }
+
+    function outHide(id) {
+        var showDiv = document.getElementById('showDiv_'+id);
+        showDiv.style.display = 'none';
+        showDiv.innerHTML = '';
+    }
+</script>
+{template 'public/footer'}

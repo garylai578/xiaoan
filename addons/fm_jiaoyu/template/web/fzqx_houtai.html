@@ -8,6 +8,10 @@
 				 <div class="form-group">
 					<div class="col-sm-9 col-xs-6" style="width:100% !important">
 						<div class="input-group text-info" id="stulist" >
+							{if $_W['username'] == 'admin'}
+							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">镇街概况&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(30001)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(30001)">全不选</a></p>
+							<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="30001" data_id="300101" type="checkbox" name="qxarr"  value="3000101" style="float: none;" {if in_array(3000101,$qx)} checked="checked" {/if}>查看镇街概况</label>
+							{/if}
 							<p style="color: black;font-weight: bold;margin-top: 10px;margin-bottom: 5px;">校园设置&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="checkAll(1001)">全选</a>&nbsp;&nbsp;&nbsp;&nbsp;<a onclick="UncheckAll(1001)">全不选</a></p>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="pre" all_id="1001" data_id="00101" type="checkbox" name="qxarr"  value="1000101" style="float: none;" {if in_array(1000101,$qx)} checked="checked" {/if}>查看基本设置</label>
                         	<label  class="checkbox-inline" style="width:140px;margin-left: 10px"><input class="prd" all_id="1001" data_id="00101" type="checkbox" name="qxarr"  value="1000102" style="float: none;" {if in_array(1000102,$qx)} checked="checked" {/if}>编辑基本设置</label>

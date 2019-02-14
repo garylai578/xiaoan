@@ -205,7 +205,7 @@ class Fm_jiaoyuModuleSite extends Core {
 		include_once 'inc/func/openid.php';
 	}
 	
-	
+
     public function doMobileScplforxs() {
 		global $_GPC, $_W;
 		include_once 'inc/func/isauth.php';
@@ -422,6 +422,10 @@ class Fm_jiaoyuModuleSite extends Core {
 		$this->getLogic ( __FUNCTION__, 'web' );
 	}
 
+    public function doWebtown() {
+        $this->getLogic ( __FUNCTION__, 'web' );
+    }
+
 	public function doWebShoucelist() {
 		$this->getLogic ( __FUNCTION__, 'web' );
 	}
@@ -573,6 +577,10 @@ class Fm_jiaoyuModuleSite extends Core {
 	public function doMobileBjqajax() {
 		$this->getLogic ( __FUNCTION__, 'mobile' );
 	}
+
+    public function doMobileXsqjajax() {
+        $this->getLogic ( __FUNCTION__, 'mobile');
+    }
 
     public function doMobileDongtaiajax() {
 		$this->getLogic ( __FUNCTION__, 'mobile' );

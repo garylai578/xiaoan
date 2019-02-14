@@ -98,6 +98,7 @@ class Core extends WeModuleSite {
 	public $table_yuecostlog = 'wx_school_yuecostlog';
 	public $table_upsence = 'wx_school_upsence';
 	public $table_teasencefiles = 'wx_school_teasencefiles';
+	public $table_guest = 'wx_school_guest';
     public function getNaveMenu($schoolid, $action)
     {
         global $_W, $_GPC;
@@ -127,6 +128,17 @@ class Core extends WeModuleSite {
 			'icon' => 'fa fa-user-md',
 			'this' => 'no1'
 		);
+
+        if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'3000101')){
+            $navemenu[0]['items'][] =  array(
+                'title' => '信息概况 ',
+                'url' =>$do != 'town' ? $this->createWebUrl('town', array('op' => 'display', 'schoolid' => $schoolid)) : '#',
+                'active' => $action == 'town' ? ' active' : '',
+                'append' => array(
+                    'title' => '<i style="color:#d9534f;" class="fa fa-bank"></i>',
+                ),
+            );
+        }
 
 		if($_W['isfounder'] || $_W['role'] == 'owner' || strstr($qxarr,'100010')){
 			$navemenu[0]['items'][] =  array(
