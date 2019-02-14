@@ -551,25 +551,31 @@
 								<input type="checkbox" value="1" name="is_stuewcode"  {if $reply['is_stuewcode']== 1 }checked{/if}>
 								<div class="help-block">开启后手动添加学生会自动生成二维码,批量导入不会生成,需手动批量生成</div>
 							</div>
-						</div>
-						<div class="form-group">
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">允许小票打印</label>
-							<div class="col-sm-9">
+							<!--<div class="col-sm-9">
 								<label class="radio-inline">
-									<input type="radio" name="is_printer" value="1" {if $reply['is_printer']== 1 || empty($reply['is_printer'])}checked{/if}>是
+									<input type="radio" name="is_stuewcode" value="1" {if $reply['is_stuewcode']== 1 || empty($reply['is_stuewcode'])}checked{/if}>开启
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="is_printer" value="2" {if $reply['is_printer'] == 2}checked{/if}>否
+									<input type="radio" name="is_stuewcode" value="2" {if $reply['is_stuewcode'] == 2}checked{/if}>关闭
 								</label>
-								<div class="help-block">是否运行学校使用小票打印机和打印功能</div>
-							</div>	
+								
+							</div>-->	
 						</div>
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">允许使用视频</label>
 							<div class="col-sm-9">
 								<input type="checkbox" value="1" name="is_fbnew"  {if $reply['is_fbnew']== 1 || empty($reply['is_fbnew'])}checked{/if}>
 								<div class="help-block">启用后允许本校发布作业通知班级圈等使用小视频功能</div>
-							</div>	
+							</div>
+							<!--<div class="col-sm-9">
+								<label class="radio-inline">
+									<input type="radio" name="is_fbnew" value="1" {if $reply['is_fbnew']== 1 || empty($reply['is_fbnew'])}checked{/if}>是
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="is_fbnew" value="2" {if $reply['is_fbnew'] == 2}checked{/if}>否
+								</label>
+								
+							</div>-->	
 						</div>
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">允许使用录音</label>
@@ -582,7 +588,7 @@
 								</label>
 								<div class="help-block">启用后允许本校发布作业通知班级圈等使用录音功能</div>
 							</div>	
-						</div>	
+						</div>					
 						<div class="form-group">
 							<label class="col-xs-12 col-sm-3 col-md-2 control-label">腾讯云点播secretId</label>
 							<div class="input-group">
@@ -718,10 +724,10 @@
 							<input type="hidden" name="mallpayweid" value="{$reply['chongzhiweid']}">	
 						{/if}
 						<div class="form-group">
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label">学生钱包</label>
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">启用订单</label>
 							<div class="col-sm-9">
 								<input type="checkbox" value="1" name="is_shoufei" data-id="" {if $reply['is_shoufei'] == 1}checked{/if}>
-									<div class="help-block">启用后学生中心将显示钱包和订单入口</div>
+									<div class="help-block">启用后家长端显示订单入口</div>
 							</div>
 						</div>
 						{if $_W['isfounder'] || $_W['role'] == 'owner'}
@@ -734,7 +740,7 @@
 								<label class="radio-inline">
 									<input type="radio" name="Is_point" value="0" {if $reply['Is_point'] == 0|| empty($reply['is_wxsign'])}checked{/if} id="credit_sp2">否
 								</label>
-								<div class="help-block">启用后家长或学生可以用积分抵用消费，学生端也会显示积分余额</div>
+								<div class="help-block">启用后家长或学生可以用积分抵用消费</div>
 							</div>	
 						</div>
 						<div id="jfzjbl" class="form-group" {if $reply['Is_point'] == 1}style="display:block"{else}style="display:none"{/if}>
@@ -759,6 +765,17 @@
 								</label>
 								<label class="radio-inline">
 									<input type="radio" name="is_recordmac" value="2" {if $reply['is_recordmac'] ==2 || empty($reply['is_recordmac'])}checked{/if}>否
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label">启用人脸识别</label>
+							<div class="col-sm-9">
+								<label class="radio-inline">
+									<input type="radio" name="is_face" value="1" {if $reply['is_face']==1}checked{/if}>是
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="is_face" value="2" {if $reply['is_face'] ==2 || empty($reply['is_face'])}checked{/if}>否
 								</label>
 							</div>
 						</div>

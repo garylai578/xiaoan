@@ -407,6 +407,7 @@ if($operation == 'post'){
         'is_cardpay'          => intval($_GPC['is_cardpay']),
         'is_cardlist'         => intval($_GPC['is_cardlist']),
         'is_recordmac'        => intval($_GPC['is_recordmac']),
+        'is_face'        => intval($_GPC['is_face']),
         'is_wxsign'           => intval($_GPC['is_wxsign']),
 		'is_printer'          => intval($_GPC['is_printer']),
         'is_signneedcomfim'   => intval($_GPC['is_signneedcomfim']),
