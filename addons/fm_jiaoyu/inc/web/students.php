@@ -426,7 +426,7 @@
                     $arr[$ii]['s_name'] = trim($row['s_name']);
                     $arr[$ii]['banji']  = $bj['sname'];
                     if(!empty($row['icon']))
-                        $arr[$ii]['icon'] = "http://jy.xingheoa.com/".$row['icon'];
+                        $arr[$ii]['icon'] = "http://qn.xingheoa.com/".$row['icon'];
                     else
                         $arr[$ii]['icon'] = "";
                     $ii++;
