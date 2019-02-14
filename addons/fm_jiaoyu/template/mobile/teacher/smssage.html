@@ -124,6 +124,17 @@ body {font-family: initial;}
 					<span class="vacation_title">原因:</span><span class="vacation_title vacation_titleOther">{$row['conet']}</span>
 					<div class="left_dotsVacation left_dotsVacationOther"></div>
 				</div>
+
+				<ul class="user_img_list3">
+					{if !empty($row['picurls'])}
+					{loop $row['picurls'] $pic}
+					<li style="height: 70px;">
+						<img img_path="{php echo tomedia($pic)}" src="{php echo tomedia($pic)}">
+					</li>
+					{/loop}
+					{/if}
+				</ul>
+
 				<!--老师回复-->
 				{if $row['status'] == 0}
 				<div class="teachReplyBox qx_00402">
@@ -304,6 +315,7 @@ setTimeout(function() {
 
 	});
 </script>
+<script type="text/javascript" src="https://res.wx.qq.com/open/js/jweixin-1.3.0.js"></script>
 <script type="text/javascript">
 		$("#showbjlist").on('click', function () {
             $('#selectList').show();
@@ -319,6 +331,27 @@ setTimeout(function() {
 	function isSelect(bjid){
 		jTips("数据加载中！···");
 		location.href = "{php echo $this->createMobileUrl('smssage', array('schoolid' => $schoolid), true)}"+ '&bj_id=' + bjid;
-	}		
+	}
+
+	$(function () {
+        //预览图片
+        $(".vacationRecord_section").on("click", ".user_img_list3 li", function (e) {
+
+            if ($(this).attr("data-flag") == "table") {
+                location.href = $(this).parents(".user_info").find(".other_info_box3 a").attr("href");
+                return false;
+            }
+            var this_img = $(this).children('img').attr('img_path');
+            var this_img_arr = [];
+            $(this).parent('.user_img_list3').children('li').each(function () {
+                this_img_arr.push($(this).children('img').attr('img_path'));
+            })
+            wx.previewImage({
+                current: this_img, // 当前显示图片的http链接
+                urls: this_img_arr // 需要预览的图片http链接列表
+            });
+        });
+	});
+
 </script>
 {php include $this->template('newfooter');}

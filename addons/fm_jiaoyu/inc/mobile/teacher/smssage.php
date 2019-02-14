@@ -63,6 +63,12 @@
 				$leave[$index]['s_name'] = $student['s_name'];
 				$leave[$index]['key'] = $thisid;
 				$thisid ++;
+
+				if(!empty($row['picurl'])) {
+				    $picurls = $row['picurl'];
+                    $picurls = substr($row['picurl'], 0, -1);
+                    $leave[$index]['picurls'] = explode(';', $picurls);
+                }
 			}	 			
 			include $this->template(''.$school['style3'].'/smssage');
         }else{

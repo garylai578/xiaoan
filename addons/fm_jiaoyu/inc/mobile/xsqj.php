@@ -37,7 +37,7 @@
         if(!empty($it)){
 			$item = pdo_fetch("SELECT * FROM " . tablename ( 'mc_members' ) . " where uniacid=:uniacid AND uid=:uid ", array(':uid' => $it['uid'], ':uniacid' => $weid));  $userinfo = iunserializer($it['userinfo']);
 		    $this->checkobjiect($schoolid, $student['id'], $obid);
-			include $this->template(''.$school['style2'].'/xsqj');
+			include $this->template(''.$school['style2'].'/xsqjnew');
         }else{
 			session_destroy();
 		    $stopurl = $_W['siteroot'] .'app/'.$this->createMobileUrl('bangding', array('schoolid' => $schoolid));
