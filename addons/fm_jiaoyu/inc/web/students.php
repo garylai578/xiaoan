@@ -392,7 +392,7 @@
 			if(!empty($_GPC['nj_id'])){
 				$condition .= " AND xq_id = '{$_GPC['nj_id']}'";
 			}
-			if(!empty($_GPC['s_type'])){
+			if(!empty($_GPC['s_type']) || $_GPC['s_type'] == 0){
 				$condition .= " AND s_type = '{$_GPC['s_type']}'";
 			}
 			if(!empty($_GPC['bj_id'])){

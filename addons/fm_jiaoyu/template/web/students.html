@@ -76,6 +76,8 @@ require(['bootstrap'],function($){
 								<option value="">按学生类型</option>
 								<option value="1" {if $_GPC['s_type'] == 1} selected="selected"{/if}>走读生</option>
 								<option value="2" {if $_GPC['s_type'] == 2} selected="selected"{/if}>住校生</option>
+                          <option value="3" {if $_GPC['s_type'] == 3} selected="selected"{/if}>半走读生</option>
+                          <option value="0" {if $_GPC['s_type'] == 0} selected="selected"{/if}>未设置</option>
                         </select>
                     </div>
 					{/if}
@@ -112,7 +114,7 @@ require(['bootstrap'],function($){
            
             
 			<div class="alert we7-page-alert">
-				{if empty($_GPC['bj_id']) && empty($_GPC['bd_type']) && empty($_GPC['nj_id'])}
+				{if empty($_GPC['bj_id']) && empty($_GPC['bd_type']) && empty($_GPC['nj_id'])  && (empty($_GPC['s_type'])&&$_GPC['s_type']!=0)}
 				<p><i class="wi wi-info-sign"></i> 本校学生人数:<strong class="text-danger">{$totalsss}个</strong></p>
 				{else}
 				<p><i class="wi wi-info-sign"></i> 检索到学生人数:<strong class="text-danger">{$total}个</strong></p>				
