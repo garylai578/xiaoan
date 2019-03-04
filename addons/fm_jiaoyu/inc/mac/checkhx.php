@@ -329,7 +329,7 @@ if ($operation == 'classinfo') {
                             $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = array(array('startTime'=>"00:00", 'endTime'=>"23:59"));
                         }elseif($checktime[0]['type'] == 5){
                             $todaytimeset1 = transTimeset4T1($checktime);
-                            $todaytimeset2 = array(array('startTime'=>$checktime[count($checktime)-1]['end'], 'endTime'=>"23:59"));
+                            $todaytimeset2 = array(array('startTime'=>$checktime[count($checktime)-1]['start'], 'endTime'=>$checktime[count($checktime)-1]['end']));
                             $todaytimeset3 = transTimeset4T3($checktime);
                         }
                     }else{
@@ -338,30 +338,32 @@ if ($operation == 'classinfo') {
                         }else{
                             $timeset_work = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=1 ORDER BY id ASC ");
                             if($k == 5){//星期五
-                                if($checkdateset['friday'] == 1){
+                                if($checkdateset['friday'] == 1){   // 如果周五单独设置，则周五最后一个时间段都可以放行
                                     $timeset_fri = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=2 ORDER BY id ASC ");
                                     $todaytimeset1 = transTimeset4T1($timeset_fri);
-                                    $todaytimeset2 = array(array('startTime'=>$timeset_fri[count($timeset_fri)-1]['end'], 'endTime'=>"23:59"));
+                                    $todaytimeset2 = array(array('startTime'=>$timeset_fri[count($timeset_fri)-1]['start'], 'endTime'=>$timeset_fri[count($timeset_fri)-1]['end']));
                                     $todaytimeset3 =  transTimeset4T3($timeset_fri);
                                 }else{
                                     $todaytimeset1 = transTimeset4T1($timeset_work);
-                                    $todaytimeset2 = array(array('startTime'=>$timeset_work[count($timeset_work)-1]['end'], 'endTime'=>"23:59"));
+                                    $todaytimeset2 = array(array('startTime'=>$timeset_work[count($timeset_work)-1]['start'], 'endTime'=>$timeset_work[count($timeset_work)-1]['end']));
                                     $todaytimeset3 =  transTimeset4T3($timeset_work);
                                 }
                             }elseif($k == 6){//星期六
-                                if($checkdateset['saturday'] == 1){
+                                if($checkdateset['saturday'] == 1){     // 如果周六单独设置，则按照工作日的规则设置
                                     $timeset_sat = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=3 ORDER BY id ASC ");
                                     $todaytimeset1 = transTimeset4T1($timeset_sat);
-                                    $todaytimeset2 = array(array('startTime'=>$timeset_sat[count($timeset_sat)-1]['end'], 'endTime'=>"23:59"));
+//                                    $todaytimeset2 = array(array('startTime'=>$timeset_sat[count($timeset_sat)-1]['start'], 'endTime'=>$timeset_sat[count($timeset_sat)-1]['end']));
+                                    $todaytimeset2 = array(array('startTime'=>"00:00", 'endTime'=>"00:00"));
                                     $todaytimeset3 =  transTimeset4T3($timeset_sat);
                                 }else{
                                     $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = array(array('startTime'=>"00:00", 'endTime'=>"23:59"));
                                 }
                             }elseif($k == 0){//星期天
-                                if($checkdateset['sunday'] == 1){
+                                if($checkdateset['sunday'] == 1){   // 如果周日单独设置，则按照工作日的规则设置
                                     $timeset_sun = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=4 ORDER BY id ASC ");
-                                       $todaytimeset1 = transTimeset4T1($timeset_sun);
-                                    $todaytimeset2 = array(array('startTime'=>$timeset_sun[count($timeset_sun)-1]['end'], 'endTime'=>"23:59"));
+                                    $todaytimeset1 = transTimeset4T1($timeset_sun);
+//                                    $todaytimeset2 = array(array('startTime'=>$timeset_sun[count($timeset_sun)-1]['start'], 'endTime'=>$timeset_sun[count($timeset_sun)-1]['end']));
+                                    $todaytimeset2 = array(array('startTime'=>"00:00", 'endTime'=>"00:00"));
                                     $todaytimeset3 =  transTimeset4T3($timeset_sun);
                                 }else{
                                     $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = array(array('startTime'=>"00:00", 'endTime'=>"23:59"));
@@ -478,7 +480,7 @@ if ($operation == 'check') {
                 }
             }
             $signMode = $_GPC['signMode'];
-            if($ckmac['type'] !=0){
+            if($ckmac['type'] !=0){ // checkmac的type字段表示该设备是进校还是离校，0表示不区分
                 include 'checktime2.php';
             }else{
                 include 'checktime.php';
@@ -1019,13 +1021,7 @@ if ($operation == 'qrcode') {
  */
 function transTimeset4T1($checktime){
     for($i=0, $len=count($checktime); $i <= $len; ++$i){
-        if($i == 0){
-            $time[$i] = array('startTime'=>"06:00", 'endTime'=>$checktime[0]['start']);
-        }elseif($i == $len){
-            $time[$i] = array('startTime'=>$checktime[$i-1]['end'], 'endTime'=>"23:59");
-        }else{
-            $time[$i] = array('startTime'=>$checktime[$i-1]['end'], 'endTime'=>$checktime[$i]['start']);
-        }
+        $time[$i] = array('startTime'=>$checktime[$i]['start'], 'endTime'=>$checktime[$i]['end']);
     }
     return $time;
 }
@@ -1033,16 +1029,15 @@ function transTimeset4T1($checktime){
 /** 根据正常的上课时间算出半住宿生（Type=2）的允许外出时间段
  *
  * @param $checktime 正常的上课时间
- * @return array 允许外出的时间段
+ * @return array 允许外出的时间段:第一和最后一个时间段.
  */
 function transTimeset4T3($checktime){
-    for($i=0, $len=count($checktime), $j=0; $i <= $len; ++$i) {
-        if ($i == 0) {
-            $time[$j++] = array('startTime' => "06:00", 'endTime' => $checktime[0]['start']);
-        } elseif ($i == $len) {
-            $time[$j++] = array('startTime' => $checktime[$i - 1]['end'], 'endTime' => "23:59");
-        }
-    }
+    $len=count($checktime);
+    $time[0] = array('startTime'=>$checktime[0]['start'], 'endTime'=>$checktime[0]['end']);
+
+    if($len>1)
+        $time[1] = array('startTime'=>$checktime[$len-1]['start'], 'endTime'=>$checktime[$len-1]['end']);
+
     return $time;
 }
 
