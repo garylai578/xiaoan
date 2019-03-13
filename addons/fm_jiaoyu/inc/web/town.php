@@ -205,6 +205,8 @@ if ($operation == 'display') {
 
     foreach($schoolCheckLog as $key =>$row){
         /**各校出勤情况**/
+        if($row['id']==21)// 不显示的学校的id
+            continue;
         $bjids = pdo_fetchall("SELECT sid FROM " . tablename($this->table_classify) . " WHERE schoolid = :schoolid AND is_temple != 1 AND `type`='theclass' AND is_over = 1  ", array(':schoolid' => $row['id']));
         $schoolCheckLog[$key]['xxzrs'] = 0;
         $schoolCheckLog[$key]['xxcqzs'] = 0;
@@ -213,6 +215,15 @@ if ($operation == 'display') {
             $bjrs = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));
             $schoolCheckLog[$key]['xxzrs'] += $bjrs;
             $bjqksm = pdo_fetchcolumn("SELECT COUNT(distinct sid) FROM " . tablename($this->table_checklog) . " WHERE bj_id = '{$bj['sid']}' AND leixing = 1 AND isconfirm = 1  $condition9 "); //只要当天刷卡进入了学校的都算做出勤，没有考虑刷卡后请假离校的情况
+
+            $bjsid = pdo_fetchall("SELECT distinct sid FROM " . tablename($this->table_checklog) . " WHERE bj_id = '{$bj['sid']}' AND isconfirm = 1");
+            $bjqksm = 0;
+            foreach ($bjsid as $sid){
+                $leixing = pdo_fetch("SELECT leixing  FROM " . tablename($this->table_checklog) . "  WHERE isconfirm=1 and sid='{$sid['sid']}' ORDER BY createtime DESC");
+                if($leixing['leixing'] == 1 || $leixing['leixing'] == 3)
+                    $bjqksm++;
+            }
+
             $schoolCheckLog[$key]['xxcqzs'] += $bjqksm;
             $bjqjsm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_leave) . " WHERE bj_id = '{$bj['sid']}' And isliuyan = 0 $condition8 ");
             $schoolCheckLog[$key]['xxqjrs'] += $bjqjsm;
@@ -273,16 +284,16 @@ if ($operation == 'display') {
         /** 各校来访人员情况 **/
         $guests = pdo_fetchall("SELECT * FROM " . tablename($this->table_guest) . " WHERE schoolid = '{$row['id']}' AND checkintime > '{$start}' AND checkintime < '{$end}'");
         foreach ($guests as $k=>$v){
-            $guestCheckLog[$k]['school'] = $row['title'];
-            $guestCheckLog[$k]['guestName'] = $v['gname'];
-            $guestCheckLog[$k]['guestGender'] = ($v['gender']==1)?"男":"女";
-            $guestCheckLog[$k]['guestId'] = substr($v['idnum'], 0, 10)."********";
-            $guestCheckLog[$k]['guestCheckInTime'] = date("Y-m-d H:i:s", $v['checkintime']);
-            $guestCheckLog[$k]['guestPic'] = $v['pic'];
+            $guestCheckLog[$key][$k]['school'] = $row['title'];
+            $guestCheckLog[$key][$k]['guestName'] = $v['gname'];
+            $guestCheckLog[$key][$k]['guestGender'] = ($v['gender']==1)?"男":"女";
+            $guestCheckLog[$key][$k]['guestId'] = substr($v['idnum'], 0, 10)."********";
+            $guestCheckLog[$key][$k]['guestCheckInTime'] = date("Y-m-d H:i:s", $v['checkintime']);
+            $guestCheckLog[$key][$k]['guestPic'] = $v['pic'];
 
             $nowYear = date("Y",time());
             $birthYear = substr($v['birthday'], 0, 4);
-            $guestCheckLog[$k]['guestAge'] = ($nowYear - $birthYear)."岁";
+            $guestCheckLog[$key][$k]['guestAge'] = ($nowYear - $birthYear)."岁";
         }
 
         if($i < ($size/2)){
