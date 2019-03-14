@@ -189,7 +189,7 @@ $config['sgoodsdetail']['sgoodsdetail_spxq'] = '商品详情';//商品详情的�
 $config['sgoodsdetail']['sgoodsdetail_xsxm'] = '我要购买';
 /**学生提交购买页**/
 $config['seditorder']['seditorder_title'] = '商品信息';
-$config['seditorder']['seditorder_jdwj'] = '寄到我加';
+$config['seditorder']['seditorder_jdwj'] = '寄到我家';
 $config['seditorder']['seditorder_dxzq'] = '到校自取';
 /**学生班级相册**/
 $config['sxclist']['sxclist_title'] = '相册'; //二年级一班相册
