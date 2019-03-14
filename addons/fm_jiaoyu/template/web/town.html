@@ -262,7 +262,8 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {loop $guestCheckLog $row}
+                                {loop $guestCheckLog $schoolcheck}
+                                {loop $schoolcheck $row}
                                 <tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
                                     <td>
                                         <div class="text-ellipsis ng-binding">{$row['school']}</div>
@@ -279,6 +280,7 @@
                                         </a>
                                         {/if}</td>
                                 </tr>
+                                {/loop}
                                 {/loop}
                                 </tbody>
                             </table>

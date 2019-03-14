@@ -244,8 +244,6 @@ if ($operation == 'display') {
                     $grdcheck = pdo_fetch("SELECT createtime FROM " . tablename($this->table_checklog) . " WHERE tid = '{$grd['id']}' AND leixing = 1  $condition9 ORDER BY createtime ASC");
                     if (!empty($grdcheck))
                         $schoolCheckLog[$key]['guardcheck'] .= $grd['tname'] . "--" . date("Y-m-d H:i:s", $grdcheck['createtime']) . "; ";
-                    else
-                        $schoolCheckLog[$key]['guardcheck'] = "无刷卡信息";
                 }
             }
         }else{
