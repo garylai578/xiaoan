@@ -67,31 +67,29 @@ if($signMode == 65 || $signMode == 66 || $signMode == 1 || $signMode == 2){
     $hasLeave = pdo_fetch($sql2);
     if(!empty($hasLeave)){
         $type = "正常请假";
-    }else{
-        $type = "";
     }
 	if ($jxstart <= $now & $now <= $jxend){
-		$type = $type."早上进校";
+		$type = "早上进校";
 		$leixing = 1;
 	}
 	if ($lxstart <= $now & $now <= $lxend){
-		$type = $type."下午离校";
+		$type = "下午离校";
 		$leixing = 2;
 	}
 	if ($jxstart1 <= $now & $now <= $jxend1){
-		$type = $type."午间进校";
+		$type = "午间进校";
 		$leixing = 1;
 	}
 	if ($lxstart1 <= $now & $now <= $lxend1){
-		$type = $type."午间离校";
+		$type = "午间离校";
 		$leixing = 2;
 	}
 	if ($jxstart2 <= $now & $now <= $jxend2){
-		$type = $type."晚间进校";
+		$type = "晚间进校";
 		$leixing = 1;
 	}
 	if ($lxstart2 <= $now & $now <= $lxend2){
-		$type = $type."晚间离校";
+		$type = "晚间离校";
 		$leixing = 2;
 	}
 }
