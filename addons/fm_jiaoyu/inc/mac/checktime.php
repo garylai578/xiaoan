@@ -65,9 +65,6 @@ if($signMode == 65 || $signMode == 66 || $signMode == 1 || $signMode == 2){
 }else{
     $sql2 = "SELECT * FROM " . tablename($this->table_leave) . " WHERE sid = ".$ckuser['sid']." And schoolid = ".$schoolid." And startime1 <= ".time()." And endtime1 >= ".time();
     $hasLeave = pdo_fetch($sql2);
-    if(!empty($hasLeave)){
-        $type = "正常请假";
-    }
 	if ($jxstart <= $now & $now <= $jxend){
 		$type = "早上进校";
 		$leixing = 1;
@@ -92,5 +89,8 @@ if($signMode == 65 || $signMode == 66 || $signMode == 1 || $signMode == 2){
 		$type = "晚间离校";
 		$leixing = 2;
 	}
+    if(!empty($hasLeave)){
+        $type = "正常请假:".$type;
+    }
 }
 ?>
