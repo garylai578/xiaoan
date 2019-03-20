@@ -260,6 +260,14 @@ if ($operation == 'classinfo') {
 
             $class = pdo_fetchall("SELECT id as childId, bj_id as classId, icon as headIcon, s_name as name,s_type, createdate as updatetime FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And bj_id = '{$classid}' ORDER BY id DESC");
             foreach($class as $key =>$row) {
+                if($ckmac['s_type'] == 2 && $row['s_type'] == 4) {    //  如果闸机设置了不允许接送生通过，而该学生又刚好是接送生，则不发送该学生信息。
+                    unset($class[$key]);
+                    continue;
+                }
+
+                if($row['s_type'] == 4)   // 如果接送生允许通行，将学生的类型设置为1传输给闸机
+                    $class[$key]['s_type'] = 1;
+
                 if(!empty($row['headIcon'])){
                     $class[$key]['headIcon'] = $urls.$row['headIcon'];
                 }else{
@@ -439,9 +447,23 @@ if ($operation == 'check') {
     }else{
         $signTime = trim($_GPC['signTime']);
     }
-    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid And createtime = :createtime ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid,':createtime' =>$signTime));
-    if(empty($checkthisdata)){
-        if(!empty($ckuser)){
+//    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid And createtime = :createtime ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid,':createtime' =>$signTime));
+    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid ORDER BY createtime DESC ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid));
+    $signMode = $_GPC['signMode'];
+    if ($ckmac['type'] != 0) { // checkmac的type字段表示该设备是进校还是离校，0表示不区分
+        include 'checktime2.php';
+    } else {
+        include 'checktime.php';
+    }
+    $checklog = false;  // 考勤信息是否录入系统
+    if(empty($checkthisdata))   // 如果没有记录
+        $checklog = true;
+    elseif(($signTime - $checkthisdata['createtime']) > 60) //  如果刷卡间隔大于60秒
+        $checklog = true;
+    elseif($checkthisdata['leixing'] != $leixing)   //  如果不是同时刷进或刷出
+        $checklog = true;
+    if($checklog){ //1分钟内的相同方向刷卡都认为是重复刷卡
+        if(!empty($ckuser)) {
             $times = TIMESTAMP;
             $nowtime = date('H:i',$signTime);
             if($_GPC['picurl']) {
@@ -478,12 +500,6 @@ if ($operation == 'check') {
                     }
                     $pic2 = $picurl2;
                 }
-            }
-            $signMode = $_GPC['signMode'];
-            if($ckmac['type'] !=0){ // checkmac的type字段表示该设备是进校还是离校，0表示不区分
-                include 'checktime2.php';
-            }else{
-                include 'checktime.php';
             }
             if($_GPC['signId'] == '999999999'){
                 $data = array(

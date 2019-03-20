@@ -45,21 +45,18 @@ if($signMode == 65 || $signMode == 66 || $signMode == 1 || $signMode == 2){
     }else {
         if ($jxstart <= $now & $now <= $jxend) {
             $type = "早上" . $lx;
-        }
-        if ($lxstart <= $now & $now <= $lxend) {
+        }elseif($lxstart <= $now & $now <= $lxend) {
             $type = "下午" . $lx;
-        }
-        if ($jxstart1 <= $now & $now <= $jxend1) {
+        }elseif($jxstart1 <= $now & $now <= $jxend1) {
             $type = "午间" . $lx;
-        }
-        if ($lxstart1 <= $now & $now <= $lxend1) {
+        }elseif($lxstart1 <= $now & $now <= $lxend1) {
             $type = "午间" . $lx;
-        }
-        if ($jxstart2 <= $now & $now <= $jxend2) {
+        }elseif($jxstart2 <= $now & $now <= $jxend2) {
             $type = "晚间" . $lx;
-        }
-        if ($lxstart2 <= $now & $now <= $lxend2) {
+        }elseif($lxstart2 <= $now & $now <= $lxend2) {
             $type = "晚间" . $lx;
+        }else{
+            $type = $type.":".$lx;
         }
     }
 }else{

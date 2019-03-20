@@ -55,7 +55,8 @@
 					'bj_id'		 =>intval($_GPC['bj_id']),
 					'js_id'		 =>intval($_GPC['js_id']),
 					'is_bobao'   =>intval($_GPC['is_bobao']),
-					'is_master'  =>intval($_GPC['is_master'])					
+					'is_master'  =>intval($_GPC['is_master']),
+					's_type'  =>intval($_GPC['s_type']),
 				);
 				if(!empty($id)){
 					if($item['macname'] != $data['macname']){

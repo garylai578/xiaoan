@@ -73,10 +73,11 @@ require(['bootstrap'],function($){
 					<label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label" style="width: 100px;">按类型</label>
                     <div class="col-sm-2 col-lg-2">
                         <select style="margin-right:15px;" name="s_type" class="form-control">
-								<option value="">按学生类型</option>
-								<option value="1" {if $_GPC['s_type'] == 1} selected="selected"{/if}>走读生</option>
-								<option value="2" {if $_GPC['s_type'] == 2} selected="selected"{/if}>住校生</option>
-                          <option value="3" {if $_GPC['s_type'] == 3} selected="selected"{/if}>半走读生</option>
+							<option value="">按学生类型</option>
+							<option value="1" {if $_GPC['s_type'] == 1} selected="selected"{/if}>走读生</option>
+							<option value="2" {if $_GPC['s_type'] == 2} selected="selected"{/if}>住校生</option>
+                          	<option value="3" {if $_GPC['s_type'] == 3} selected="selected"{/if}>半走读生</option>
+							<option value="4" {if $_GPC['s_type'] == 4} selected="selected"{/if}>接送生</option>
                         </select>
                     </div>
 					{/if}
@@ -664,6 +665,7 @@ $(function(){
                         <label class="radio-inline"><input type="radio" name="s_type" value="2" {if !empty($item) && $item['s_type'] == 2}checked="true"{/if} /> 住校</label>
 						&nbsp;&nbsp;&nbsp;
                         <label class="radio-inline"><input type="radio" name="s_type" value="3" {if !empty($item) && $item['s_type'] == 3}checked="true"{/if} /> 半走读</label>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="4" {if !empty($item) && $item['s_type'] == 4}checked="true"{/if} /> 接送生</label>
                         <span class="help-block"></span>
                     </div>
                 </div>
