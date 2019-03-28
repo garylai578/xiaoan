@@ -271,7 +271,7 @@ if($operation == 'post'){
 		'bj_id' => $bj_id,
 		'pname' => $pname,
 		'pard' => $pard,
-		'usertype' => 1,
+		'usertype' => 0,//录卡功能只开放给学生使用，所以这里应该是0
 		'is_on' => 1,
 		'createtime' => time(),
 		'severend' => $severend,
