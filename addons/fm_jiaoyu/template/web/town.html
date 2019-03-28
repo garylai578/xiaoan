@@ -1,6 +1,6 @@
 {template 'public/header'}
 {template 'public/comhead'}
-<meta http-equiv="refresh" content="60"> <!-- 每隔10秒自动更新一次-->
+<!--meta http-equiv="refresh" content="60"--> <!-- 每隔10秒自动更新一次-->
 <script type="text/javascript" src="{MODULE_URL}public/web/js/jquery.magnific-popup.js"></script>
 <link rel="stylesheet" href="{MODULE_URL}public/web/css/magnific-popup.css">
 <!-- <script src="{$_W['siteroot']}addons/fm_jiaoyu/public/web/js/jquery.easypiechart.js"></script> -->
@@ -55,7 +55,7 @@
                                 <tr>
                                     <th>学校</th>
                                     <th>学生人数</th>
-                                    {if !empty($_GPC['addtime'])}<th>出勤人次</th>{else}<th>出勤人数</th>{/if}
+                                    {if !empty($_GPC['addtime'])}<th>出勤人次</th>{else}<th>在校人数</th>{/if}
                                     {if !empty($_GPC['addtime'])}<th>请假人次</th>{else}<th>请假人数</th>{/if}
                                     {if !empty($_GPC['addtime'])}<th>缺勤人次</th>{else}<th>缺勤人数</th>{/if}
                                 </tr>
@@ -93,7 +93,7 @@
                                 <tr>
                                     <th>学校</th>
                                     <th>学生人数</th>
-                                    {if !empty($_GPC['addtime'])}<th>出勤人次</th>{else}<th>出勤人数</th>{/if}
+                                    {if !empty($_GPC['addtime'])}<th>出勤人次</th>{else}<th>在校人数</th>{/if}
                                     {if !empty($_GPC['addtime'])}<th>请假人次</th>{else}<th>请假人数</th>{/if}
                                     {if !empty($_GPC['addtime'])}<th>缺勤人次</th>{else}<th>缺勤人数</th>{/if}
                                 </tr>

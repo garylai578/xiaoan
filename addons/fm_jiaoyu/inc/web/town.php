@@ -40,7 +40,7 @@ if ($operation == 'display') {
     $condition4 .= " AND paytime > '{$start}' AND paytime < '{$end}'";
     $params[':start'] = $starttime;
     $params[':end'] = $endtime;
-    $bm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_signup) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ");
+    /*$bm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_signup) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ");
     $bjq = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_bjq) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ");
     $kq = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_checklog) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ");
     $dd = pdo_fetchall('SELECT SUM(cose) FROM ' . tablename($this->table_order) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND status = 2 ");
@@ -183,7 +183,7 @@ if ($operation == 'display') {
             $lastkq[$index]['bj_name'] = $banji['sname'];
             $lastkq[$index]['time'] = sub_day($row['createtime']);
         }
-    }
+    }*/
     if(!empty($_GPC['addtime'])) {
         $starttime1 = strtotime($_GPC['addtime']['start']);
         $endtime1 = strtotime($_GPC['addtime']['end']) + 86399;
@@ -199,35 +199,65 @@ if ($operation == 'display') {
     /**各校出勤情况**/
     $areaid = pdo_fetch("SELECT areaid FROM " . tablename($this->table_index). " WHERE id= '{$schoolid}'");
 
-    $schoolCheckLog = pdo_fetchall("SELECT id,title FROM " . tablename($this->table_index) . " WHERE weid = '{$weid}' AND id != '{$schoolid}' AND areaid = '{$areaid['areaid']}' ORDER BY ssort DESC ,id DESC ");
+    $schoolCheckLog = pdo_fetchall("SELECT id,title, typeid FROM " . tablename($this->table_index) . " WHERE weid = '{$weid}' AND id != '{$schoolid}' AND areaid = '{$areaid['areaid']}' ORDER BY ssort DESC ,id DESC ");
     $size = sizeof($schoolCheckLog);
     $i = 0;
 
+    /**各校出勤情况**/
     foreach($schoolCheckLog as $key =>$row){
-        /**各校出勤情况**/
         if($row['id']==21)// 不显示的学校的id
             continue;
         $bjids = pdo_fetchall("SELECT sid FROM " . tablename($this->table_classify) . " WHERE schoolid = :schoolid AND is_temple != 1 AND `type`='theclass' AND is_over = 1  ", array(':schoolid' => $row['id']));
         $schoolCheckLog[$key]['xxzrs'] = 0;
         $schoolCheckLog[$key]['xxcqzs'] = 0;
         $schoolCheckLog[$key]['xxqjrs'] = 0;
-        foreach ($bjids as $bj){
-            $bjrs = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));
-            $schoolCheckLog[$key]['xxzrs'] += $bjrs;
-            $bjqksm = pdo_fetchcolumn("SELECT COUNT(distinct sid) FROM " . tablename($this->table_checklog) . " WHERE bj_id = '{$bj['sid']}' AND leixing = 1 AND isconfirm = 1  $condition9 "); //只要当天刷卡进入了学校的都算做出勤，没有考虑刷卡后请假离校的情况
 
-            $bjsid = pdo_fetchall("SELECT distinct sid FROM " . tablename($this->table_checklog) . " WHERE bj_id = '{$bj['sid']}' AND isconfirm = 1");
-            $bjqksm = 0;
-            foreach ($bjsid as $sid){
-                $leixing = pdo_fetch("SELECT leixing  FROM " . tablename($this->table_checklog) . "  WHERE isconfirm=1 and sid='{$sid['sid']}' ORDER BY createtime DESC");
-                if($leixing['leixing'] == 1 || $leixing['leixing'] == 3)
-                    $bjqksm++;
-            }
-
-            $schoolCheckLog[$key]['xxcqzs'] += $bjqksm;
-            $bjqjsm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_leave) . " WHERE bj_id = '{$bj['sid']}' And isliuyan = 0 $condition8 ");
-            $schoolCheckLog[$key]['xxqjrs'] += $bjqjsm;
+        // log日志，在web目录下
+/*        $logfile = './town_' . date("Y-m-d", $endtime) . '.log';
+        $dir_name = dirname($logfile);
+        if (!file_exists($dir_name)) {
+            mkdir(iconv("UTF-8", "GBK", $dir_name), 0777, true);
         }
+        $fp = fopen($logfile, "a");//打开文件资源通道 不存在则自动创建
+        fwrite($fp, "time:" . time() . "\n");*/
+        if($row['typeid'] == 20) {   //如果是幼儿园，只要当天进园就算出勤
+            foreach ($bjids as $bj) {    // 对于每一个班级
+                $bjs = pdo_fetchall("SELECT id FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));//该班的所有学生
+                $schoolCheckLog[$key]['xxzrs'] += sizeof($bjs);
+                $bjqksm = 0; //班级出勤人数
+                foreach ($bjs as $s_id) {    //统计班级的出请情况
+//                    $t1 = time();
+                    $sql = "SELECT id FROM " . tablename($this->table_checklog) . " WHERE isconfirm=1 and sid='{$s_id['id']}' AND (leixing = 1 OR leixing = 3) $condition9 ";
+                    $checkin = pdo_fetch($sql);
+//                    $t2 =time();
+//                    fwrite($fp, "time:".(t2-t1).", checkin:".$checkin['id'].", sql:". $sql . "\n");
+                    if (!empty($checkin['id']))
+                        $bjqksm++;
+                }
+                $schoolCheckLog[$key]['xxcqzs'] += $bjqksm;
+                $bjqjsm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_leave) . " WHERE bj_id = '{$bj['sid']}' And isliuyan = 0 $condition8 ");
+                $schoolCheckLog[$key]['xxqjrs'] += $bjqjsm; //请假人数
+            }
+        }else {
+            foreach ($bjids as $bj) {    // 对于每一个班级
+                $bjs = pdo_fetchall("SELECT id FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));//该班的所有学生
+                $schoolCheckLog[$key]['xxzrs'] += sizeof($bjs);
+                $bjqksm = 0; //班级出勤人数
+                foreach ($bjs as $s_id) {    //如果是小学或者中学，对于每一个学生，如果最近一条考勤记录是入校，则算出勤
+                    $leixing = pdo_fetch("SELECT leixing  FROM " . tablename($this->table_checklog) . "  WHERE isconfirm=1 and sid='{$s_id['id']}' ORDER BY createtime DESC");
+                    if ($leixing['leixing'] == 1 || $leixing['leixing'] == 3) {
+                        $bjqksm++;
+                    } else {
+//                    fwrite($fp, "checkout:". $s_id['id'] . "\n");
+                    }
+                }
+                $schoolCheckLog[$key]['xxcqzs'] += $bjqksm;
+                $bjqjsm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_leave) . " WHERE bj_id = '{$bj['sid']}' And isliuyan = 0 $condition8 ");
+                $schoolCheckLog[$key]['xxqjrs'] += $bjqjsm; //请假人数
+            }
+        }
+//        fclose($fp);//关闭资源通道
+
         $schoolCheckLog[$key]['qqzrs'] = $schoolCheckLog[$key]['xxzrs'] - $schoolCheckLog[$key]['xxcqzs'] - $schoolCheckLog[$key]['xxqjrs'];
 
         /**各校保安情况**/
@@ -243,7 +273,7 @@ if ($operation == 'display') {
                 foreach ($guards as $grd) {
                     $grdcheck = pdo_fetch("SELECT createtime FROM " . tablename($this->table_checklog) . " WHERE tid = '{$grd['id']}' AND leixing = 1  $condition9 ORDER BY createtime ASC");
                     if (!empty($grdcheck))
-                        $schoolCheckLog[$key]['guardcheck'] .= $grd['tname'] . "--" . date("Y-m-d H:i:s", $grdcheck['createtime']) . "; ";
+                        $schoolCheckLog[$key]['guardcheck'] .= "<p>".$grd['tname'] . "--" . date("Y-m-d H:i:s", $grdcheck['createtime']) ."</p>" ;
                 }
             }
         }else{
@@ -305,75 +335,6 @@ if ($operation == 'display') {
     /**end**/
     include $this->template ( 'web/town' );
 }
-
-/**各班出勤情况**/
-if($operation == 'c') {
-    if($_GPC['njid']) {
-        $njid = $_GPC['njid'];
-    } else {
-        $frnjid = pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND type = 'semester' AND is_over = 1 ORDER BY ssort DESC ,sid DESC ");
-        $njid = $frnjid['sid'];
-    }
-    $start = mktime(0,0,0,date("m"),date("d"),date("Y"));
-    $end = $start + 86399;
-    if(!empty($_GPC['addtime'])) {
-        $starttime = strtotime($_GPC['start']);
-        $endtime = strtotime($_GPC['end']) + 86399;
-        $condition3 .= " AND createtime > '{$starttime}' AND createtime < '{$endtime}'";
-        $day = timediff($starttime,$endtime);
-        $day_num =  $day['day']+1;
-    } else {
-        $condition3 .= " AND createtime > '{$start}' AND createtime < '{$end}'";
-        $condition5 .= " AND ( (startime1 < '{$start}' AND endtime1 > '{$end}') OR ( startime1 > '{$start}' AND startime1 < '{$end}') OR ( endtime1 > '{$start}' AND endtime1 < '{$end}'))";
-    }
-
-    $allthisbj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE parentid = '{$njid}' ORDER BY ssort DESC ,sid DESC ");
-    $allthisbjsname = array();
-    $njcqzssss = array();
-    $bjkqbl = array();
-    $bjzrss = array();
-    if($day_num){
-        $days = array();
-        $daykey = array();
-        for($i = 0; $i < $day_num; $i++){
-            $keys = date('Y-m-d', $starttime + 86400 * $i);
-            $days[$keys] = 0;
-            $daykey[$keys] = 0;
-        }
-        foreach($allthisbj as $index => $v){
-            $bjzrs = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_students) . " WHERE schoolid = :schoolid And bj_id = :bj_id", array(':schoolid' => $schoolid, ':bj_id' => $v['sid']));
-            $allbjqksm = pdo_fetchall("SELECT sid,createtime FROM " . tablename($this->table_checklog) . " WHERE bj_id = '{$v['sid']}' AND leixing = 1 AND isconfirm = 1  $condition3 ");
-            $bjqksm = 0;
-            foreach($allbjqksm as $da) {
-                $key = date('Y-m-d', $da['createtime']);
-                if(in_array($key, array_keys($days))) {
-                    if(!in_array($da['sid'], $daykey[$key])) {
-                        $daykey[$key] = $da['sid'];
-                        $bjqksm++;
-                    }
-                }
-            }
-            $bjzrss[] = $bjzrs;
-            $njcqzssss[] =  $bjqksm;
-            $bjkqbl[] =  round($bjqksm/($bjzrs*$day_num)*100,2);
-            $allthisbjsname[] = $v['sname'];
-        }
-    }else{
-        foreach($allthisbj as $index => $v){
-            $bjzrs = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_students) . " WHERE schoolid = :schoolid And bj_id = :bj_id", array(':schoolid' => $schoolid, ':bj_id' => $v['sid']));
-            $bjqksm = pdo_fetchcolumn("SELECT COUNT(distinct sid) FROM " . tablename($this->table_checklog) . " WHERE bj_id = '{$v['sid']}' AND leixing = 1 AND isconfirm = 1  $condition3 ");
-            $njcqzssss[] =  $bjqksm;
-            $allthisbjsname[] = $v['sname'];
-            $bjkqbl[] =  round($bjqksm/$bjzrs*100,2);
-        }
-    }
-    $data['allthisbj'] = $allthisbjsname;
-    $data['bjcqzs'] = $njcqzssss;
-    $data['bjkqbl'] = $bjkqbl;
-    die ( json_encode ( $data ) );
-
-}
-/**end**/
 
 function timediff($begin_time,$end_time){
     if($begin_time < $end_time){
