@@ -1,7 +1,47 @@
 {template 'public/header'}
 {template 'public/comhead'}
 <!-- <script src="{$_W['siteroot']}addons/fm_jiaoyu/public/web/js/jquery.easypiechart.js"></script> -->
-{if $operation == 'display'}
+
+{if $operation == 'display' && $schoolid == 17}
+<div class="row">
+	<div>
+		<div class="panel panel-default" style="position: relative;">
+			<div class="chart-title ng-binding" style="padding: 4px 10px;">各校统计情况</div>
+			<div style="min-height: 357px;">
+				<!-- ngIf: charts.gradeAttendance.loading -->
+				<div class="slimScrollDiv" style="position: relative; width: auto; height: auto;">
+					<div style="overflow-y: scroll;width: auto; height: auto;">
+						<table class="table table-hover table-condensed table-layout-fixed   mb5 clear_bold">
+							<thead>
+							<tr>
+								<th>id</th>
+								<th>学校</th>
+								<th>最后刷卡时间</th>
+								<th>log信息</th>
+							</tr>
+							</thead>
+							<tbody>
+							{loop $schoolCheckLog $row}
+							<tr ng-repeat="post in charts.gradeAttendance.chartData" class="ng-scope">
+								<td class="ng-binding">{$row['id']}</td>
+								<td>
+									<div class="text-ellipsis ng-binding">{$row['title']}</div>
+								</td>
+								<td class="ng-binding">{$row['lastcheck']}</td>
+								<td class="ng-binding">{$row['log']}</td>
+							</tr>
+							{/loop}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+{elseif $operation == 'display' && $schoolid != 17}
 <style>
 .pull-left{margin-right: 10% !important; width: 66px;height: 66px;text-align: center;line-height: 65px;}
 .icon-rounded {color: #ffffff;border-radius: 50px; -webkit-border-radius: 50px; -moz-border-radius: 50px; -o-border-radius: 50px;-ms-border-radius: 50px;font-size: 25px;}
