@@ -11,6 +11,8 @@ $schoolid = $_GPC['schoolid'];
 $macid = $_GPC['macid'];
 $ckmac = pdo_fetch("SELECT * FROM " . tablename($this->table_checkmac) . " WHERE macid = '{$macid}' And schoolid = '{$schoolid}' ");
 $school = pdo_fetch("SELECT * FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}' ");
+$todayTime = mktime(0,0,0,date("m"),date("d"),date("Y"));
+$tomorrowTime = $todayTime + 3600*24;
 if ($operation == 'default') {
     echo("错误，未知操作");
     exit;
@@ -287,7 +289,7 @@ if ($operation == 'classinfo') {
                     $class[$key]['signId'] = $card['0']['idcard'];
                 }
                 //  是否启用人脸识别。人脸识别的id卡号取关系是10（其他家长）的卡号
-                if($isface['is_face'] == 1){
+                if($isface['is_face'] == 1 || $isface['is_face'] == 4){
                     $faceid = pdo_fetch("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE sid = '{$row['childId']}' and pard=10");
                     if(!empty($faceid))
                         $class[$key]['faceid'] = $faceid['idcard'];
@@ -400,7 +402,7 @@ if ($operation == 'classinfo') {
             $result['ServerTime'] = date('Y-m-d H:i:s',time());
             echo json_encode($result);
         }
-    }else{
+    }else{//如果是教师
         if(!empty($ckmac)){
             $class = pdo_fetchall("SELECT id as TID, fz_id as classId, thumb as headIcon, tname as name, updatetime FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} And fz_id = '{$classid}' ORDER BY id DESC");
             foreach($class as $key =>$row) {
@@ -425,7 +427,7 @@ if ($operation == 'classinfo') {
                     $class[$key]['signId'] = $card['0']['idcard'];
                 }
                 //  是否启用人脸识别
-                if($isface['is_face'] == 1){
+                if($isface['is_face'] == 1 || $isface['is_face'] == 3){
                     $class[$key]['faceid'] = $card['0']['idcard'];
                 }else
                     $class[$key]['faceid'] = -1;
@@ -447,9 +449,24 @@ if ($operation == 'check') {
     }else{
         $signTime = trim($_GPC['signTime']);
     }
+    //如果签到时间与当前服务器时间相差大于10分钟，则将信息存入log表中
+    if(abs($signTime - time()) > 600){
+        $log = pdo_fetch("SELECT * FROM " . tablename($this->table_log) . " WHERE schoolid = :schoolid AND type = 1 AND createtime > $todayTime AND createtime < $tomorrowTime", array(':schoolid' =>$schoolid));
+        if(empty($log)){
+            $data = array(
+                'weid' => $weid,
+                'schoolid' => $schoolid,
+                'type' => 1,
+                'createtime' => time(),
+                'msg' => "学校服务器时间与后台时间偏差大于1小时，请检查！",
+            );
+            pdo_insert($this->table_log, $data);
+        }
+    }
 //    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid And createtime = :createtime ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid,':createtime' =>$signTime));
     $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid ORDER BY createtime DESC ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid));
     $signMode = $_GPC['signMode'];
+    $nowtime = date('H:i',$signTime);
     if ($ckmac['type'] != 0) { // checkmac的type字段表示该设备是进校还是离校，0表示不区分
         include 'checktime2.php';
     } else {
@@ -462,10 +479,10 @@ if ($operation == 'check') {
         $checklog = true;
     elseif($checkthisdata['leixing'] != $leixing)   //  如果不是同时刷进或刷出
         $checklog = true;
+
     if($checklog){ //1分钟内的相同方向刷卡都认为是重复刷卡
         if(!empty($ckuser)) {
             $times = TIMESTAMP;
-            $nowtime = date('H:i',$signTime);
             if($_GPC['picurl']) {
                 load()->func('file');
                 $urls = "http://www.daren007.com/attachment/";
@@ -612,7 +629,7 @@ if ($operation == 'check') {
         }
     }else{
         $fstype = true;
-        $result['info'] = "不可重复相同刷卡数据";
+        $result['info'] = "1分钟内不可重复相同刷卡数据";
     }
     if ($fstype ==true){
         $result['data'] = "";

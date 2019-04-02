@@ -236,8 +236,8 @@
 		$ckuser = pdo_fetch("SELECT sid,pard,tid,severend FROM " . tablename($this->table_idcard) . " WHERE idcard = '{$_GPC['signId']}' And weid = '{$weid}' And schoolid = '{$schoolid}' ");
 		$bj = pdo_fetch("SELECT bj_id FROM " . tablename($this->table_students) . " WHERE id = '{$ckuser['sid']}' ");
 		$signTime = strtotime($_GPC['signTime']);
-        $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid ORDER BY createtime DESC ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid));
-        if(empty($checkthisdata) || ($signTime - $checkthisdata['createtime']) > 60){ //1分钟内的刷卡都认为是重复刷卡
+        $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = '{$_GPC['signId']}' And createtime = '{$signTime}' And schoolid = '{$schoolid}' ");
+        if(empty($checkthisdata)){
 			if(!empty($ckuser)){
 				$times = TIMESTAMP;
 				$pic = $_GPC['picurl'];
