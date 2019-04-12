@@ -314,6 +314,23 @@
 				$this->exportexcel($arr, array('教师','绑定码','手机'), '教师绑定码');
                 exit();
 			}
+
+            //////////导出教师头像/////////////////
+            if($_GPC['out_putpic'] == 'out_putpic'){
+                $lists = pdo_fetchall("SELECT id, tname, thumb FROM " . tablename($this->table_teachers) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ");
+                $ii   = 0;
+                foreach($lists as $index => $row){
+                    $arr[$ii]['id'] = $row['id'];
+                    $arr[$ii]['tname'] = trim($row['tname']);
+                    if(!empty($row['thumb']))
+                        $arr[$ii]['thumb'] = "http://qn.xingheoa.com/".$row['thumb'];
+                    else
+                        $arr[$ii]['thumb'] = "";
+                    $ii++;
+                }
+                $this->exportexcel($arr, array('id', '姓名',  '头像'), '教师头像信息表');
+                exit();
+            }
 			
 			///////////////////导出教师信息////////////////////////////////
 			if($_GPC['out_putTeaInfo'] == 'out_putTeaInfo'){
