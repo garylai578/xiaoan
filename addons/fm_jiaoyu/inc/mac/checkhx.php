@@ -450,7 +450,7 @@ if ($operation == 'check') {
         $signTime = trim($_GPC['signTime']);
     }
     //如果签到时间与当前服务器时间相差大于10分钟，则将信息存入log表中
-    if(abs($signTime - time()) > 600){
+    if(abs($signTime - time()) > 3600){
         $log = pdo_fetch("SELECT * FROM " . tablename($this->table_log) . " WHERE schoolid = :schoolid AND type = 1 AND createtime > $todayTime AND createtime < $tomorrowTime", array(':schoolid' =>$schoolid));
         if(empty($log)){
             $data = array(
@@ -458,7 +458,7 @@ if ($operation == 'check') {
                 'schoolid' => $schoolid,
                 'type' => 1,
                 'createtime' => time(),
-                'msg' => "学校服务器时间与后台时间偏差大于1小时，请检查！",
+                'msg' => "学校服务器时间与后台时间偏差大于1小时，或服务器发送信息滞后，请检查！",
             );
             pdo_insert($this->table_log, $data);
         }
@@ -625,7 +625,7 @@ if ($operation == 'check') {
                 $fstype = true;
             }
         }else{
-            $result['info'] = "本卡未绑定任何学生或老师";
+            $result['info'] = "本卡(".$_GPC['signId'].")未绑定任何学生或老师";
         }
     }else{
         $fstype = true;
@@ -1014,7 +1014,7 @@ if ($operation == 'qrcode') {
                         $fstype = true;
                     }
                 }else{
-                    $result['info'] = "本卡未绑定任何学生或老师";
+                    $result['info'] =  "本卡(".$_GPC['signId'].")未绑定任何学生或老师";
                 }
             }else{
                 $fstype = true;
