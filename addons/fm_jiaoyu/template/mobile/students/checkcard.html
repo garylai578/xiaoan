@@ -100,11 +100,7 @@ box-sizing: border-box;text-align: left;color: #666;font-size: 14px;}
 						{/if}	
 						</div>
 					</div>
-					{if getoauthurl() != "weixin.appzenka.com"}
-					<div class="righta">
-						<a onclick="jiebang({$item['id']});">解绑</a>
-					</div>
-					{/if}
+
 					{if $school['is_cardpay'] == 1}
 					<div class="rightb">
 						<a onclick="gopay({$item['id']});">续费</a>
