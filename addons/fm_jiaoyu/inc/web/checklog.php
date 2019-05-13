@@ -65,12 +65,24 @@ if($operation == 'display'){
     $params[':start'] = $starttime;
     $params[':end']   = $endtime;
     if(!empty($_GPC['sname'])){
-        $students  = pdo_fetch("SELECT id FROM " . tablename($this->table_students) . " WHERE schoolid = :schoolid And s_name = :s_name ", array(':schoolid' => $schoolid, ':s_name' => $_GPC['sname']));
-        $condition .= " AND sid = '{$students['id']}'";
+        $students  = pdo_fetchall("SELECT id FROM " . tablename($this->table_students) . " WHERE schoolid = :schoolid And s_name = :s_name ", array(':schoolid' => $schoolid, ':s_name' => $_GPC['sname']));
+        foreach ($students as $ss) {
+            $sids .= " sid = '{$ss['id']}' OR ";
+        }
+        if(strlen($sids) > 3) {
+            $sids = substr($sids, 0, strlen($sids) - 3);
+            $condition .= " AND (".$sids.") ";
+        }
     }
     if(!empty($_GPC['tname'])){
-        $teachers  = pdo_fetch("SELECT id FROM " . tablename($this->table_teachers) . " WHERE schoolid = :schoolid And tname = :tname ", array(':schoolid' => $schoolid, ':tname' => $_GPC['tname']));
-        $condition .= " AND tid = '{$teachers['id']}'";
+        $teachers  = pdo_fetchall("SELECT id FROM " . tablename($this->table_teachers) . " WHERE schoolid = :schoolid And tname = :tname ", array(':schoolid' => $schoolid, ':tname' => $_GPC['tname']));
+        foreach ($teachers as $tt) {
+            $tids .= " tid = '{$tt['id']}' OR ";
+        }
+        if(strlen($tids) > 3) {
+            $tids = substr($tids, 0, strlen($tids) - 3);
+            $condition .= " AND (".$tids.") ";
+        }
     }
     $allbj = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' AND weid = '{$weid}' AND type = 'theclass' ORDER BY ssort DESC");
 
