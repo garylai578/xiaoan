@@ -3185,23 +3185,7 @@ class Core extends WeModuleSite {
 					}
 				}
 				if(!empty($smsset['jxlxtx'])){
-				    $stdtime = time();
-					$wxres = $this->sendtempmsg($smsset['jxlxtx'], $url, $data, '#FF0000', $openid['openid']);
-                    $endtime = time();
-					if($endtime-$log['createtime'] > 60 || !empty($wxres['errno'])) {
-                        $logfile = './Check_delate_'.date("Y-m-d", $endtime).'.log';
-                        $dir_name = dirname($logfile);
-                        if (!file_exists($dir_name)) {
-                            mkdir(iconv("UTF-8", "GBK", $dir_name), 0777, true);
-                        }
-                        $fp = fopen($logfile, "a");//打开文件资源通道 不存在则自动创建
-                        if(!empty($wxres['errno'])){
-                            fwrite($fp, "发送失败:".$wxres['message'].", send data:学校id：".$schoolid.", 学生名称：" . $s_name . "，刷卡时间：" . $ttime . "\n");//写入文件
-                        }else {
-                            fwrite($fp, "delate:" . ($endtime - $log['createtime']) . ", send cost time:".($endtime - $stdtime) . ", send time:" . date("Y-m-d H:i:s", time()) . ". send data:学校id：".$schoolid.", 学生名称：" . $s_name . "，刷卡时间：" . $ttime . "\n");//写入文件
-                        }
-                        fclose($fp);//关闭资源通道
-                    }
+					$this->sendtempmsg($smsset['jxlxtx'], $url, $data, '#FF0000', $openid['openid']);
 				}
 			}
 		}
