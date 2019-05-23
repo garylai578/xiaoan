@@ -77,9 +77,12 @@ require(['bootstrap'],function($){
 							<option value="1" {if $_GPC['s_type'] == 1} selected="selected"{/if}>走读生</option>
 							<option value="2" {if $_GPC['s_type'] == 2} selected="selected"{/if}>住校生</option>
                           	<option value="3" {if $_GPC['s_type'] == 3} selected="selected"{/if}>半走读生</option>
-							<option value="4" {if $_GPC['s_type'] == 4} selected="selected"{/if}>接送生</option>
+							<option value="4" {if $_GPC['s_type'] == 4} selected="selected"{/if}>全天接送生</option>
+							<option value="5" {if $_GPC['s_type'] == 5} selected="selected"{/if}>下午接送生</option>
+							<option value="6" {if $_GPC['s_type'] == 6} selected="selected"{/if}>中午自走下午接送生</option>
                         </select>
                     </div>
+
 					{/if}
 					<div class="col-sm-2 col-lg-2">
 						<button class="btn btn-default"><i class="fa fa-search"></i> 搜索</button>
@@ -660,13 +663,15 @@ $(function(){
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
                     <div class="col-sm-9">
-                        <label class="radio-inline"><input type="radio" name="s_type" value="1" {if empty($item) || $item['s_type'] == 1}checked="true"{/if} /> 走读</label>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="1" {if empty($item) || $item['s_type'] == 1}checked="true"{/if} /> 走读生</label>
                         &nbsp;&nbsp;&nbsp;
-                        <label class="radio-inline"><input type="radio" name="s_type" value="2" {if !empty($item) && $item['s_type'] == 2}checked="true"{/if} /> 住校</label>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="2" {if !empty($item) && $item['s_type'] == 2}checked="true"{/if} /> 住校生</label>
 						&nbsp;&nbsp;&nbsp;
-                        <label class="radio-inline"><input type="radio" name="s_type" value="3" {if !empty($item) && $item['s_type'] == 3}checked="true"{/if} /> 半走读</label>
-                        <label class="radio-inline"><input type="radio" name="s_type" value="4" {if !empty($item) && $item['s_type'] == 4}checked="true"{/if} /> 接送生</label>
-                        <span class="help-block"></span>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="3" {if !empty($item) && $item['s_type'] == 3}checked="true"{/if} /> 半走读生</label>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="4" {if !empty($item) && $item['s_type'] == 4}checked="true"{/if} /> 全天接送生</label>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="5" {if !empty($item) && $item['s_type'] == 5}checked="true"{/if} /> 下午接送生</label>
+                        <label class="radio-inline"><input type="radio" name="s_type" value="6" {if !empty($item) && $item['s_type'] == 6}checked="true"{/if} /> 中午自走下午接送生</label>
+                        <span class="help-block">用于配合考勤机使用，若设置了考勤的允许通行时间段，对于“普通通道”，走读生在所有通行时间段内可以出校门；住校生只能在周五最后一个时间段可以出校门；半走读生在每天最后一个时间段可以出校门。<br/>对于“接送通道”，全天接送生在所有通行时间段内可以出校门，下午接送生在每天最后一个时间段可以出校门。中午自走下午接送生可以在中午走普通通道，下午走接送通道。注：进校门不做限制！</span>
                     </div>
                 </div>
                 <!--修改结束-->

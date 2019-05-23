@@ -319,16 +319,17 @@
 						</div>
 
 						<div class="form-group">
-							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require"></span>允许接送生通行</label>
+							<label class="col-xs-12 col-sm-3 col-md-2 control-label"><span class="require"></span>通道类型</label>
 							<div class="col-sm-9 col-xs-12">
 							<label class="radio-inline">
-								<input type="radio" value="1" class="printer-type" name="s_type" {if $item['s_type'] == '1' || $item['s_type'] == 0}checked{/if} id="credit50" > 允许
+								<input type="radio" value="1" class="printer-type" name="s_type" {if $item['s_type'] == '1' || $item['s_type'] == 0}checked{/if} id="credit50" > 普通通道
 							</label>
 							<label class="radio-inline">
-								<input type="radio" value="2" class="printer-type" name="s_type" {if $item['s_type'] == '2'}checked{/if} id="credit51" > 不允许
-								<span class="label label-success">若不允许，则接送生不能在此闸机通行，包括出入都不允许</span>
+								<input type="radio" value="2" class="printer-type" name="s_type" {if $item['s_type'] == '2'}checked{/if} id="credit51" > 接送通道
 							</label>
+								<div class="help-block">接送通道只允许接送生外出，接送生只允许从接送通道外出！</div>
 							</div>
+
 						</div>
 
 						<div class="form-group">
