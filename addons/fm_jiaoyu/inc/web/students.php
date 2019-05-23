@@ -421,7 +421,7 @@
                 $ii   = 0;
                 foreach($lists as $index => $row){
                     $arr[$ii]['id'] = $row['id'];
-                    $arr[$ii]['numberid'] = $row['numberid'];
+                    $arr[$ii]['numberid'] = "'".$row['numberid'];//防止科学计数法
                     $bj                = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = '{$row['bj_id']}'");
                     $arr[$ii]['s_name'] = trim($row['s_name']);
                     $arr[$ii]['banji']  = $bj['sname'];
