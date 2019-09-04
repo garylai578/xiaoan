@@ -296,7 +296,7 @@
             jTips("请选择购买数量");
             return;
         }
-        if({$MyAddress} == " "){
+        if($("#MyAddressId").val() == ""){
 	        jTips("收货人信息不能为空，请编辑收货人信息");
 	        return;
         }
