@@ -208,13 +208,15 @@ if($operation == 'post'){
 					die (json_encode($data));
 					exit;
 				}
-			}else{
+			}
+			// 将录卡功能开放给学校使用start
+			/*else{
 				$data['msg'] = "本卡不是有效卡，请联系管理员索取有效卡";
 				$data['result'] = false;
 				die (json_encode($data));
 				exit;
-			}
-		}else{
+			}*/
+//		}else{   //将录卡功能开放给学校使用end
 			if(!empty($checkcard['sid']) || !empty($checkcard['tid'])){
 				$data['msg'] = "抱歉，本卡已绑定其他用户";
 				$data['result'] = false;
