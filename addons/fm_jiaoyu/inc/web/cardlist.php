@@ -148,7 +148,7 @@ if($operation == 'post'){
 	}
 }elseif($operation == 'recording'){
 	mload()->model('tea');
-	$allbjlist = GetAllClassInfoByTid($schoolid,2,$schooltype,$_W['tid']);
+	$allbjlist = GetAllClassInfoByTid($schoolid,2,$schooltype,9);//默认可以看到所有班级，9是管理员的tid
 	$allguanxi = getallpardset();
 	$bj_id = $_GPC['bj_id'];
 	if($bj_id){
