@@ -269,17 +269,23 @@ if ($operation == 'classinfo') {
                 }
                 $class[$key]['name'] = $row['name'];
                 $class[$key]['signId'] = "";
-                $card = pdo_fetchall("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE sid = '{$row['childId']}' ORDER BY id DESC");
-                $num = count($card);
-                if ($num > 1){
-                    foreach($card as $k =>$r){
-                        if(!empty($r['idcard'])){
-                           $class[$key]['signId'] .= "#" . $r['idcard'];
+                $card = pdo_fetchall("SELECT idcard, severend FROM " . tablename($this->table_idcard) . " WHERE sid = '{$row['childId']}' ORDER BY id DESC");
+
+                if(($card['0']['severend'] < time() && $card['0']['severend'] != 0) || $card['0']['severend'] == null) // 如果超出有效期，则更新标识
+                    $class[$key]['updatetime']--;
+                else {
+                    $num = count($card);
+                    if ($num > 1) {
+                        foreach ($card as $k => $r) {
+                            if (!empty($r['idcard'])) {
+                                $class[$key]['signId'] .= "#" . $r['idcard'];
+                            }
                         }
+                    } else {
+                        $class[$key]['signId'] = $card['0']['idcard'];
                     }
-                }else{
-                    $class[$key]['signId'] = $card['0']['idcard'];
                 }
+
                 //  是否启用人脸识别。人脸识别的id卡号取关系是10（其他家长）的卡号
                 if($isface['is_face'] == 1 || $isface['is_face'] == 4){
                     $faceid = pdo_fetch("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE sid = '{$row['childId']}' and pard=10");
@@ -480,17 +486,22 @@ if ($operation == 'classinfo') {
                 $class[$key]['name'] = $row['name'];
                 $class[$key]['signId'] = "";
                 $class[$key]['s_type'] = "909"; //如果是老师，则s_type=909，通行不受限制
-                $card = pdo_fetchall("SELECT idcard  FROM " . tablename($this->table_idcard) . " WHERE tid = '{$row['TID']}' ORDER BY id DESC");
-                $num = count($card);
-                if ($num > 1){
-                    foreach($card as $k =>$r){
-                        if(!empty($r['idcard'])){
-                            $class[$key]['signId'] .= "#" . $r['idcard'];
+                $card = pdo_fetchall("SELECT idcard,severend  FROM " . tablename($this->table_idcard) . " WHERE tid = '{$row['TID']}'ORDER BY id DESC");
+                if(($card['0']['severend'] < time() && $card['0']['severend'] != 0) || $card['0']['severend'] == null) // 如果超出有效期，则更新标识
+                    $class[$key]['updatetime']--;
+                else {
+                    $num = count($card);
+                    if ($num > 1) {
+                        foreach ($card as $k => $r) {
+                            if (!empty($r['idcard'])) {
+                                $class[$key]['signId'] .= "#" . $r['idcard'];
+                            }
                         }
+                    } else {
+                        $class[$key]['signId'] = $card['0']['idcard'];
                     }
-                }else{
-                    $class[$key]['signId'] = $card['0']['idcard'];
                 }
+
                 //  是否启用人脸识别
                 if($isface['is_face'] == 1 || $isface['is_face'] == 3){
                     $class[$key]['faceid'] = $card['0']['idcard'];
