@@ -88,7 +88,7 @@
 					<div class="col-sm-9 col-xs-6">
 						<div class="input-group text-info">
 							{loop $banji $uni}
-									<label for="uni_{$uni['sid']}" class="checkbox-inline" style="width:140px;margin-left: 10px"><input id="uni_{$uni['sid']}" type="checkbox" name="arr[]" value="{$uni['sid']}"{if ($id && $uni['datesetid'] == $id)}checked="checked"{/if} {if ($id && $uni['datesetid'] != 0 && $uni['datesetid'] !=$id) || (empty($id) && $uni['datesetid'] != 0  ) }disabled="disabled"{/if}> {$uni['sname']}</label>
+									<label for="uni_{$uni['sid']}" class="checkbox-inline" style="width:140px;margin-left: 10px"><input id="uni_{$uni['sid']}" type="checkbox" name="arr[]" value="{$uni['sid']}"{if ($id && $uni['datesetid'] == $id)}checked="checked"{/if} {if ($id && $uni['datesetid'] != 0 && $uni['datesetid'] !=$id) || (empty($id) && $uni['datesetid'] != 0  ) }{/if}> {$uni['sname']}</label>
 							{/loop}
 						</div>
 						<div class="help-block">选择本安排适用的班级,若班级已指定安排则不可选</div>

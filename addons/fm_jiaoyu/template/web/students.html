@@ -663,14 +663,14 @@ $(function(){
                 <div class="form-group">
                     <label class="col-xs-12 col-sm-3 col-md-2 control-label">类型</label>
                     <div class="col-sm-9">
-                        <label class="radio-inline"><input type="radio" name="s_type" value="1" {if empty($item) || $item['s_type'] == 1}checked="true"{/if} /> 走读生</label>
+                        <label class="radio-inline" style="color: #00A000;"><input type="radio" name="s_type" value="1" {if empty($item) || $item['s_type'] == 1}checked="true"{/if} /> 走读生</label>
                         &nbsp;&nbsp;&nbsp;
                         <label class="radio-inline"><input type="radio" name="s_type" value="2" {if !empty($item) && $item['s_type'] == 2}checked="true"{/if} /> 住校生</label>
 						&nbsp;&nbsp;&nbsp;
-                        <label class="radio-inline"><input type="radio" name="s_type" value="3" {if !empty($item) && $item['s_type'] == 3}checked="true"{/if} /> 半走读生</label>
-                        <label class="radio-inline"><input type="radio" name="s_type" value="4" {if !empty($item) && $item['s_type'] == 4}checked="true"{/if} /> 全天接送生</label>
+                        <label class="radio-inline"  style="color: #00a0e9;"><input type="radio" name="s_type" value="3" {if !empty($item) && $item['s_type'] == 3}checked="true"{/if} /> 半走读生</label>
+                        <label class="radio-inline"  style="color: #980c10;"><input type="radio" name="s_type" value="4" {if !empty($item) && $item['s_type'] == 4}checked="true"{/if} /> 全天接送生</label>
                         <label class="radio-inline"><input type="radio" name="s_type" value="5" {if !empty($item) && $item['s_type'] == 5}checked="true"{/if} /> 下午接送生</label>
-                        <label class="radio-inline"><input type="radio" name="s_type" value="6" {if !empty($item) && $item['s_type'] == 6}checked="true"{/if} /> 中午自走下午接送生</label>
+                        <label class="radio-inline"  style="background: whitesmoke"><input type="radio" name="s_type" value="6" {if !empty($item) && $item['s_type'] == 6}checked="true"{/if} /> 中午自走下午接送生</label>
                         <span class="help-block">用于配合考勤机使用，若设置了考勤的允许通行时间段，对于“普通通道”，走读生在所有通行时间段内可以出校门；住校生只能在周五最后一个时间段可以出校门；半走读生在每天最后一个时间段可以出校门。<br/>对于“接送通道”，全天接送生在所有通行时间段内可以出校门，下午接送生在每天最后一个时间段可以出校门。中午自走下午接送生可以在中午走普通通道，下午走接送通道。注：进校门不做限制！</span>
                     </div>
                 </div>

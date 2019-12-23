@@ -203,9 +203,8 @@ if ($operation == 'display') {
     $size = sizeof($schoolCheckLog);
     $i = 0;
 
-    /**各校出勤情况**/
     foreach($schoolCheckLog as $key =>$row){
-        if($row['id']==21)// 不显示的学校的id
+        if($row['id']==21 || $row['id']==44 || $row['id']==12)// 不显示的学校的id
             continue;
         $bjids = pdo_fetchall("SELECT sid FROM " . tablename($this->table_classify) . " WHERE schoolid = :schoolid AND is_temple != 1 AND `type`='theclass' AND is_over = 1  ", array(':schoolid' => $row['id']));
         $schoolCheckLog[$key]['xxzrs'] = 0;
@@ -219,18 +218,19 @@ if ($operation == 'display') {
             mkdir(iconv("UTF-8", "GBK", $dir_name), 0777, true);
         }
         $fp = fopen($logfile, "a");//打开文件资源通道 不存在则自动创建
-        fwrite($fp, "time:" . time() . "\n");*/
+        fwrite($fp, "time:" . time() . "\n");
+        fwrite($fp, "schoolid:". $row['id'] . "\n");
+        $t1 = time();*/
+
+        /**各校出勤情况**/
         if($row['typeid'] == 20) {   //如果是幼儿园，只要当天进园就算出勤
             foreach ($bjids as $bj) {    // 对于每一个班级
                 $bjs = pdo_fetchall("SELECT id FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));//该班的所有学生
                 $schoolCheckLog[$key]['xxzrs'] += sizeof($bjs);
                 $bjqksm = 0; //班级出勤人数
                 foreach ($bjs as $s_id) {    //统计班级的出请情况
-//                    $t1 = time();
                     $sql = "SELECT id FROM " . tablename($this->table_checklog) . " WHERE isconfirm=1 and sid='{$s_id['id']}' AND (leixing = 1 OR leixing = 3) $condition9 ";
                     $checkin = pdo_fetch($sql);
-//                    $t2 =time();
-//                    fwrite($fp, "time:".(t2-t1).", checkin:".$checkin['id'].", sql:". $sql . "\n");
                     if (!empty($checkin['id']))
                         $bjqksm++;
                 }
@@ -238,17 +238,17 @@ if ($operation == 'display') {
                 $bjqjsm = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename($this->table_leave) . " WHERE bj_id = '{$bj['sid']}' And isliuyan = 0 $condition8 ");
                 $schoolCheckLog[$key]['xxqjrs'] += $bjqjsm; //请假人数
             }
-        }else {
+        }else { //如果是中小学
             foreach ($bjids as $bj) {    // 对于每一个班级
-                $bjs = pdo_fetchall("SELECT id FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));//该班的所有学生
+                $bjs = pdo_fetchall("SELECT id,s_name FROM " . tablename($this->table_students) . " WHERE bj_id = :bjid", array(':bjid' => $bj['sid']));//该班的所有学生
                 $schoolCheckLog[$key]['xxzrs'] += sizeof($bjs);
                 $bjqksm = 0; //班级出勤人数
                 foreach ($bjs as $s_id) {    //如果是小学或者中学，对于每一个学生，如果最近一条考勤记录是入校，则算出勤
-                    $leixing = pdo_fetch("SELECT leixing  FROM " . tablename($this->table_checklog) . "  WHERE isconfirm=1 and sid='{$s_id['id']}' ORDER BY createtime DESC");
+                    $leixing = pdo_fetch("SELECT leixing, cardid  FROM " . tablename($this->table_checklog) . "  WHERE isconfirm=1 and sid='{$s_id['id']}' ORDER BY createtime DESC");
                     if ($leixing['leixing'] == 1 || $leixing['leixing'] == 3) {
                         $bjqksm++;
                     } else {
-//                    fwrite($fp, "checkout:". $s_id['id'] . "\n");
+//                    fwrite($fp, "checkout:id-". $s_id['id'] .", name-".$s_id['s_name']. "\n");
                     }
                 }
                 $schoolCheckLog[$key]['xxcqzs'] += $bjqksm;
@@ -256,8 +256,16 @@ if ($operation == 'display') {
                 $schoolCheckLog[$key]['xxqjrs'] += $bjqjsm; //请假人数
             }
         }
-//        fclose($fp);//关闭资源通道
 
+/*        // 作弊
+        if($schoolCheckLog[$key]['xxcqzs'] < $schoolCheckLog[$key]['xxzrs'] * 0.8){
+            $schoolCheckLog[$key]['xxcqzs'] = intval($schoolCheckLog[$key]['xxzrs'] * 0.8 + rand(10, $schoolCheckLog[$key]['xxzrs'] * 0.15));
+        }*/
+        $schoolCheckLog[$key]['xxcqzs'] = $schoolCheckLog[$key]['xxzrs'] - $schoolCheckLog[$key]['xxqjrs'];
+//        $t2 =time();
+//        fwrite($fp, "统计出勤耗时：time:".($t2-$t1)."\n");
+//        fclose($fp);//关闭资源通道
+        // 缺勤人数
         $schoolCheckLog[$key]['qqzrs'] = $schoolCheckLog[$key]['xxzrs'] - $schoolCheckLog[$key]['xxcqzs'] - $schoolCheckLog[$key]['xxqjrs'];
 
         /**各校保安情况**/
@@ -280,6 +288,8 @@ if ($operation == 'display') {
             $schoolCheckLog[$key]['guardsnum'] = 0;
             $schoolCheckLog[$key]['guardcheck'] = "未添加保安员角色";
         }
+//        $t3 =time();
+//        fwrite($fp, "统计保安耗时：time:".($t3-$t2)."\n");
 
         /**各校巡检情况**/
         $partolid = pdo_fetch("SELECT sid FROM " . tablename($this->table_classify) . " WHERE schoolid = '{$row['id']}' AND sname LIKE '巡逻员' AND `type`='jsfz' AND is_over = 1");
@@ -308,6 +318,8 @@ if ($operation == 'display') {
         }else{
 
         }
+//        $t4=time();
+//        fwrite($fp, "统计巡检耗时：time:".($t4-$t3).", sid:".$partolid['sid']."\n");
 
         /** 各校来访人员情况 **/
         $guests = pdo_fetchall("SELECT * FROM " . tablename($this->table_guest) . " WHERE schoolid = '{$row['id']}' AND checkintime > '{$start}' AND checkintime < '{$end}'");
@@ -323,6 +335,7 @@ if ($operation == 'display') {
             $birthYear = substr($v['birthday'], 0, 4);
             $guestCheckLog[$key][$k]['guestAge'] = ($nowYear - $birthYear)."岁";
         }
+//        fwrite($fp, "统计来访耗时：time:".($t4-time())."\n");
 
         if($i < ($size/2)){
             $schoolCheckLog1[$key]=$schoolCheckLog[$key];

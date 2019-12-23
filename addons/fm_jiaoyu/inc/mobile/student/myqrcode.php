@@ -50,7 +50,7 @@ foreach ($expireQrcode as $item=>$value){
     pdo_delete($this->table_idcard, $delCard);
 }
 
-$del = array('expire <'=>time(), 'type'=>44);
+$del = array('expire <'=>(time()-3600*2), 'type'=>44);
 pdo_delete($this->table_qrinfo, $del);
 
 include $this->template('students/myqrcode');
