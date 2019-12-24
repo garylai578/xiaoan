@@ -522,7 +522,7 @@
 				$nowtime = date('H:i',$signTime);
 				if($_GPC['picurl']) {
 					load()->func('file');
-					$urls = "http://www.daren007.com/attachment/";
+					$urls = "https://mac.weimeizhan.com/attachment/";
 					$path = "images/fm_jiaoyu/check/". date('Y/m/d/');	
 					if (!is_dir(IA_ROOT."/attachment/". $path)) {
 						mkdirs(IA_ROOT."/attachment/". $path, "0777");

@@ -148,7 +148,7 @@
                 if (istrlen($data['address']) == 0) {
                     //message('请输入地址。', '', 'error');
                 }
-				$urlsss = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
+				$urlsss = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
                 if (!empty($id)) {
                     unset($data['dateline']);
                     pdo_update($this->table_index, $data, array('id' => $id, 'weid' => $weid));
@@ -374,7 +374,7 @@
 					}
 				}
 			}
-			$urlsss = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';										
+			$urlsss = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
 			makcodetype($urlsss,$weid,$copyid,$_W['uniaccount']['name'],$_W['siteroot']);
 			message('复制学校成功，请刷查看列表页面', referer(), 'success');			
         } elseif ($operation == 'delete') {
