@@ -8930,7 +8930,7 @@ qcVideo("Reporter", function (util) {
 });
 qcVideo("SHA", function (Log, $) {
     var SETTING    = {
-        WORK_JS : "https://mac.weimeizhan.com/wq/public/mobile/js/calculator_worker_sha1.js",
+        WORK_JS : "http://www.daren007.com/wq/public/mobile/js/calculator_worker_sha1.js",
         MAX_DOING_SHA1 : 3,
         MAX_SHA_SIZE : Math.pow(2, 30) * 4,
         REPORT_INTERVAL : 60000

@@ -10,7 +10,7 @@ global $_W, $_GPC;
 if(!$_W['isfounder']){
     message('无权访问!');
 }
-define('FM_JIAOYU_AUTH_URL', 'https://mac.weimeizhan.com/api/');
+define('FM_JIAOYU_AUTH_URL', 'http://www.daren007.com/api/');
 $op = empty($_GPC['op']) ? 'display' : $_GPC['op'];
 load()->func('communication');
 load()->func('file');

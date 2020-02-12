@@ -117,7 +117,7 @@ body {font-family: initial;}
 
     .icon_1{    width: 100%;
     height: 100%;
-    background-image: url(https://manger.weimeizhan.com/addons/fm_jiaoyu/public/mobile/img/radio_icon3.png);
+    background-image: url(https://manger.daren007.com/addons/fm_jiaoyu/public/mobile/img/radio_icon3.png);
     background-position: center;
     background-size: 40px;
     background-repeat: no-repeat;}

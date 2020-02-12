@@ -1198,7 +1198,7 @@
 			pdo_update($this->table_index,$data,array('id'=>$_GPC['schoolid']));	
 			$result ['result'] = true;
 			$result ['msg'] = "设置成功";
-			$url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
+			$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
 			makcodetype($url,$_GPC['weid'],$_GPC['schoolid'],$_GPC ['wxnam'],$_GPC ['site']);
 		 die ( json_encode ( $result ) );
 		}

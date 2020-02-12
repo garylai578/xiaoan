@@ -13,7 +13,7 @@ if($schoolid){
 	$GLOBALS['frames'] = $this->getNaveMenu($schoolid, $action);
 }
 $logo              = pdo_fetch("SELECT logo,title FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
-define('FM_JIAOYU_AUTH_URL', 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fhelp.php');
+define('FM_JIAOYU_AUTH_URL', 'http%3a%2f%2fwww.daren007.com%2fapi%2fhelp.php');
 $operation = empty($_GPC['op']) ? 'display' : $_GPC['op'];
 $oauthurl = getoauthurl();
 $versionfile = IA_ROOT . '/addons/fm_jiaoyu/inc/version.php';

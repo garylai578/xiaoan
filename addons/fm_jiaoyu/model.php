@@ -861,7 +861,7 @@ function SendPost($FullHttpUrl,$Req,$isHttps){
 
 function upload_file_to_cdn($data,$host){
     $ch = curl_init();
-	$url = 'http%3a%2f%2fmac.weimeizhan.com%2fapi%2famr.php';
+	$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2famr.php';
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		$postdata = array (
 			"type" => 'amr',
@@ -895,7 +895,7 @@ function upload_file_to_cdn($data,$host){
 
 function delvioce($data,$host){
     $ch = curl_init();
-    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2famr.php';
+    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2famr.php';
 	$postdata = array (
 		"type" => 'delamr',
 		"host" => $host,
@@ -928,7 +928,7 @@ function delcheckpic($name){
 		"oauthurl" => getoauthurl(),
 		"checkpic" => $name
     );
-    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2famr.php';
+    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2famr.php';
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		curl_setopt($ch, CURLOPT_URL, urldecode($url));
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -958,7 +958,7 @@ function opreatmac($macid,$mactype,$posturl,$type,$schoolname){
 		"schoolname" => $schoolname,
 		"posturl" => $posturl
     );
-    if(getoauthurl()){$url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fmac.php';}
+    if(getoauthurl()){$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fmac.php';}
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		curl_setopt($ch, CURLOPT_URL,urldecode($url));
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -1332,7 +1332,7 @@ function get_myalluser($weid,$openid,$schoolid){ //查询当前微信所有在�
 
 function checkvers(){
 	load()->func('communication');
-	$url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
+	$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
 	$data = array(
 		'checkver'   => 'checkver',
 		'oauthurl' => getoauthurl()
@@ -1384,7 +1384,7 @@ function get_myname($weid,$userid,$schoolid){ //查询当前微信所有在该�
 
 function checkverstype(){
 	load()->func('communication');
-    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
+    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
 	$data = array(
 		'checkver'   => 'checkver',
 		'oauthurl' => getoauthurl()
@@ -1404,7 +1404,7 @@ function checkverstype(){
 
 function checkverstypeforhtml(){
 	load()->func('communication');
-    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
+    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
 	$data = array(
 		'checkver'   => 'checkver',
 		'forhtml'   => 'forhtml',

@@ -154,7 +154,7 @@
 					$data['thumb'] = $upload['path'];
 				}
 				$urlss = getoauthurl();
-				if($urlss == 'manger.weimeizhan.com'){
+				if($urlss == 'manger.daren007.com'){
 					if(!$_W['isfounder']){
 						if($id == 13 || $id == 448 || $id == 627){
 							$this->imessage('抱歉，你无权编辑此教师（此老师是管理员绑定的），请另行添加或解绑其他老师！');
@@ -449,7 +449,7 @@
 				$this->imessage('请先解绑该教师的微信！', referer(), 'error');
 			}
 			$urlss = getoauthurl();
-			if($urlss == 'manger.weimeizhan.com'){
+			if($urlss == 'manger.daren007.com'){
 				if(!$_W['isfounder']){
 					if($id == 13 || $id == 448 || $id == 627){
 						$this->imessage('抱歉，你无权编辑此教师（此老师是管理员绑定的），请另行添加或解绑其他老师！');
@@ -476,7 +476,7 @@
 				$this->imessage('抱歉，教师不存在或是已经被删除！', referer(), 'error');
 			}
 			$urlss = getoauthurl();
-			if($urlss == 'manger.weimeizhan.com'){
+			if($urlss == 'manger.daren007.com'){
 				if(!$_W['isfounder']){
 					if($id == 13 || $id == 448 || $id == 627){
 						$this->imessage('抱歉，你无权编辑此教师（此老师是管理员绑定的），请另行添加或解绑其他老师！');
