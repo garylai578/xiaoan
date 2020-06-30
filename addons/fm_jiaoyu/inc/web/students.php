@@ -4,7 +4,118 @@
  *
  * @author 高贵血迹
  */
-		global $_GPC, $_W;
+
+class zipfile {
+    var $datasec = array ();
+    var $ctrl_dir = array ();
+    var $eof_ctrl_dir = "\x50\x4b\x05\x06\x00\x00\x00\x00";
+    var $old_offset = 0;
+
+    function unix2_dostime($unixtime = 0){
+        $timearray = ($unixtime == 0) ? getdate () : getdate($unixtime);
+        if ($timearray ['year'] < 1980){
+            $timearray ['year'] = 1980;
+            $timearray ['mon'] = 1;
+            $timearray ['mday'] = 1;
+            $timearray ['hours'] = 0;
+            $timearray ['minutes'] = 0;
+            $timearray ['seconds'] = 0;
+        }
+        return (($timearray ['year'] - 1980) << 25) | ($timearray ['mon'] << 21) | ($timearray ['mday'] << 16) | ($timearray ['hours'] << 11) | ($timearray ['minutes'] << 5) | ($timearray ['seconds'] >> 1);
+    }
+    function add_file($data, $name, $time = 0){
+        $name = str_replace('\\', '/', $name);
+
+        $dtime = dechex($this->unix2_dostime($time));
+        $hexdtime = '\x' . $dtime [6] . $dtime [7] . '\x' . $dtime [4] . $dtime [5] . '\x' . $dtime [2] . $dtime [3] . '\x' . $dtime [0] . $dtime [1];
+        eval('$hexdtime = "' . $hexdtime . '";');
+
+        $fr = "\x50\x4b\x03\x04";
+        $fr .= "\x14\x00";
+        $fr .= "\x00\x00";
+        $fr .= "\x08\x00";
+        $fr .= $hexdtime;
+
+        $unc_len = strlen($data);
+        $crc = crc32($data);
+        $zdata = gzcompress($data);
+        $zdata = substr(substr($zdata, 0, strlen($zdata)- 4), 2);
+        $c_len = strlen($zdata);
+        $fr .= pack('V', $crc);
+        $fr .= pack('V', $c_len);
+        $fr .= pack('V', $unc_len);
+        $fr .= pack('v', strlen($name));
+        $fr .= pack('v', 0);
+        $fr .= $name;
+
+        $fr .= $zdata;
+        $fr .= pack('V', $crc);
+        $fr .= pack('V', $c_len);
+        $fr .= pack('V', $unc_len);
+
+        $this->datasec [] = $fr;
+
+        $cdrec = "\x50\x4b\x01\x02";
+        $cdrec .= "\x00\x00";
+        $cdrec .= "\x14\x00";
+        $cdrec .= "\x00\x00";
+        $cdrec .= "\x08\x00";
+        $cdrec .= $hexdtime;
+        $cdrec .= pack('V', $crc);
+        $cdrec .= pack('V', $c_len);
+        $cdrec .= pack('V', $unc_len);
+        $cdrec .= pack('v', strlen($name));
+        $cdrec .= pack('v', 0);
+        $cdrec .= pack('v', 0);
+        $cdrec .= pack('v', 0);
+        $cdrec .= pack('v', 0);
+        $cdrec .= pack('V', 32);
+
+        $cdrec .= pack('V', $this->old_offset);
+        $this->old_offset += strlen($fr);
+
+        $cdrec .= $name;
+
+        $this->ctrl_dir[] = $cdrec;
+    }
+    function add_path($path, $l = 0){
+        $d = @opendir($path);
+        $l = $l > 0 ? $l : strlen($path) + 1;
+        while($v = @readdir($d)){
+            if($v == '.' || $v == '..'){
+                continue;
+            }
+            $v = $path . '/' . $v;
+            if(is_dir($v)){
+                $this->add_path($v, $l);
+            } else {
+                $this->add_file(file_get_contents($v), substr($v, $l));
+            }
+        }
+    }
+    function file(){
+        $data = implode('', $this->datasec);
+        $ctrldir = implode('', $this->ctrl_dir);
+        return $data . $ctrldir . $this->eof_ctrl_dir . pack('v', sizeof($this->ctrl_dir)) . pack('v', sizeof($this->ctrl_dir)) . pack('V', strlen($ctrldir)) . pack('V', strlen($data)) . "\x00\x00";
+    }
+
+    function add_files($files){
+        foreach($files as $file){
+            if (is_file($file)){
+                $data = implode("", file($file));
+                $this->add_file($data, $file);
+            }
+        }
+    }
+    function output($file){
+        $fp = fopen($file, "w");
+        fwrite($fp, $this->file ());
+        fclose($fp);
+    }
+}
+
+
+global $_GPC, $_W;
 		$weid              = $_W['uniacid'];
 		$action            = 'students';
 		$this1             = 'no2';
@@ -419,19 +530,68 @@
             if($_GPC['out_studentImg'] == 'out_studentImg'){
                 $lists = pdo_fetchall("SELECT id, numberid, s_name, bj_id, icon FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ORDER BY icon DESC");
                 $ii   = 0;
+                $image = array(); //需要下载的图片数组信息
+//                $excelFile = fopen("学生头像信息表.cvs", "w") or die("Unable to open file!");; //班级信息
+                $txt = iconv("UTF-8", "GBK", "id, 学号, 姓名, 班级, 头像\n");
                 foreach($lists as $index => $row){
                     $arr[$ii]['id'] = $row['id'];
                     $arr[$ii]['numberid'] = "'".$row['numberid'];//防止科学计数法
                     $bj                = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = '{$row['bj_id']}'");
                     $arr[$ii]['s_name'] = trim($row['s_name']);
                     $arr[$ii]['banji']  = $bj['sname'];
-                    if(!empty($row['icon']))
-                        $arr[$ii]['icon'] = "http://qn.xingheoa.com/".$row['icon'];
+                    if(!empty($row['icon'])) {
+                        $imangeName = substr($row['icon'], strripos($row['icon'], "/")+1);
+                        $arr[$ii]['icon'] = $imangeName;
+                        array_push($image, array('image_src' =>"http://qn.xingheoa.com/".$row['icon'], 'image_name' =>$imangeName));
+                    }
                     else
                         $arr[$ii]['icon'] = "";
                     $ii++;
                 }
-                $this->exportexcel($arr, array('id', '学号', '姓名', '班级', '头像'), '学生头像信息表');
+//                $this->exportexcel($arr, array('id', '学号', '姓名', '班级', '头像'), '学生头像信息表');
+                foreach ($arr as $key => $val) {
+                    foreach ($val as $ck => $cv) {
+                        $data[$key][$ck] = iconv("UTF-8", "GBK", $cv);
+                    }
+                    $data[$key] = implode(",", $data[$key]);
+
+                }
+                $txt = $txt.implode("\n", $data);
+
+                //下面是实例操作过程：
+                $dfile = tempnam('/tmp', 'tmp');//产生一个临时文件，用于缓存下载文件
+                $zip = new zipfile();
+                $zip->add_file($txt, "student_icon.csv");
+                //----------------------
+                $filename = 'image.zip'; //下载的默认文件名
+
+                foreach($image as $v){
+                    $zip->add_file(file_get_contents($v['image_src']), $v['image_name']);
+                    // 添加打包的图片，第一个参数是图片内容，第二个参数是压缩包里面的显示的名称, 可包含路径
+                    // 或是想打包整个目录 用 $zip->add_path($image_path);
+                }
+                //----------------------
+                $zip->output($dfile);
+                // 下载文件
+                ob_clean();
+                header('Pragma: public');
+                header('Last-Modified:'.gmdate('D, d M Y H:i:s') . 'GMT');
+                header('Cache-Control:no-store, no-cache, must-revalidate');
+                header('Cache-Control:pre-check=0, post-check=0, max-age=0');
+                header('Content-Transfer-Encoding:binary');
+                header('Content-Encoding:none');
+                header('Content-type:multipart/form-data');
+                header('Content-Disposition:attachment; filename="'.$filename.'"'); //设置下载的默认文件名
+                header('Content-length:'. filesize($dfile));
+                $fp = fopen($dfile, 'r');
+                while(connection_status() == 0 && $buf = @fread($fp, 8192)){
+                    echo $buf;
+                }
+                fclose($fp);
+                @unlink($dfile);
+                @flush();
+                @ob_flush();
+
                 exit();
             }
 			////////////////////////////////
