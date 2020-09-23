@@ -62,7 +62,7 @@ if(checksubmit('submit')){
 				pdo_insert($this->table_checktimeset, $dataf);
 			}
 		}
-		if($checksetinfo['saturday'] == 1){
+		if($checksetinfo['saturday'] != 0){
 			$satur_name_start = 'satur_start'.$i;
 			$satur_name_end = 'satur_end'.$i;
 			if(($_GPC[$satur_name_start] != '00:00' && !empty($_GPC[$satur_name_start])) || ($_GPC[$satur_name_end] != '00:00' && !empty($_GPC[$satur_name_end]))){
@@ -77,7 +77,7 @@ if(checksubmit('submit')){
 				pdo_insert($this->table_checktimeset, $datasa);
 			}
 		}
-		if($checksetinfo['sunday'] == 1){
+		if($checksetinfo['sunday'] != 0){
 			$sun_name_start = 'sun_start'.$i;
 			$sun_name_end = 'sun_end'.$i;
 			if(($_GPC[$sun_name_start] != '00:00' && !empty($_GPC[$sun_name_start])) || ($_GPC[$sun_name_end] != '00:00' && !empty($_GPC[$sun_name_end]))){

@@ -365,28 +365,30 @@ if ($operation == 'classinfo') {
                                         $todaytimeset6 = transTimeset4T6($timeset_work);
                                     }
                                 } elseif ($k == 6) {//星期六
-                                    if ($checkdateset['saturday'] == 1) {     // 如果周六单独设置，则按照工作日的规则设置
+                                    if($checkdateset['saturday'] == 0){ // 周六放假
+                                        $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
+                                    }else{
                                         $timeset_sat = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=3 ORDER BY id ASC ");
                                         $todaytimeset1 = transTimeset4T1($timeset_sat);
-                                        if($checkdateset['sunday'] == 0) //如果周日放假，则周六最后一个时间段可以离校
-                                            $todaytimeset2 = array(array('startTime'=>$timeset_sat[count($timeset_sat)-1]['start'], 'endTime'=>$timeset_sat[count($timeset_sat)-1]['end']));
-                                        else // 否证周六不能离校
-                                            $todaytimeset2 = array(array('startTime' => "00:00", 'endTime' => "00:00"));
                                         $todaytimeset3 = transTimeset4T3($timeset_sat);
                                         $todaytimeset6 = transTimeset4T6($timeset_sat);
-                                    } else {
-                                        $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
+                                        if($checkdateset['saturday'] == 2)// 如果周六单独设置，2表示放学后住校生允许出校
+                                            $todaytimeset2 = array(array('startTime'=>$timeset_sat[count($timeset_sat)-1]['start'], 'endTime'=>$timeset_sat[count($timeset_sat)-1]['end']));
+                                        else //否则不允许出校
+                                            $todaytimeset2 = array(array('startTime' => "00:00", 'endTime' => "00:00"));
                                     }
                                 } elseif ($k == 0) {//星期天
-                                    if ($checkdateset['sunday'] == 1) {   // 如果周日单独设置，则按照工作日的规则设置
+                                    if($checkdateset['sunday'] == 0){ // 周天放假
+                                        $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
+                                    }else{
                                         $timeset_sun = pdo_fetchall("SELECT start,end FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and type=4 ORDER BY id ASC ");
                                         $todaytimeset1 = transTimeset4T1($timeset_sun);
-//                                    $todaytimeset2 = array(array('startTime'=>$timeset_sun[count($timeset_sun)-1]['start'], 'endTime'=>$timeset_sun[count($timeset_sun)-1]['end']));
-                                        $todaytimeset2 = array(array('startTime' => "00:00", 'endTime' => "00:00"));
                                         $todaytimeset3 = transTimeset4T3($timeset_sun);
                                         $todaytimeset6 = transTimeset4T6($timeset_sun);
-                                    } else {
-                                        $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
+                                        if($checkdateset['sunday'] == 2)// 如果周日单独设置，2表示放学后住校生允许出校
+                                            $todaytimeset2 = array(array('startTime'=>$timeset_sun[count($timeset_sun)-1]['start'], 'endTime'=>$timeset_sun[count($timeset_sun)-1]['end']));
+                                        else //否则不允许出校
+                                            $todaytimeset2 = array(array('startTime' => "00:00", 'endTime' => "00:00"));
                                     }
                                 } else {//工作日
                                     $todaytimeset1 = transTimeset4T1($timeset_work);
@@ -660,7 +662,8 @@ if ($operation == 'check') {
                         $result['info'] = "本卡已失效,请联系学校管理员";
                     }
                     $fstype = true;
-                }else{
+                }
+                else{
                     $data = array(
                         'weid' => $weid,
                         'schoolid' => $schoolid,
