@@ -522,6 +522,17 @@ if ($operation == 'classinfo') {
 }
 
 if ($operation == 'check') {
+/*    if(($_GPC['signId'] == "1079121746" && strtotime($_GPC['signTime']) == 1600990461)
+        || ($_GPC['signId'] == "1079233970" && strtotime($_GPC['signTime']) == 1600990481)){
+        $result['data'] = "";
+        $result['code'] = 1000;
+        $result['msg'] = "success";
+        $result['ServerTime'] = date('Y-m-d H:i:s',time());
+        $result['CostTime'] = 0;
+        echo json_encode($result);
+        exit;
+    }*/
+
     $starttime=time();
 
     $fstype = false;
@@ -683,17 +694,44 @@ if ($operation == 'check') {
                     );
                     pdo_insert($this->table_checklog, $data);
                     $checkid = pdo_insertid();
-                    if($school['send_overtime'] >= 1){
+
+                    $wxres = "";
+                    $wxstate = 1; // 1-发送成功，2-用户没有绑定微信， 3-超过设置的延时不发送， 4-发送失败
+                    if($school['send_overtime'] >= 1){ // 如果设置了延时不发送
                         $overtime = $school['send_overtime']*60;
                         $timecha = $times - $signTime;
                         if($overtime >= $timecha){
-                            $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                            $wxres = $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
                         }else{
                             $result['info'] = "延迟发送之数据将不推送刷卡提示";
+                            $wxres="delay not send, shcoolid: ".$schoolid. ", cardid：".$_GPC ['signId'].", signTime：".date("Y-m-d h:i:s", $signTime).", sendTime：".date("Y-m-d h:i:s");
+                            $wxstate = 3;
                         }
                     }else{
-                        $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                        $wxres = $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
                     }
+
+                    if(is_array($wxres)){
+                        if($wxres->errcode != 0) {
+                            $content = "\n微信发送失败，有返回失败信息，checklogid：".$checkid.", 返回信息：\n";
+                            file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", $content . "\n", FILE_APPEND);
+                            file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt",  serialize($wxres), FILE_APPEND);
+                            $wxstate = 4;
+                          //$wxres = $wxres->errcode;
+                        }else{
+                            $wxstate = 1;
+                          	$wxres = "";
+                        }
+                    }elseif($wxres == 2) {
+                        $wxstate = 2; //用户没有绑定微信
+                        $wxres = "";
+                    }elseif($wxstate !=3){
+                        file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", "\n微信发送失败其他情况，checklogid：".$checkid.", 返回信息：\n",  FILE_APPEND);
+                        file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt",  $wxres."\n", FILE_APPEND);
+                        $wxstate = 4;
+                    }
+                    $rse = pdo_update($this->table_checklog, array('wxstate' => $wxstate, 'remark'=> serialize($wxres)), array('id' => $checkid));
+//                    file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt",  "sql:".$rse. ", wxstate=".$wxstate. ", remark=".var_dump($wxres)."\n", FILE_APPEND);
                     $fstype = true;
                 }
             }

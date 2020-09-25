@@ -520,7 +520,7 @@ class Core extends WeModuleSite {
 		if($weid == ''){
 			$access_token = $this->getAccessToken2();
 			if(empty($access_token)) {
-				return;
+				return "access token is empty!";
 			}
 		}else{
 			$access_token = $this->getAccessToken3($weid);
@@ -3090,9 +3090,11 @@ class Core extends WeModuleSite {
 
 	public function sendMobileJxlxtz($schoolid, $weid, $bj_id, $sid, $type, $leixing, $id, $pard) { //学生进校离校通知
 		global $_GPC,$_W;
+		$res = "p1";
 		$smsset = get_weidset($weid,'jxlxtx');	
 		$sms_set = get_school_sms_set($schoolid);
 		if($sms_set['jxlxtx'] == 1 || !empty($smsset['jxlxtx'])) {
+            $res = "p2";
 			$student = pdo_fetch("SELECT * FROM " . tablename($this->table_students) . " where id = :id ", array(':id' => $sid));
 			$log = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " where id = :id ", array(':id' => $id));
 			$userinfo = pdo_fetchall("SELECT id,pard,userinfo FROM ".tablename($this->table_user)." where weid = :weid And schoolid = :schoolid And sid = :sid",array(':weid'=>$weid, ':schoolid'=>$schoolid, ':sid'=>$sid));
@@ -3100,14 +3102,18 @@ class Core extends WeModuleSite {
 			$macs=pdo_fetchall("SELECT macid FROM " . tablename($this->table_checkmac) . " where bj_id = :bj_id  And schoolid=:schoolid And weid=:weid", array(':bj_id' => $log['bj_id'],':schoolid'=>$schoolid,':weid'=>$weid));
 			$macids=array();
 			if($macs){
+                $res = "p3";
 				foreach($macs as $k => $v){
 					array_push($macids,$v['macid']);
+                    $res = "p4";
 				} 
 			}
 			$macs1=pdo_fetchall("SELECT macid FROM " . tablename($this->table_checkmac) . " where is_master =2   And schoolid=:schoolid And weid=:weid", array(':schoolid'=>$schoolid,':weid'=>$weid));  
 			if($macs1){
+                $res = "p5";
 				foreach($macs1 as $k => $v){
 					array_push($macids,$v['macid']);
+                    $res = "p6";
 				}
 			}
 			$jdata = array(
@@ -3123,8 +3129,12 @@ class Core extends WeModuleSite {
 			if($macs || $macs1){
 				$this->pushMess($jdata);
 			}
-			/***分班播报**/	
+			/***给每一个绑定的微信用户发信息**/
+            if(empty($userinfo)) {
+                $res = 2; // 该学生没有绑定微信，返回2.
+            }
 			foreach ($userinfo as $key => $value) {
+                $res = "p7";
 				$openid = pdo_fetch("select id,openid from ".tablename($this->table_user)." where id = '{$value['id']}' ");
 				$s_name = $student['s_name'];
 				include 'pard.php';
@@ -3172,8 +3182,10 @@ class Core extends WeModuleSite {
 					$url = $_W['sitescheme'].'wei.yesaaa.cn/app/index.php?i='.$weid.'&schoolid='.$schoolid.'&time='.$time.'&userid='.$openid['id'].'&logid='.$id.'&c=entry&do=checklogdetail&m=fm_jiaoyu';
 				}
 				if(isallow_sendsms($schoolid,'jxlxtx')){
+                    $res = "p8";
 					$mobile = unserialize($value['userinfo']);
 					if($mobile['mobile']){
+                        $res = "p9";
 						$ttimes = date('m月d日 H:i', TIMESTAMP);
 						$content = array(
 							'name' => $s_name,
@@ -3182,13 +3194,18 @@ class Core extends WeModuleSite {
 						);
 						mload()->model('sms');
 						sms_send($mobile['mobile'], $content, $smsset['sms_SignName'], $smsset['sms_Code'], 'jxlxtx', $weid, $schoolid);
+                        $res = "p10";
 					}
 				}
 				if(!empty($smsset['jxlxtx'])){
-					$this->sendtempmsg($smsset['jxlxtx'], $url, $data, '#FF0000', $openid['openid']);
-				}
+                    $res = $this->sendtempmsg($smsset['jxlxtx'], $url, $data, '#FF0000', $openid['openid']);
+				    if(empty($res))
+                        file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", "返回为空，url：".$url . "\n", FILE_APPEND);
+					return $res;
+				}else{            $res = "p12";}
 			}
-		}
+		}else{            $res = "p13";}
+		return $res;
 	}
 	
 	public function sendMobileJxlxtz_yl($schoolid, $weid, $sid, $id,$macid) { //学生进校离校通知 养老院

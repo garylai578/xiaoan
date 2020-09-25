@@ -116,6 +116,7 @@
 							<th style="width:8%;">拍照</th>
 							<th style="width:8%;"></th>
 							<th style="width:8%;">状态</th>
+							<th style="width:8%;">发送情况</th>
 							<th class="qx_2304" style="text-align:right; width:10%;">操作</th>
 						</tr>
 					</thead>
@@ -206,7 +207,14 @@
 										<span class="label label-danger">老师未确认</span>
 									{/if}
 								{/if}
-								</td>	
+								</td>
+								<td>
+									{if $item['wxstate'] ==1}<span class="label label-success">已发送</span>{/if}
+									{if $item['wxstate'] ==2}<span class="label label-success">没有绑定微信</span>{/if}
+									{if $item['wxstate'] ==3}<span class="label label-success">超时不发送</span>{/if}
+									{if $item['wxstate'] ==4}<span class="label label-danger">其他情况</span>{/if}
+
+								</td>
 								<td class="qx_2304" style="text-align:right;">				
 									<a class="btn btn-default btn-sm" href="{php echo $this->createWebUrl('checklog', array('id' => $item['id'], 'op' => 'delete', 'schoolid' => $schoolid))}" onclick="return confirm('此操作不可恢复，确认删除？');return false;" title="删除"><i class="fa fa-times"></i></a>
 								</td>
