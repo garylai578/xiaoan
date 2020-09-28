@@ -209,7 +209,7 @@
 								{/if}
 								</td>
 								<td>
-									{if $item['wxstate'] ==1}<span class="label label-success">已发送</span>{/if}
+									{if $item['wxstate'] ==1}<span class="label label-success">"{php echo unserialize($item['remark'])}"</span>{/if}
 									{if $item['wxstate'] ==2}<span class="label label-success">没有绑定微信</span>{/if}
 									{if $item['wxstate'] ==3}<span class="label label-success">超时不发送</span>{/if}
 									{if $item['wxstate'] ==4}<span class="label label-danger">其他情况</span>{/if}

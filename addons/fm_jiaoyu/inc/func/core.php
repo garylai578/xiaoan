@@ -3091,6 +3091,7 @@ class Core extends WeModuleSite {
 	public function sendMobileJxlxtz($schoolid, $weid, $bj_id, $sid, $type, $leixing, $id, $pard) { //学生进校离校通知
 		global $_GPC,$_W;
 		$res = "p1";
+        $sendTimes = 0;
 		$smsset = get_weidset($weid,'jxlxtx');	
 		$sms_set = get_school_sms_set($schoolid);
 		if($sms_set['jxlxtx'] == 1 || !empty($smsset['jxlxtx'])) {
@@ -3199,13 +3200,21 @@ class Core extends WeModuleSite {
 				}
 				if(!empty($smsset['jxlxtx'])){
                     $res = $this->sendtempmsg($smsset['jxlxtx'], $url, $data, '#FF0000', $openid['openid']);
-				    if(empty($res))
+                    if(is_array($res)) {
+                        if ($res->errcode != 0) {
+                            $content = "\n微信发送失败，有返回失败信息，checklogid：" . $id . ", 返回信息：\n";
+                            file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", $content . "\n", FILE_APPEND);
+                            file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", serialize($res), FILE_APPEND);
+                        }else {
+                            $sendTimes++;
+                        }
+                    }else
                         file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", "返回为空，url：".$url . "\n", FILE_APPEND);
-					return $res;
+
 				}else{            $res = "p12";}
 			}
 		}else{            $res = "p13";}
-		return $res;
+		return array("code"=>$res, "sendTimes"=>$sendTimes);
 	}
 	
 	public function sendMobileJxlxtz_yl($schoolid, $weid, $sid, $id,$macid) { //学生进校离校通知 养老院
