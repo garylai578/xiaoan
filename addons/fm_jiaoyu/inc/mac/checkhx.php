@@ -522,17 +522,6 @@ if ($operation == 'classinfo') {
 }
 
 if ($operation == 'check') {
-/*    if(($_GPC['signId'] == "1079121746" && strtotime($_GPC['signTime']) == 1600990461)
-        || ($_GPC['signId'] == "1079233970" && strtotime($_GPC['signTime']) == 1600990481)){
-        $result['data'] = "";
-        $result['code'] = 1000;
-        $result['msg'] = "success";
-        $result['ServerTime'] = date('Y-m-d H:i:s',time());
-        $result['CostTime'] = 0;
-        echo json_encode($result);
-        exit;
-    }*/
-
     $starttime=time();
 
     $fstype = false;
@@ -560,7 +549,7 @@ if ($operation == 'check') {
         }
     }
 //    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid And createtime = :createtime ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid,':createtime' =>$signTime));
-    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid ORDER BY createtime, id DESC ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid)); //解决刷进后马上刷出（间隔不到1秒），导致反复插入数据库的问题
+    $checkthisdata = pdo_fetch("SELECT * FROM " . tablename($this->table_checklog) . " WHERE cardid = :cardid And schoolid = :schoolid ORDER BY createtime DESC, id DESC ", array(':cardid' =>$_GPC['signId'],':schoolid' =>$schoolid)); //解决刷进后马上刷出（间隔不到1秒），导致反复插入数据库的问题
     $signMode = $_GPC['signMode'];
     $nowtime = date('H:i',$signTime);
     if ($ckmac['type'] != 0) { // checkmac的type字段表示该设备是进校还是离校，0表示不区分
@@ -711,24 +700,13 @@ if ($operation == 'check') {
                         $res = $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
                     }
 
-                    $wxres = $res['code'];
-                    if(is_array($wxres)){
-                        if($wxres->errcode != 0) { //微信发送失败
-                            $wxstate = 4;
-                        }else{
-                            $wxstate = 1;
-                          	$wxres = "已发" . $res['sendTimes'] . "人";
+                    if(is_array($res)) {
+                        $wxstate = $res['code'];
+                        if ($wxstate == 4) { //部分发送成功
+                            $wxres = $res['content'];
                         }
-                    }elseif($wxres == 2) {
-                        $wxstate = 2; //用户没有绑定微信
-                        $wxres = "";
-                    }elseif($wxstate !=3){
-                        file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt", "\n微信发送失败其他情况，checklogid：".$checkid.", 返回信息：\n",  FILE_APPEND);
-                        file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt",  $wxres."\n", FILE_APPEND);
-                        $wxstate = 4;
                     }
-                    $rse = pdo_update($this->table_checklog, array('wxstate' => $wxstate, 'remark'=> serialize($wxres)), array('id' => $checkid));
-//                    file_put_contents(dirname(__FILE__) . DIRECTORY_SEPARATOR . "wxres.txt",  "sql:".$rse. ", wxstate=".$wxstate. ", remark=".var_dump($wxres)."\n", FILE_APPEND);
+                    $rse = pdo_update($this->table_checklog, array('wxstate' => $wxstate, 'remark'=> $wxres), array('id' => $checkid));
                     $fstype = true;
                 }
             }

@@ -276,7 +276,7 @@
 				}
 				if(!empty($ckuser['sid'])){
 					if($school['is_cardpay'] == 1){					
-						if($ckuser['severend'] > $times){
+						if($ckuser['severend'] > $times){ //卡片在有效期内
 							$data = array(
 							'weid' => $weid,
 							'schoolid' => $schoolid,
@@ -314,7 +314,9 @@
 								}
 							}
 							$fstype = true;	
-						}					
+						}else{
+
+                        }
 					}else{
 						$data = array(
 						'weid' => $weid,
@@ -335,24 +337,38 @@
 						);
 						pdo_insert($this->table_checklog, $data);
 						$checkid = pdo_insertid();
-						if($school['send_overtime'] >= 1){
+                        $wxres = "";
+                        $wxstate = 1; // 1-发送成功，2-用户没有绑定微信， 3-超过设置的延时不发送， 4-发送失败
+						if($school['send_overtime'] >= 1){ // 如果设置了延时不发送
 							$overtime = $school['send_overtime']*60;
 							$timecha = $times - $signTime;
 							if($overtime >= $timecha){
 								if(is_showyl()){
-									$this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
+                                    $res = $this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
 								}else{
-									$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                                    $res = $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
 								}
-							}
+							}else{
+                                $result['info'] = "延迟发送之数据将不推送刷卡提示";
+                                $wxres="delay not send, shcoolid: ".$schoolid. ", cardid：".$_GPC ['signId'].", signTime：".date("Y-m-d h:i:s", $signTime).", sendTime：".date("Y-m-d h:i:s");
+                                $wxstate = 3;
+                            }
 						}else{
 							if(is_showyl()){
-								$this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
+                                $res = $this->sendMobileJxlxtz_yl($schoolid, $weid,$ckuser['sid'],$checkid,$ckmac['id']);
 							}else{
-								$this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
+                                $res = $this->sendMobileJxlxtz($schoolid, $weid, $bj['bj_id'], $ckuser['sid'], $type, $leixing, $checkid, $ckuser['pard']);
 							}
-						}					
-						$fstype = true;
+						}
+
+                        if(is_array($res)) {
+                            $wxstate = $res['code'];
+                            if ($wxstate == 4) { //部分发送成功
+                                $wxres = $res['content'];
+                            }
+                        }
+                        $rse = pdo_update($this->table_checklog, array('wxstate' => $wxstate, 'remark'=> $wxres), array('id' => $checkid));
+                        $fstype = true;
 					}
 				}
 				if(!empty($ckuser['tid'])){
