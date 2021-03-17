@@ -342,7 +342,8 @@ if ($operation == 'classinfo') {
                                 $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
                             } elseif ($checktime[0]['type'] == 5) {
                                 $todaytimeset1 = transTimeset4T1($checktime);
-                                $todaytimeset2 = array(array('startTime' => $checktime[count($checktime) - 1]['start'], 'endTime' => $checktime[count($checktime) - 1]['end']));
+//                                $todaytimeset2 = array(array('startTime' => $checktime[count($checktime) - 1]['start'], 'endTime' => $checktime[count($checktime) - 1]['end']));
+                                $todaytimeset2 = array(array('startTime' => "00:00", 'endTime' => "00:00"));  //该逻辑需要修改：特殊上课日对于走读生来说，上完课是否运行出校，应该可以选择
                                 $todaytimeset3 = transTimeset4T3($checktime);
                                 $todaytimeset6 = transTimeset4T6($checktime);
                             }
