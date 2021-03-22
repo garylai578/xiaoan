@@ -100,6 +100,8 @@ class Core extends WeModuleSite {
 	public $table_teasencefiles = 'wx_school_teasencefiles';
 	public $table_guest = 'wx_school_guest';
 	public $table_log = 'wx_school_log';
+	public $table_car = 'wx_school_car';
+	public $table_carpass='wx_school_carpass';
     public function getNaveMenu($schoolid, $action)
     {
         global $_W, $_GPC;

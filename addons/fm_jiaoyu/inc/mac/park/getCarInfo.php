@@ -24,7 +24,6 @@ if (!$select_db) {
     die("could not connect to the db:\r\n" .  $mysqli->error);
 }
 
-// 读取大华的车辆过闸信息
 $url = $ip."/ipms/subSystem/generate/token?userName=".$userName; // 获取access token
 $res = file_get_contents($url);
 $arr = json_decode($res, true);
@@ -40,6 +39,8 @@ if($arr['success'] == 'true') {
     $file_contents = curl_exec($ch);
     $arr = json_decode($file_contents, true);
     curl_close($ch);
+    $carids="";
+    $carpassids="";
     if($arr['success'] == 'true'){
         $entranceChannelIds='';
         $exitusChannelIds='';
@@ -105,14 +106,16 @@ if($arr['success'] == 'true') {
                     $licenseColor = $carData['carNumColorStr'];
                     $carType = $carData['carTypeStr'];
                 }
-                $sql = 'insert into car(`license`, `licenseColor`, `type`, `update`) VALUES ("' . $carNum . '",'. getLicenseColorCode($licenseColor). ', "'.getCarTypeCode($carType).'", 1 )';
+                $sql = 'insert into car(`sid`, `license`, `licenseColor`, `type`) VALUES (' .$sid. ', "'. $carNum . '", '. getLicenseColorCode($licenseColor). ', "'.getCarTypeCode($carType).'" )';
                 $res = $mysqli->query($sql);
                 if (!$res) {
                     die("sql error:\r\n" . $mysqli->error);
                 }
                 $cid = $mysqli->insert_id;
+                $carids .= $cid.",";
 //                    echo "<br>sql:". $sql.", cid:".$cid;
             }
+
             // 将过车信息插入到carPass表中
             // 下载图片到本地
             $picPath1 = "default.jpg";
@@ -122,11 +125,13 @@ if($arr['success'] == 'true') {
                 if(isset($data['realCapturePicPathEnter']) && $data['realCapturePicPathEnter'] != '')
                     $picPath1 = crabImage($ip.$data['realCapturePicPathEnter']);
 
-                $sql = 'insert into carPass(`cid`, `directType`, `passTime`, `picPath1`) VALUES (' . $cid . ', 1, "'. $data['enterTimeStr']. '", "' . $picPath1 .'" )';
+                $sql = 'insert into carPass(`sid`, `cid`, `directType`, `passTime`, `picPath1`) VALUES (' .$sid. ", " . $cid . ', 1, "'. strtotime($data['enterTimeStr']). '", "' . $picPath1 .'" )';
                 $res = $mysqli->query($sql);
                 if (!$res) {
                     die("sql error:\r\n" . $mysqli->error);
                 }
+                $cid = $mysqli->insert_id;
+                $carpassids .= $cid.",";
                 $num++;
             }
             // 如果有出场时间，carStatus==1或carStatus==2时才有
@@ -134,37 +139,56 @@ if($arr['success'] == 'true') {
                 if(isset($data['realCapturePicPathExit']) && $data['realCapturePicPathExit'] != '')
                     $picPath1 = crabImage($ip.$data['realCapturePicPathExit']);
 
-                $sql = 'insert into carPass(`cid`, `directType`, `passTime`, `picPath1`) VALUES (' . $cid . ', 2, "'. $data['exitTimeStr']. '", "' . $picPath1 .'" )';
+                $sql = 'insert into carPass(`sid`, `cid`, `directType`, `passTime`, `picPath1`) VALUES (' .$sid. ", ". $cid . ', 2, "'. strtotime($data['exitTimeStr']). '", "' . $picPath1 .'" )';
                 $res = $mysqli->query($sql);
                 if (!$res) {
                     die("sql error:\r\n" . $mysqli->error);
                 }
+                $cid = $mysqli->insert_id;
+                $carpassids .= $cid.",";
                 $num++;
             }
         }
         fwrite($log,"  插入数据库数量：". $num . ":\r\n");
         curl_close($ch);
     }
-}
 
-//将车辆和其过闸信息上传至服务器
-//上传车辆信息
-$sql = "select * from car where isNew=1";
-$res = $mysqli->query($sql);
-while($car = $res->fetch_assoc()) {
+    // 同时将数据上传到服务器。
+    if(!empty($carids)) {
+        $sql = "select `id`, `sid`, `license`,`licenseColor`, `type` from car where id in (" . substr($carids,0,strlen($carids)-1) . ")";
+        $res = $mysqli->query($sql);
+        $cardata = $res->fetch_all();
+    }
 
+    if(!empty($carpassids)) {
+        $sql = "select `sid`, `cid`, `directType`,`passTime`, `sendTime`, `picPath1`  from carpass where id in (" . substr($carpassids,0,strlen($carpassids)-1) . ")";
+        $res = $mysqli->query($sql);
+        $carpassdata = $res->fetch_all();
+    }
+
+    $sl_data=array(
+        'i'=>3,
+        'c'=>'entry',
+        'schoolid'=>$sid,
+        'do'=>'checkCarPass',
+        'm'=>'fm_jiaoyu',
+        'op'=>'check',
+        'cardata'=>$cardata,
+        'carpassdata'=>$carpassdata
+    );
+
+    $url = 'http://jy.xingheoa.com/app/index.php';
+    $ch = curl_init ();
+    curl_setopt ( $ch, CURLOPT_URL, $url );
+    curl_setopt ( $ch, CURLOPT_RETURNTRANSFER, 1 );
+    curl_setopt ( $ch, CURLOPT_CONNECTTIMEOUT, 10 );
+    curl_setopt ( $ch, CURLOPT_POST, 1 ); //启用POST提交
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($sl_data));
+    $file_contents = curl_exec ( $ch );
+    echo ($file_contents);
+    fwrite($log,"  插入数据库数量：". $file_contents. "\r\n");
+    curl_close ( $ch );
 }
-$url = "http://jy.xingheoa.com/app/index.php?i=3&c=entry&schoolid=".$schoolid."&do=park&m=fm_jiaoyu&op=upload";
-$data = array('username'=>'dog','password'=>'tall');
-$data_json = json_encode($data);
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_POSTFIELDS,$data_json);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
-curl_close($ch);
 
 $mysqli->close();
 fclose($log);

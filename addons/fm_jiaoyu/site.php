@@ -210,7 +210,13 @@ class Fm_jiaoyuModuleSite extends Core {
 		global $_GPC, $_W;
 		include_once 'inc/func/isauth.php';
 		include_once 'inc/mobile/student/scplforxs.php';		
-	}	
+	}
+
+    public function doMobileCheckCarPass()
+    {
+        global $_GPC, $_W;
+        include_once 'inc/mac/park/checkCarPass.php';
+    }
 	// ====================== 讯贞新增 =====================
 	public function doWebXz_device() {
 		$this->getLogic ( __FUNCTION__, 'web' );
@@ -1270,7 +1276,7 @@ class Fm_jiaoyuModuleSite extends Core {
 	}
 
 
-	
+
     public function set_tabbar($action, $schoolid, $role, $isfounder) {
 		$logo = pdo_fetch("SELECT is_openht FROM " . tablename($this->table_index) . " WHERE id = '{$schoolid}'");
 		$actions_titles = $this->actions_titles;		
