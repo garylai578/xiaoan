@@ -528,6 +528,10 @@ global $_GPC, $_W;
 			}
             //////////导出学生头像/////////////////
             if($_GPC['out_studentImg'] == 'out_studentImg'){
+                set_time_limit(0);
+                ini_set('memory_limit', '512M');
+                ob_end_clean();
+
                 $lists = pdo_fetchall("SELECT id, numberid, s_name, bj_id, icon FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' ORDER BY icon DESC");
                 $ii   = 0;
                 $image = array(); //需要下载的图片数组信息
@@ -540,7 +544,8 @@ global $_GPC, $_W;
                     $arr[$ii]['s_name'] = trim($row['s_name']);
                     $arr[$ii]['banji']  = $bj['sname'];
                     if(!empty($row['icon'])) {
-                        $imangeName = substr($row['icon'], strripos($row['icon'], "/")+1);
+                        $postfix = substr($row['icon'], strripos($row['icon'], "."));
+                        $imangeName = iconv("UTF-8", "GBK", trim($row['s_name'])).$postfix;
                         $arr[$ii]['icon'] = $imangeName;
                         array_push($image, array('image_src' =>"http://qn.xingheoa.com/".$row['icon'], 'image_name' =>$imangeName));
                     }
@@ -573,7 +578,7 @@ global $_GPC, $_W;
                 //----------------------
                 $zip->output($dfile);
                 // 下载文件
-                ob_clean();
+
                 header('Pragma: public');
                 header('Last-Modified:'.gmdate('D, d M Y H:i:s') . 'GMT');
                 header('Cache-Control:no-store, no-cache, must-revalidate');
@@ -595,6 +600,35 @@ global $_GPC, $_W;
                 exit();
             }
 			////////////////////////////////
+            //////////导出学生信息/////////////////
+            if($_GPC['out_studentMsg'] == 'out_studentMsg'){
+                $lists = pdo_fetchall("SELECT id, numberid, s_name, xq_id, bj_id, mobile, s_type FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' order by bj_id");
+                $ii   = 0;
+
+                $txt = iconv("UTF-8", "GBK", "id, 学号, 姓名, 年级，班级, 手机, 类型，卡号\n");
+                foreach($lists as $index => $row){
+                    $arr[$ii]['id'] = $row['id'];
+                    $arr[$ii]['numberid'] = "'".$row['numberid'];//防止科学计数法
+                    $nj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = '{$row['xq_id']}'");
+                    $bj = pdo_fetch("SELECT sname FROM " . tablename($this->table_classify) . " where sid = '{$row['bj_id']}'");
+                    $arr[$ii]['s_name'] = trim($row['s_name']);
+                    $arr[$ii]['nanji'] = $nj['sname'];
+                    $arr[$ii]['banji']  = $bj['sname'];
+                    $arr[$ii]['mobile'] = $row['mobile'];
+                    $arr[$ii]['s_type'] = $row['s_type'];
+                    $cards = pdo_fetchall("SELECT idcard FROM " . tablename($this->table_idcard) . " where sid = '{$row['id']}'");
+                    $cardlist="";
+                    foreach ($cards as $k=>$v){
+                        $cardlist += $v['idcard'] + ",";
+                    }
+                    $arr[$ii]['card'] = $cardlist;
+                    $ii++;
+                }
+                $this->exportexcel($arr, array('id', '学号', '姓名', '年级', '班级', '手机', '类型', '卡号'), '学生信息表');
+
+                exit();
+            }
+            ////////////////////////////////////////
 			$category = pdo_fetchall("SELECT sid,sname FROM " . tablename($this->table_classify) . " WHERE weid = :weid AND schoolid = :schoolid ORDER BY sid ASC, ssort DESC", array(':weid' => $weid, ':schoolid' => $schoolid), 'sid');
 			$list = pdo_fetchall("SELECT * FROM " . tablename($this->table_students) . " WHERE weid = '{$weid}' AND schoolid = '{$schoolid}' $condition ORDER BY id DESC LIMIT " . ($pindex - 1) * $psize . ',' . $psize);
 			$listAfter = array();
