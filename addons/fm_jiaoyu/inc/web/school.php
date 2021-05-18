@@ -9,13 +9,14 @@
 
         $action = 'school';
         $title = '学校管理';
+//$t1=time();
         $url = $this->createWebUrl($action, array('op' => 'display'));
 		$city = pdo_fetchall("SELECT * FROM " . tablename($this->table_area) . " where weid = '{$weid}' And type = 'city' ORDER BY ssort DESC");
         $area = pdo_fetchall("SELECT * FROM " . tablename($this->table_area) . " where weid = '{$weid}' And type = '' ORDER BY ssort DESC");
         $schooltype = pdo_fetchall("SELECT * FROM " . tablename($this->table_type) . " where weid = '{$weid}' ORDER BY ssort DESC");
         $set = pdo_fetch("SELECT * FROM " . tablename($this->table_set) . " WHERE :weid = weid", array(':weid' => $weid)); 
         $operation = !empty($_GPC['op']) ? $_GPC['op'] : 'display';
-
+//$t2=time();
         if ($operation == 'display') {
 			$starttime = mktime(0,0,0,date("m"),date("d"),date("Y"));
 			$endtime = $starttime + 86399;
@@ -27,6 +28,7 @@
 			$allxx  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_index)." WHERE weid = '{$weid}' ");
 			$allstu  = pdo_fetchall("select id,keyid FROM ".tablename($this->table_students)." WHERE weid = '{$weid}' ");
 			$allxs = 0;
+//$t3=time();
 			foreach($allstu as $val){
 				if($val['keyid'] == 0){
 					$allxs++;
@@ -35,6 +37,7 @@
 					$allxs++;
 				}				
 			}
+//$t4=time();
 			$allls  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_teachers)." WHERE weid = '{$weid}' ");
 			$allkq  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_checklog)." WHERE weid = '{$weid}' ");	
 			$allbd  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_user)." WHERE weid = '{$weid}' ");
@@ -49,6 +52,7 @@
                 }
                 message('操作成功!', $url);
             }
+//$t5=time();
             if (!empty($_GPC['keyword'])) {
                 $condition .= " AND title LIKE '%{$_GPC['keyword']}%'";
             }
@@ -75,14 +79,16 @@
 			$where1 = "WHERE weid = '{$weid}' And schoolid = '{$id}'";
 
 			$schoollist = pdo_fetchall("SELECT * FROM " . tablename($this->table_index) . " $where $condition   order by ssort desc,id desc LIMIT " . ($pindex - 1) * $psize . ",{$psize}");
-            
+//$t6=time();
 			if (!empty($schoollist)) {
                 $total = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_index) . " $where $condition");
 				$shumu = pdo_fetchcolumn("SELECT COUNT(*) FROM " . tablename($this->table_students) . " $where1 ");
                 $pager = pagination($total, $pindex, $psize);
             }
+//$t7=time();
 			$versionfile = IA_ROOT . '/addons/fm_jiaoyu/inc/func/auth2.php';
 			require $versionfile;
+//$t8=time();
 			foreach($schoollist as $key => $row){
 				$shoptype = pdo_fetch("SELECT name FROM " . tablename($this->table_type) . " where weid = :weid And id = :id", array(':weid' => $weid,':id' => $row['typeid']));
 				$citys = pdo_fetch("SELECT name FROM " . tablename($this->table_area) . " where weid = :weid And id = :id", array(':weid' => $weid,':id' => $row['cityid']));
@@ -99,7 +105,10 @@
 				$schoollist[$key]['city'] = $citys['name'];
 				$schoollist[$key]['qujian'] = $quyu['name'];
 			}
+//$t9=time();
 			delvioce('school',FM_JIAOYU_HOST);
+//$t10=time();
+//echo('<br>school.php,t:'.($t2-$t1).", ".($t3-$t2).", ".($t4-$t3).", ".($t5-$t4).", ".($t6-$t5).", ".($t7-$t6).", ".($t8-$t7).", ".($t9-$t8).", ".($t10-$t9));
         } elseif ($operation == 'post') {
 			$allxx  = pdo_fetchcolumn("select count(*) FROM ".tablename($this->table_index)." WHERE weid = '{$weid}' ");
 			if($set['school_max'] != 0 && !$_W['isfounder']){

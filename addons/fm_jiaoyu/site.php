@@ -14,13 +14,18 @@ class Fm_jiaoyuModuleSite extends Core {
 	private function getLogic($_name, $type = "web", $auth = false) {
 		global $_W, $_GPC;
 		if ($type == 'web') {
+//		    $t1=time();
 			checkLogin ();  //检查登陆
+//            $t2=time();
 			include_once 'inc/func/list.php';
+//			$t3=time();
 			if($_GPC['schoolid']){
 				get_language($_GPC['schoolid']);
 				$language = $_W['lanconfig'][$_GPC['do']];
 			}
+//            $t4 = time();
 			include_once 'inc/web/' . strtolower ( substr ( $_name, 5 ) ) . '.php';
+//            echo("<br>time,t1:".$t1.", t2-1:".($t2-$t1).", t3-2:".($t3-$t2).", t4-3:".($t4-$t3).", t5-4:".(time()-$t4));
 		} else if ($type == 'mobile') {
 			 if ($auth) {
 				  include_once 'inc/func/isauth.php';

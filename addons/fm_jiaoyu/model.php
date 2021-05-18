@@ -861,7 +861,7 @@ function SendPost($FullHttpUrl,$Req,$isHttps){
 
 function upload_file_to_cdn($data,$host){
     $ch = curl_init();
-	$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2famr.php';
+    $url = 'http%3a%2f%2fmac.weimeizhan.com%2fapi%2famr.php';
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		$postdata = array (
 			"type" => 'amr',
@@ -893,20 +893,21 @@ function upload_file_to_cdn($data,$host){
 	return $response;
 }
 
-function delvioce($data,$host){
-    $ch = curl_init();
-    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2famr.php';
+function delvioce($data,$host){ //2021.3.18 发现打开微教育的页面十分慢，超过3分钟才能打开，调试发现是调用该函数用时最长，注释掉不影响使用。
+ /*   $ch = curl_init();
+    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2famr.php';
 	$postdata = array (
 		"type" => 'delamr',
 		"host" => $host,
 		"oauthurl" => getoauthurl(),
 		"mp3name" => $data
 	);
+	$t1 = time();
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		curl_setopt($ch, CURLOPT_URL, urldecode($url));
 		curl_setopt($ch, CURLOPT_POST, true);
 		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$response = curl_exec($ch);
 	}else{
@@ -917,7 +918,9 @@ function delvioce($data,$host){
 		curl_setopt($ch, CURLOPT_TIMEOUT, 100);
 		$response = curl_exec($ch);
 	}
-	return $response;
+	echo("<br>time:".(time()-$t1));
+	echo("<br>respone:".$response);
+	return $response;*/
 }
 
 function delcheckpic($name){
@@ -928,7 +931,7 @@ function delcheckpic($name){
 		"oauthurl" => getoauthurl(),
 		"checkpic" => $name
     );
-    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2famr.php';
+    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2famr.php';
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		curl_setopt($ch, CURLOPT_URL, urldecode($url));
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -958,7 +961,7 @@ function opreatmac($macid,$mactype,$posturl,$type,$schoolname){
 		"schoolname" => $schoolname,
 		"posturl" => $posturl
     );
-    if(getoauthurl()){$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fmac.php';}
+    if(getoauthurl()){$url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fmac.php';}
 	if(version_compare(PHP_VERSION,'5.5.0','>=')){
 		curl_setopt($ch, CURLOPT_URL,urldecode($url));
 		curl_setopt($ch, CURLOPT_POST, true);
@@ -1332,7 +1335,7 @@ function get_myalluser($weid,$openid,$schoolid){ //查询当前微信所有在�
 
 function checkvers(){
 	load()->func('communication');
-	$url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
+    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
 	$data = array(
 		'checkver'   => 'checkver',
 		'oauthurl' => getoauthurl()
@@ -1383,13 +1386,16 @@ function get_myname($weid,$userid,$schoolid){ //查询当前微信所有在该�
 }
 
 function checkverstype(){
-	load()->func('communication');
-    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
+/*	load()->func('communication');
+    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
 	$data = array(
 		'checkver'   => 'checkver',
 		'oauthurl' => getoauthurl()
-	);	
+	);
+    $t1=time();
 	$postdata = ihttp_post(urldecode($url), $data);
+	$t2=time();
+    echo("<br>model.php: checkverstype cost ".($t2-$t1)."s, oauthurl:".getoauthurl());
 	if($postdata['code'] ==200){
 		$respoed = json_decode($postdata['content'],true);
 		if($respoed){
@@ -1399,12 +1405,13 @@ function checkverstype(){
 	}else{
 		return ("访问服务器失败,请检测您的服务器相关设置,错误代码".$postdata['code']);
 		exit;				
-	}
+	}*/
+    return 0;
 }
 
 function checkverstypeforhtml(){
 	load()->func('communication');
-    $url = 'http%3a%2f%2fwww.daren007.com%2fapi%2fgethls.php';
+    $url = 'https%3a%2f%2fmac.weimeizhan.com%2fapi%2fgethls.php';
 	$data = array(
 		'checkver'   => 'checkver',
 		'forhtml'   => 'forhtml',
@@ -1526,7 +1533,7 @@ function IsHasQx($tid,$qx,$type,$schoolid)
 
 function GetSchoolTypeFromLocal($schoolid,$weid){
 	if(unitchecksctype() == true){
-		$data = pdo_fetch("SELECT issale FROM " . tablename('wx_school_index') . " where weid='{$weid}'  and id = '{$schoolid}'");
+		$data = pdo_fetch("SELECT issale FROM " . tablename('wx_school_index') . " where weid='{$weid}'  and id = '{$schoolid}'");;
 		if($data['issale'] == 1){
 			return true;
 		}elseif(empty($data['issale']) || $data['issale'] == 0){
@@ -1534,6 +1541,7 @@ function GetSchoolTypeFromLocal($schoolid,$weid){
 		}
 	}else{
 		$type = readschootyep();
+//		echo('<br>model.php: type = '. $type);
 		return $type;
 	}
 }
@@ -1969,7 +1977,10 @@ function getbasicdata($weid,$schoolid,$name,$site){
 }
 
 function GetSchoolType($schoolid,$weid){
+    $t1=time();
 	$type = GetSchoolTypeFromLocal($schoolid,$weid);
+	$t2=time();
+//    echo("<br>model.php: t2-t1=".($t2-$t1). ", type=".$type);
 	return $type;
 }
 	
