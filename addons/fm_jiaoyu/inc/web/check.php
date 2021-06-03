@@ -187,9 +187,18 @@
 						if($data['macname'] == 6){
 							$mactype = 5;
 							$posturl = $_W['siteroot'] . 'app/index.php?i=' . $weid . '&c=entry&schoolid=' . $schoolid . '&do=checkwn&m=fm_jiaoyu';
-						}						
-						$addmac = opreatmac($data['macid'],$mactype,$posturl,'add',$logo['title']);
-						$respoed = json_decode($addmac,true);
+						}
+						//调用微教育接口失败，屏蔽该接口，重新添加新增设备的逻辑
+//						$addmac = opreatmac($data['macid'],$mactype,$posturl,'add',$logo['title']);
+//						$respoed = json_decode($addmac,true);
+                        $respoed["result"] = 1;
+                        $hasmac = pdo_fetch("SELECT * FROM " . tablename($this->table_checkmac) . " WHERE macid = '{$data['macid']}'");
+                        if($hasmac) {
+                            $respoed["result"] = 4;
+                            $school = pdo_fetch("SELECT title FROM " . tablename($this->table_index) . " WHERE id = '{$hasmac["schoolid"]}'");
+                            $respoed['info'] = "该设备已经存在学校：" . $school['title'] . "，请先删除再添加！";
+                        }
+
 						if($respoed['result'] !=0){
 							if($respoed['result'] == 1){
 								pdo_insert($this->table_checkmac, $data);
@@ -251,7 +260,7 @@
 					$mactype = 3;
 					$posturl = '';
 				}
-				opreatmac($item['macid'],$mactype,$posturl,'del',$logo['title']);
+//				opreatmac($item['macid'],$mactype,$posturl,'del',$logo['title']);
 				pdo_delete($this->table_checkmac, array('id' => $id));
 			}else{
 				pdo_delete($this->table_checkmac, array('id' => $id));
