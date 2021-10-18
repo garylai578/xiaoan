@@ -5,7 +5,7 @@
 
 global $_GPC, $_W;
 
-$operation = in_array ( $_GPC ['op'], array ('default', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','getleave', 'qrcode', 'identify') ) ? $_GPC ['op'] : 'default';
+$operation = in_array ( $_GPC ['op'], array ('default', 'getMacIfc', 'login', 'classinfo', 'check', 'gps', 'banner', 'video','getleave', 'qrcode', 'identify') ) ? $_GPC ['op'] : 'default';
 $weid = $_GPC['i'];
 $schoolid = $_GPC['schoolid'];
 $macid = $_GPC['macid'];
@@ -17,6 +17,30 @@ if ($operation == 'default') {
     echo("错误，未知操作");
     exit;
 }
+
+// 获取4个接口信息，替代微教育的接口(返回的值是正确的，但是在客户端调用却无反应，不起作用，重新写了一个接口：http://jy.xingheoa.com/addons/fm_jiaoyu/macinterfaces.php)
+if($operation == 'getMacIfc') {
+    if (empty($macid)) {
+        echo ('设备id不能为空');
+        exit;
+    }
+
+    $mac = pdo_fetch("SELECT * FROM " . tablename($this->table_checkmac) . " WHERE macid = '{$macid}'");
+    if (empty($mac)) {
+        echo "你无权使用本设备！";
+        exit;
+    }
+
+    $macIfc = array(
+        "check" => urlencode("http://jy.xingheoa.com/app/index.php?i=".$weid."&c=entry&schoolid=" . $mac["schoolid"] . "&do=checkhx&m=fm_jiaoyu&op=check&mactype=other&macid=" . $macid),
+        "login" => urlencode("http://jy.xingheoa.com/app/index.php?i=".$weid."&c=entry&schoolid=" . $mac["schoolid"] . "&do=checkhx&m=fm_jiaoyu&op=login&mactype=other&macid=" . $macid),
+        "class" => urlencode("http://jy.xingheoa.com/app/index.php?i=".$weid."&c=entry&schoolid=" . $mac["schoolid"] . "&do=checkhx&m=fm_jiaoyu&op=classinfo&mactype=other&macid=" . $macid),
+        "banner" => urlencode("http://jy.xingheoa.com/app/index.php?i=".$weid."&c=entry&schoolid=" . $mac["schoolid"] . "&do=checkhx&m=fm_jiaoyu&op=banner&mactype=other&macid=" . $macid)
+    );
+    echo json_encode($macIfc);
+    exit;
+}
+
 if(empty($school)){
     echo("找不到本校");
     exit;
@@ -526,8 +550,11 @@ if ($operation == 'check') {
     $starttime=time();
 
     $fstype = false;
-    if(strlen($_GPC['signId'])==9)  //  部分卡号只有9位
-        $_GPC['signId'] = '0'.$_GPC['signId'];
+    if(strlen($_GPC['signId']) < 10) {  //  部分卡号前面是0时，被闸机删除了0，需要补回来
+        $nums = 10 -  strlen($_GPC['signId']);
+        for($i=0; $i < $nums; $i++)
+            $_GPC['signId'] = '0' . $_GPC['signId'];
+    }
 
     $ckuser = pdo_fetch("SELECT * FROM " . tablename($this->table_idcard) . " WHERE idcard = :idcard And schoolid = :schoolid ", array(':idcard' =>$_GPC['signId'],':schoolid' =>$schoolid));
     if($_GPC['mactype'] == 'other'){
