@@ -363,7 +363,7 @@ if ($operation == 'classinfo') {
                         $checktime = pdo_fetchall("SELECT * FROM " . tablename($this->table_checktimeset) . " WHERE weid = '{$weid}' And schoolid = {$school['id']} and  checkdatesetid = '{$checkdatesetid}' and date = '{$nowdate}' ORDER BY id ASC ");
                         if (!empty($checktime)) { // 如果周五、周六、周日单独设置（checktimeset里的date不为空）
                             if ($checktime[0]['type'] == 6) { //type=1工作日，2周五，3周六，4周日，5特殊上，6特殊休
-                                $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
+                                $todaytimeset1 = $todaytimeset2 = $todaytimeset3 = $todaytimeset4 = $todaytimeset5 = $todaytimeset6 = array(array('startTime' => "00:00", 'endTime' => "23:59"));
                             } elseif ($checktime[0]['type'] == 5) {
                                 $todaytimeset1 = transTimeset4T1($checktime);
 //                                $todaytimeset2 = array(array('startTime' => $checktime[count($checktime) - 1]['start'], 'endTime' => $checktime[count($checktime) - 1]['end']));
@@ -428,6 +428,11 @@ if ($operation == 'classinfo') {
                         $week3[$k] = array('weekno' => $k, 'groups' => $todaytimeset3);
                         $week5[$k] = $week4[$k] = array('weekno' => $k, 'groups' => array(array('startTime' => "00:00", 'endTime' => "00:00")));
                         $week6[$k] = array('weekno' => $k, 'groups' => $todaytimeset6);
+                        // 如果是特殊设置为放假，则放行
+                        if(!empty($todaytimeset4))
+                            $week4[$k] = array('weekno' => $k, 'groups' => $todaytimeset4);
+                        if(!empty($todaytimeset5))
+                            $week5[$k] = array('weekno' => $k, 'groups' => $todaytimeset5);
                     }
                 }elseif($ckmac['s_type'] == 2){     //如果是接送通道
                     for ($k = 0; $k < 7; ++$k) {
