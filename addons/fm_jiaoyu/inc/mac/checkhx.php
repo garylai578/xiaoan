@@ -1216,17 +1216,17 @@ function transTimeset4T1($checktime){
     return $time;
 }
 
-/** 根据正常的上课时间算出半住宿生（Type=2）的允许外出时间段
+/** 根据正常的上课时间算出半住宿生（Type=3）的允许外出时间段
  *
  * @param $checktime 正常的上课时间
- * @return array 允许外出的时间段:第一和最后一个时间段.
+ * @return array 允许外出的时间段:最后一个时间段.
  */
 function transTimeset4T3($checktime){
     $len=count($checktime);
-    $time[0] = array('startTime'=>$checktime[0]['start'], 'endTime'=>$checktime[0]['end']);
+//    $time[0] = array('startTime'=>$checktime[0]['start'], 'endTime'=>$checktime[0]['end']);
 
-    if($len>1)
-        $time[1] = array('startTime'=>$checktime[$len-1]['start'], 'endTime'=>$checktime[$len-1]['end']);
+    if($len>=1)
+        $time[0] = array('startTime'=>$checktime[$len-1]['start'], 'endTime'=>$checktime[$len-1]['end']);
 
     return $time;
 }
