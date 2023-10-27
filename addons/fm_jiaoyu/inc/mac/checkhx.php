@@ -593,7 +593,7 @@ if ($operation == 'check') {
     $checklog = false;  // 考勤信息是否录入系统
     if(empty($checkthisdata))   // 如果没有记录
         $checklog = true;
-    elseif(($signTime - $checkthisdata['createtime']) > 60) //  如果刷卡间隔大于60秒
+    elseif(abs($signTime - $checkthisdata['createtime']) > 60) //  如果刷卡间隔大于60秒
         $checklog = true;
     elseif($checkthisdata['leixing'] != $leixing)   //  如果不是同时刷进或刷出
         $checklog = true;
@@ -765,7 +765,7 @@ if ($operation == 'check') {
         }
     }else{
         $fstype = true;
-        $result['info'] = "1分钟内不可重复相同刷卡数据";
+        $result['info'] = "1分钟内不可重复相同刷卡数据，signTime=".$signTime.", checkthisdata=".$checkthisdata['createtime'].", checkthisdata=".$checkthisdata['leixing'].", leixing=".$leixing;
     }
     if ($fstype ==true){
         $end7=time();
